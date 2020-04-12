@@ -13,23 +13,29 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.tabourless.queue.R;
+import com.tabourless.queue.databinding.FragmentPlacesBinding;
 
 public class PlacesFragment extends Fragment {
 
     private PlacesViewModel homeViewModel;
+    private FragmentPlacesBinding binding;
+    private TextView textView;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         homeViewModel =
                 ViewModelProviders.of(this).get(PlacesViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_places, container, false);
-        final TextView textView = root.findViewById(R.id.text_home);
+
+        binding = FragmentPlacesBinding.inflate(inflater, container, false);
+        View view = binding.getRoot();
+
+        textView = binding.textHome;
         homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);
             }
         });
-        return root;
+        return view;
     }
 }
