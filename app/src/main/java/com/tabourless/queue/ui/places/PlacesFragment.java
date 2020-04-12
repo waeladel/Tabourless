@@ -19,7 +19,6 @@ public class PlacesFragment extends Fragment {
 
     private PlacesViewModel homeViewModel;
     private FragmentPlacesBinding binding;
-    private TextView textView;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -29,13 +28,18 @@ public class PlacesFragment extends Fragment {
         binding = FragmentPlacesBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
 
-        textView = binding.textHome;
         homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
-                textView.setText(s);
+                binding.textHome.setText(s);
             }
         });
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }
