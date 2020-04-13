@@ -1,11 +1,22 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
+        <!--Component styles-->
+        <item name="toolbarStyle">@style/ToolbarStyle.Primary.MyTheme</item>
+    </style>
+
+
+    <!--To make the Surface toolbar primary not surface -->
+    <style name="ToolbarStyle.Primary.MyTheme" parent="Widget.MaterialComponents.Toolbar.Primary">
+        <!--<item name="colorControlNormal">?colorOnPrimary</item>
+        <item name="actionMenuTextColor">?colorOnPrimary</item>
+        <item name="android:actionMenuTextColor">@color/color_on_primary</item>-->
     </style>
 
 </resources>
