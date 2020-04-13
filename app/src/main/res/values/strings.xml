@@ -3,4 +3,26 @@
     <string name="title_places">Places</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+
+    <!--toast and error messages -->
+    <string name="sign_in_cancelled">Sign in has been cancelled</string>
+    <string name="no_internet_connection">No internet connection</string>
+    <string name="unknown_error">Unknown error occurred</string>
+    <string name="upload_image_error">Sorry, couldn\'t upload your image.</string>
+    <string name="download_image_error">Sorry, couldn\'t download your image.</string>
+    <string name="update_profile_error">Sorry, couldn\'t update your profile.</string>
+    <string name="empty_profile_avatar_error">Profile picture can\'t be blank.</string>
+    <string name="empty_profile_name_error">You must enter your name.</string>
+    <string name="no_sound_id_found_error">We couldn\'t fetch your profile ID. Make sure you have internet connection</string>
+    <string name="send_message_error">Sorry, couldn\'t send your message.</string>
+    <string name="send_request_error">Sorry, couldn\'t send your request.</string>
+    <string name="activate_chat_error">Sorry, couldn\'t activate you conversation, check your internet connection</string>
+    <string name="user_visible_error">Sorry, couldn\'t change your visibility.</string>
+    <string name="mic_muted_toast">Mic is mute; Basbes can\'t search.</string>
+    <string name="headset_plugged_toast">Basbes: unplug headset for max range, or at least don\'t wear it.</string>
+    <string name="turn_speaker_on_toast">Basbes: turn speaker on to maximize visibility range.</string>
+    <string name="increase_volume_toast">Basbes: increase volume to maximize visibility range.</string>
+    <string name="cannot_toggle_speaker_toast">You don\'t have any calls or plugged headset.</string>
+    <string name="muted_device_toast">Please disable total silence mode.</string>
+    <!--toast and error messages -->
 </resources>
