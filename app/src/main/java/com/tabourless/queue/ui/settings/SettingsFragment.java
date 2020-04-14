@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 
 import android.view.LayoutInflater;
@@ -20,8 +21,7 @@ public class SettingsFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        sittingsViewModel =
-                ViewModelProviders.of(this).get(SettingsViewModel.class);
+        sittingsViewModel = new ViewModelProvider(this).get(SettingsViewModel.class);
 
         binding = FragmentPlacesBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
