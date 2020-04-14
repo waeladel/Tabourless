@@ -38,6 +38,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -58,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 123;
 
     private NavController navController ;
-    private BottomNavigationView bottomNavigation;
     private BadgeDrawable chatsBadge, notificationsBadge;
 
     //public String currentUserId;
@@ -167,19 +167,25 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
-        setSupportActionBar(binding.toolbar);
-
-        //bottomNavigation = findViewById(R.id.nav_view);
-        bottomNavigation = binding.navView;
+        //setSupportActionBar(binding.toolbar);
 
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_places, R.id.navigation_dashboard, R.id.navigation_notifications)
+                .setDrawerLayout(binding.drawerLayout)
                 .build();
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(bottomNavigation, navController);
+
+        // Setup toolbar
+        //NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        NavigationUI.setupWithNavController(binding.toolbar, navController, appBarConfiguration);
+
+        // Setup Drawer Navigation
+        NavigationUI.setupWithNavController(binding.drawerNavView, navController);
+        // Setup Button Navigation
+        NavigationUI.setupWithNavController(binding.bottomNavView, navController);
+
 
         // update CurrentUserId for all observer fragments
         mMainViewModel = new ViewModelProvider(MainActivity.this).get(MainViewModel.class);
@@ -203,27 +209,27 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "destination id= "+ destination.getId());
 
                 if(TextUtils.equals("fragment_main", destination.getLabel())){
-                    bottomNavigation.setVisibility(View.VISIBLE);
-                    bottomNavigation.setSelectedItemId(R.id.navigation_places);
+                    binding.bottomNavView.setVisibility(View.VISIBLE);
+                    binding.bottomNavView.setSelectedItemId(R.id.navigation_places);
                 }else if(TextUtils.equals("chats_fragment", destination.getLabel())){
-                    bottomNavigation.setVisibility(View.VISIBLE);
-                    bottomNavigation.setSelectedItemId(R.id.navigation_dashboard);
+                    binding.bottomNavView.setVisibility(View.VISIBLE);
+                    binding.bottomNavView.setSelectedItemId(R.id.navigation_dashboard);
                 }else if(TextUtils.equals("fragment_notification", destination.getLabel())) {
-                    bottomNavigation.setVisibility(View.VISIBLE);
-                    bottomNavigation.setSelectedItemId(R.id.navigation_notifications);
+                    binding.bottomNavView.setVisibility(View.VISIBLE);
+                    binding.bottomNavView.setSelectedItemId(R.id.navigation_notifications);
                 }else{
-                    bottomNavigation.setVisibility(View.GONE);
+                    binding.bottomNavView.setVisibility(View.GONE);
                 }
             }
         });
 
         // [START initialize_database_ref]
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
-        //bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        //binding.bottomNavView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        //notificationsBadge  = bottomNavigation.getBadge(R.id.navigation_notifications);
+        //notificationsBadge  = binding.bottomNavView.getBadge(R.id.navigation_notifications);
 
-        /*Menu menu = bottomNavigation.getMenu();
+        /*Menu menu = binding.bottomNavView.getMenu();
         MenuItem mItem =  menu.findItem(R.id.navigation_chats);
         mItem.getIcon()
         mChatsBadge = (NotificationBadge) findViewById(R.id.badge);*/
@@ -240,7 +246,7 @@ public class MainActivity extends AppCompatActivity {
                         mbottomNavigationMenuView, false);
         itemView.addView(chat_badge);
 
-        Menu menu = bottomNavigation.getMenu();
+        Menu menu = binding.bottomNavView.getMenu();
         MenuItem mItem =  menu.findItem(R.id.navigation_chats);
         */
 
@@ -256,12 +262,12 @@ public class MainActivity extends AppCompatActivity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 // User is signed in
                 if (user != null) {
-                    // If user is logged in, display bottomNavigation and ActionBar
+                    // If user is logged in, display binding.bottomNavView and ActionBar
                     // because it might be not showing due to previous log out
-                    Log.d(TAG, "onAuthStateChanged: user is signed in. set bottomNavigation and ActionBar to visible");
+                    Log.d(TAG, "onAuthStateChanged: user is signed in. set binding.bottomNavView and ActionBar to visible");
                     if(navController != null && null != navController.getCurrentDestination()){
                         if(R.id.navigation_places == navController.getCurrentDestination().getId()){
-                            bottomNavigation.setVisibility(View.VISIBLE);
+                            binding.bottomNavView.setVisibility(View.VISIBLE);
                             if(getSupportActionBar() != null){
                                 getSupportActionBar().show();
                             }
@@ -306,11 +312,11 @@ public class MainActivity extends AppCompatActivity {
                 } else { // End of checking if it's the same user or not
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
-                    // If user is logged out, hide bottomNavigation and ActionBar
+                    // If user is logged out, hide binding.bottomNavView and ActionBar
                     // because we don't want to show it before displaying login activity
                     if(navController != null && null != navController.getCurrentDestination()){
                         if(R.id.navigation_places == navController.getCurrentDestination().getId()){
-                            bottomNavigation.setVisibility(View.GONE);
+                            binding.bottomNavView.setVisibility(View.GONE);
                             if(getSupportActionBar() != null){
                                 getSupportActionBar().hide();
                             }
@@ -322,8 +328,8 @@ public class MainActivity extends AppCompatActivity {
                         mUser = null;
                     }
                     goToMain();
-                    // set selected bottomNavigation to main icon
-                    //bottomNavigation.setSelectedItemId(R.id.navigation_home);
+                    // set selected binding.bottomNavView to main icon
+                    //binding.bottomNavView.setSelectedItemId(R.id.navigation_home);
                     initiateLogin(); // start login activity
 
                     // Don't Remove MainViewModel Listeners, Listeners are needed if the new user was the last logged in user
@@ -397,6 +403,16 @@ public class MainActivity extends AppCompatActivity {
             // Remove onlineListener
             connectedRef.removeEventListener(onlineListener);
             Log.d(TAG, "Remove connectedRef onlineListener");
+        }
+    }
+
+    // To close drawer when back pressed (if it's opened) instead of closing the app
+    @Override
+    public void onBackPressed() {
+        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            binding.drawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
         }
     }
 
@@ -495,7 +511,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "getNotificationsCount onChanged notifications count = "+ count + " currentUserId= "+userKey);
                     // Display chats count if > 0
                     if(count != null && count != 0){
-                        notificationsBadge = bottomNavigation.getOrCreateBadge(R.id.navigation_notifications); //showBadge() show badge over chats menu item
+                        notificationsBadge = binding.bottomNavView.getOrCreateBadge(R.id.navigation_notifications); //showBadge() show badge over chats menu item
                         notificationsBadge.setMaxCharacterCount(3); // Max number is 99
                         //chatsBadge.setBackgroundColor(R.drawable.badge_background_shadow);
                         /*notificationsBadge.setBackgroundColor(getResources().getColor(R.color.color_primary));
@@ -504,7 +520,7 @@ public class MainActivity extends AppCompatActivity {
                         // To show badge again if it was invisible due to being 0
                         notificationsBadge.setVisible(true);
                         // Display cut icon when notifications' count is more than 0
-                        //bottomNavigation.getMenu().getItem(2).setIcon(R.drawable.ic_notifications_outline_cut);
+                        //binding.bottomNavView.getMenu().getItem(2).setIcon(R.drawable.ic_notifications_outline_cut);
                     }else{
                         // Hide chat badge. check first if it's null or not
                         if(notificationsBadge != null){
@@ -513,7 +529,7 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         // Display normal icon because there is no notifications
-                        //bottomNavigation.getMenu().getItem(2).setIcon(R.drawable.ic_notifications_outline);
+                        //binding.bottomNavView.getMenu().getItem(2).setIcon(R.drawable.ic_notifications_outline);
                     }
                 }
             });
@@ -531,7 +547,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "getChatsCount onChanged chats count = "+ count + " currentUserId= "+userKey);
                     // Display chats count if > 0
                     if(count != null && count != 0){
-                        chatsBadge = bottomNavigation.getOrCreateBadge(R.id.navigation_dashboard); // showBadge() show badge over chats menu item
+                        chatsBadge = binding.bottomNavView.getOrCreateBadge(R.id.navigation_dashboard); // showBadge() show badge over chats menu item
                         chatsBadge.setMaxCharacterCount(3); // Max number is 99
                         //chatsBadge.setBackgroundColor(R.drawable.badge_background_shadow);
                         /*chatsBadge.setBackgroundColor(getResources().getColor(R.color.color_primary));
@@ -541,7 +557,7 @@ public class MainActivity extends AppCompatActivity {
                         chatsBadge.setVisible(true);
 
                         // Display cut icon when chats count is more than 0
-                        //bottomNavigation.getMenu().getItem(1).setIcon(R.drawable.ic_chat_outline_cut);
+                        //binding.bottomNavView.getMenu().getItem(1).setIcon(R.drawable.ic_chat_outline_cut);
                     }else{
                         // Hide chat badge. check first if it's null or not
                         if(chatsBadge != null){
@@ -549,7 +565,7 @@ public class MainActivity extends AppCompatActivity {
                             chatsBadge.setVisible(false);
                         }
                         // Display normal icon because there is no chats
-                        //bottomNavigation.getMenu().getItem(1).setIcon(R.drawable.ic_chat_outline);
+                        //binding.bottomNavView.getMenu().getItem(1).setIcon(R.drawable.ic_chat_outline);
                     }
                 }
             });

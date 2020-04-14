@@ -1,8 +1,17 @@
 <resources>
     <string name="app_name">Tabourless</string>
+
+    <!--buttons and menus -->
     <string name="title_places">Places</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="title_profile">Profile</string>
+    <string name="title_settings">Settings</string>
+
+    <string name="menu_log_out">Log Out</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_profile">Profile</string>
+    <!--buttons and menus -->
 
     <!--toast and error messages -->
     <string name="sign_in_cancelled">Sign in has been cancelled</string>
@@ -24,5 +33,12 @@
     <string name="increase_volume_toast">Basbes: increase volume to maximize visibility range.</string>
     <string name="cannot_toggle_speaker_toast">You don\'t have any calls or plugged headset.</string>
     <string name="muted_device_toast">Please disable total silence mode.</string>
+
+    <!--Images content Description-->
+    <string name="cover_image_description">Your cover image</string>
+    <string name="profile_image_description">Your Profile picture</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
     <!--toast and error messages -->
 </resources>

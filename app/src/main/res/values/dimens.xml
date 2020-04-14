@@ -2,4 +2,23 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="small_icon">18dp</dimen>
+    <dimen name="small_avatar">36dp</dimen>
+    <dimen name="medium_avatar">72dp</dimen>
+    <dimen name="button_padding">16dp</dimen>
+    <dimen name="small_margin">4dp</dimen>
+
+    <dimen name="alert_dim_amount">0.60</dimen>
+
+    <!-- High emphasis of 87% - 0.87 for type. .78-->
+    <item name="my_emphasis_high_type" format="float" type="dimen">.78</item>
+    <!-- High emphasis of 87% - 0.87 for type. .78-->
+    <item name="my_emphasis_less_high" format="float" type="dimen">.70</item>
+    <!-- Medium emphasis of 60% - 0.6 is the same for type and icon. -->
+    <item name="my_emphasis_medium" format="float" type="dimen">0.54</item>
+    <!-- Disabled emphasis of 38% - 0.38 is the same for type and icon. -->
+
+    <item name="my_icons_emphasis_medium" format="float" type="dimen">0.6</item>
 </resources>

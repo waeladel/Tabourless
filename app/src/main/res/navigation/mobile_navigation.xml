@@ -22,4 +22,14 @@
         android:name="com.tabourless.queue.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications" />
+    <fragment
+        android:id="@+id/profile_fragment"
+        android:name="com.tabourless.queue.ui.profile.ProfileFragment"
+        android:label="@string/title_profile"
+        tools:layout="@layout/fragment_profile" />
+    <fragment
+        android:id="@+id/settings_fragment"
+        android:name="com.tabourless.queue.ui.settings.SettingsFragment"
+        android:label="@string/title_settings"
+        tools:layout="@layout/fragment_settings" />
 </navigation>
