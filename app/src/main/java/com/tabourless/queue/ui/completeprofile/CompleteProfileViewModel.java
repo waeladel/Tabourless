@@ -19,7 +19,7 @@ public class CompleteProfileViewModel extends ViewModel {
     private MutableLiveData<String> mText;
     private ArrayList<Integer> mBirthYears;
     private UserRepository mUserRepository;
-    private User user;
+    private User mUser;
     private final static String TAG = CompleteProfileViewModel.class.getSimpleName();
 
 
@@ -44,16 +44,18 @@ public class CompleteProfileViewModel extends ViewModel {
     }
 
     public User getUser() {
-        return user;
+        return mUser;
     }
 
     public void setUser(User user) {
-        this.user = user;
+        this.mUser = user;
     }
 
     public void getUserOnce(String userId, FirebaseUserCallback callback) {
-        if(user == null){
+        if(mUser == null){
             mUserRepository.getUserOnce(userId, callback);
+        }else{
+            callback.onCallback(mUser);
         }
     }
 

@@ -629,7 +629,6 @@ public class MainActivity extends AppCompatActivity {
                     // add lineListener for online statues
                     connectedRef.addValueEventListener(onlineListener);
                     // Set user's notification tokens
-
                     FirebaseInstanceId.getInstance().getInstanceId()
                             .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
                                 @Override

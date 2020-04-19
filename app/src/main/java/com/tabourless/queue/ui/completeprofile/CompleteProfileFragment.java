@@ -2,17 +2,16 @@ package com.tabourless.queue.ui.completeprofile;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.ColorFilter;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -20,9 +19,6 @@ import androidx.navigation.ui.NavigationUI;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -30,6 +26,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -37,6 +34,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageMetadata;
@@ -45,10 +45,8 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 import com.tabourless.queue.R;
 import com.tabourless.queue.databinding.FragmentCompleteProfileBinding;
-import com.tabourless.queue.databinding.FragmentPlacesBinding;
 import com.tabourless.queue.interfaces.FirebaseUserCallback;
 import com.tabourless.queue.models.User;
-import com.tabourless.queue.ui.main.MainActivity;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 import com.yanzhenjie.album.Action;
@@ -57,7 +55,6 @@ import com.yanzhenjie.album.AlbumFile;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import top.zibin.luban.Luban;
 import top.zibin.luban.OnCompressListener;
@@ -82,10 +79,10 @@ public class CompleteProfileFragment extends Fragment {
     private ArrayList<AlbumFile> mMediaFiles;
 
     // for image cropping and compressing
-    private Uri mAvatarOriginalUri;
-    private Uri mCoverOriginalUri;
-    private Uri mAvatarUri;
-    private Uri mCoverUri;
+    private Uri mOriginalAvatarUri;
+    private Uri mOriginalCoverUri;
+    private Uri mThumbnailAvatarUri;
+    private Uri mThumbnailCoverUri;
 
     // names of uploaded images
     private static final String AVATAR_THUMBNAIL_NAME = "avatar.jpg";
@@ -150,6 +147,10 @@ public class CompleteProfileFragment extends Fragment {
                         //currentUser = mEditProfileViewModel.getUser();
                         showCurrentUser(mViewModel.getUser());
                     }else{
+                        // let's create a temp user to use it in saving data
+                        User tempUser = new User();
+                        tempUser.setKey(currentUserId);
+                        mViewModel.setUser(tempUser);
                         // show default avatar place holder
                         mBinding.avatarImage.setImageResource(R.drawable.ic_round_account_filled_72);
                     }
@@ -176,6 +177,12 @@ public class CompleteProfileFragment extends Fragment {
 
         // Setup Drawer Navigation
         //NavigationUI.setupWithNavController(mBinding.drawerNavView, navController);
+
+        // Add black color filter to circle image
+        /*int blackColor = mContext.getResources().getColor(R.color.transparent_edit_image);
+        ColorFilter colorFilter = new PorterDuffColorFilter(blackColor, PorterDuff.Mode.DARKEN);
+        mBinding.avatarImage.setColorFilter(colorFilter);
+        mBinding.coverImage.setColorFilter(colorFilter);*/
 
         // Save profile when save button is clicked
         mBinding.saveButton.setOnClickListener(new View.OnClickListener() {
@@ -214,12 +221,12 @@ public class CompleteProfileFragment extends Fragment {
                     Log.d(TAG, "AVATAR_CROP_PICTURE requestCode= "+ requestCode);
                     CropImage.ActivityResult avatarResult = CropImage.getActivityResult(data);
                     if (resultCode == RESULT_OK) {
-                        mAvatarOriginalUri = avatarResult.getOriginalUri();
-                        mAvatarUri = avatarResult.getUri();
-                        compressImage(mAvatarOriginalUri,"original avatar");
-                        uploadImage(mAvatarUri, "avatar");
-                        Log.d(TAG, "mAvatarOriginalUri = "+ mAvatarOriginalUri);
-                        Log.d(TAG, "mAvatarUri = "+ mAvatarUri);
+                        mOriginalAvatarUri = avatarResult.getOriginalUri();
+                        mThumbnailAvatarUri = avatarResult.getUri();
+                        compressImage(mOriginalAvatarUri,"original avatar");
+                        uploadImage(mThumbnailAvatarUri, "avatar");
+                        Log.d(TAG, "mAvatarOriginalUri = "+ mOriginalAvatarUri);
+                        Log.d(TAG, "mAvatarUri = "+ mThumbnailAvatarUri);
 
                     } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                         Exception error = avatarResult.getError();
@@ -231,13 +238,13 @@ public class CompleteProfileFragment extends Fragment {
                     Log.d(TAG, "COVER CROP_PICTURE requestCode= "+ requestCode);
                     CropImage.ActivityResult coverResult = CropImage.getActivityResult(data);
                     if (resultCode == RESULT_OK) {
-                        mCoverOriginalUri = coverResult.getOriginalUri();
-                        mCoverUri = coverResult.getUri();
-                        Log.d(TAG, "mCoverOriginalUri = "+ mCoverOriginalUri);
-                        Log.d(TAG, "mCoverUri = "+ mCoverUri);
+                        mOriginalCoverUri = coverResult.getOriginalUri();
+                        mThumbnailCoverUri = coverResult.getUri();
+                        Log.d(TAG, "mCoverOriginalUri = "+ mOriginalCoverUri);
+                        Log.d(TAG, "mCoverUri = "+ mThumbnailCoverUri);
                         //uploadImage(mCoverUri, "coverImage", position);
-                        compressImage(mCoverOriginalUri,"original cover");
-                        uploadImage(mCoverUri, "coverImage");
+                        compressImage(mOriginalCoverUri,"original cover");
+                        uploadImage(mThumbnailCoverUri, "coverImage");
                     } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                         Exception error = coverResult.getError();
                         Toast.makeText(mContext, error.toString(),
@@ -486,12 +493,24 @@ public class CompleteProfileFragment extends Fragment {
                         // set ViewModel.user values
                         switch (type){
                             case "avatar":
-                                //mProfileDataArrayList.set(position,new Profile(type, String.valueOf(downloadUri),SECTION_AVATAR, SECTION_AVATAR));
                                 mViewModel.getUser().setAvatar(String.valueOf(downloadUri));
+                                //Display avatar
+                                mBinding.avatarImage.setImageResource(R.drawable.ic_round_account_filled_72);
+                                Picasso.get()
+                                        .load(mViewModel.getUser().getAvatar())
+                                        .placeholder(R.mipmap.ic_round_account_filled_72)
+                                        .error(R.drawable.ic_round_broken_image_72px)
+                                        .into(mBinding.avatarImage);
                                 break;
                             case "coverImage":
-                                //mProfileDataArrayList.set(position,new Profile(type, String.valueOf(downloadUri),SECTION_COVER, SECTION_COVER));
                                 mViewModel.getUser().setCoverImage(String.valueOf(downloadUri));
+                                // Display cover
+                                mBinding.coverImage.setImageResource(R.drawable.ic_picture_gallery_white);
+                                Picasso.get()
+                                        .load(mViewModel.getUser().getCoverImage())
+                                        .placeholder(R.mipmap.ic_picture_gallery_white_512px)
+                                        .error(R.drawable.ic_broken_image_512px)
+                                        .into(mBinding.coverImage);
                                 break;
                         }
 
@@ -518,6 +537,71 @@ public class CompleteProfileFragment extends Fragment {
     }
 
     private void saveProfile() {
+
+        // chaeck if name and avatar are not empty
+        if(TextUtils.isEmpty(mBinding.nameValue.getText())){
+            Toast.makeText(getActivity(), R.string.empty_profile_name_error,
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if(TextUtils.isEmpty(mViewModel.getUser().getAvatar())){
+            Toast.makeText(getActivity(), R.string.empty_profile_avatar_error,
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        mViewModel.getUser().setCreated(ServerValue.TIMESTAMP);
+        mViewModel.getUser().setLastOnline(0L);
+        mViewModel.getUser().setName(mBinding.nameValue.getText().toString().trim());
+        mViewModel.getUser().setBirthYear(Integer.parseInt(mBinding.spinnerBirthValue.getSelectedItem().toString()));
+        mViewModel.getUser().setGender(mBinding.spinnerGenderValue.getSelectedItem().toString());
+        if(mBinding.spinnerDisabilityValue.getSelectedItemPosition() == 0){
+            mViewModel.getUser().setDisability(false);
+        }else{
+            mViewModel.getUser().setDisability(true);
+        }
+
+        // update the database
+        mUserRef.setValue(mViewModel.getUser()).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                // Write was successful!
+                Log.i(TAG, "mUserRef onSuccess");
+                // Set user's notification tokens
+                FirebaseInstanceId.getInstance().getInstanceId()
+                        .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                                if (!task.isSuccessful()) {
+                                    Log.w(TAG, "getInstanceId failed", task.getException());
+                                    return;
+                                }
+
+                                if(null != task.getResult()){
+                                    // Get new Instance ID token
+                                    String token = task.getResult().getToken();
+                                    //mTokensRef.child(mUserId).child(token).setValue(true);
+                                    mUserRef.child("tokens").child(token).setValue(true);
+                                }
+                            }
+                        });
+                // Return to main fragment
+                if (null != navController.getCurrentDestination() && R.id.places != navController.getCurrentDestination().getId()) {
+                    navController.navigateUp();
+                }
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Write failed
+                        Toast.makeText(getActivity(), R.string.update_profile_error,
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+
+
     }
 
 }

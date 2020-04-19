@@ -55,7 +55,8 @@ dependencies {
     implementation 'com.yanzhenjie:album:2.0.2' //for gallery and camera
     api 'com.theartofdev.edmodo:android-image-cropper:2.8.0' // for cropping images
     implementation 'top.zibin:Luban:1.0.8' // for compressing original image
-    implementation "androidx.preference:preference:1.1.0" // For settings preference
+    implementation 'io.reactivex:rxandroid:1.2.1' // RxJava for compressing original image
+    implementation "androidx.preference:preference:1.1.1" // For settings preference
 
     // Required only if Facebook login support is required. Find the latest Facebook SDK releases here: https://goo.gl/Ce5L94
     implementation 'com.facebook.android:facebook-android-sdk:5.5.1'
