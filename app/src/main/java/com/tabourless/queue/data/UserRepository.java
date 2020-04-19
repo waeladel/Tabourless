@@ -211,7 +211,6 @@ public class UserRepository {
                     User user = dataSnapshot.getValue(User.class);
                     if(user != null){
                         user.setKey(dataSnapshot.getKey());
-                        Log.d(TAG, "getUserOnce User sound id= "+ user.getSoundId());
                     }
                     callback.onCallback(user);
                 } else {

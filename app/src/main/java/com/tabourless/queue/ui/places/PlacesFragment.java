@@ -10,26 +10,25 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 
 import com.tabourless.queue.databinding.FragmentPlacesBinding;
 
 public class PlacesFragment extends Fragment {
 
-    private PlacesViewModel placesViewModel;
-    private FragmentPlacesBinding binding;
+    private PlacesViewModel mViewModel;
+    private FragmentPlacesBinding mBinding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        placesViewModel = new ViewModelProvider(this).get(PlacesViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(PlacesViewModel.class);
 
-        binding = FragmentPlacesBinding.inflate(inflater, container, false);
-        View view = binding.getRoot();
+        mBinding = FragmentPlacesBinding.inflate(inflater, container, false);
+        View view = mBinding.getRoot();
 
-        placesViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+        mViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
-                binding.textHome.setText(s);
+                mBinding.textHome.setText(s);
             }
         });
         return view;
@@ -38,6 +37,6 @@ public class PlacesFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        binding = null;
+        mBinding = null;
     }
 }

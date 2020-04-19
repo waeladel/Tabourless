@@ -1,0 +1,8 @@
+<vector android:height="200dp"
+    android:viewportHeight="512"
+    android:viewportWidth="512"
+    android:width="200dp" xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <path android:fillAlpha="@dimen/my_icons_emphasis_medium" android:fillColor="?attr/colorOnBackground"
+        android:pathData="M0,96v320h512V96H0zM102.4,134.4c21.2,0 38.4,17.2 38.4,38.4c0,21.2 -17.2,38.4 -38.4,38.4C81.2,211.2 64,194 64,172.8C64,151.6 81.2,134.4 102.4,134.4zM243.2,377.6H140.8H38.4L140.8,224l56.2,84.4l110.2,-135.6l166.4,204.8H243.2z" android:strokeAlpha="0.6"/>
+</vector>

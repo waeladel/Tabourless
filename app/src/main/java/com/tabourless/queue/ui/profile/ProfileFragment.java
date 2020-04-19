@@ -7,29 +7,29 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.tabourless.queue.databinding.FragmentPlacesBinding;
+import com.tabourless.queue.databinding.FragmentProfileBinding;
 
 public class ProfileFragment extends Fragment {
-    private ProfileViewModel profileViewModel;
-    private FragmentPlacesBinding binding;
+    private ProfileViewModel mViewModel;
+    private FragmentProfileBinding mBinding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
 
-        binding = FragmentPlacesBinding.inflate(inflater, container, false);
-        View view = binding.getRoot();
+        mBinding = FragmentProfileBinding.inflate(inflater, container, false);
+        View view = mBinding.getRoot();
 
-        profileViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+        mViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
-                binding.textHome.setText(s);
+                mBinding.textHome.setText(s);
             }
         });
         return view;
@@ -38,6 +38,6 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        binding = null;
+        mBinding = null;
     }
 }

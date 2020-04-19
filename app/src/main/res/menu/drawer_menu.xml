@@ -5,12 +5,12 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@id/profile_fragment"
+            android:id="@id/profile"
             android:icon="@drawable/ic_location_on_black_24dp"
             android:title="@string/menu_profile"/>
 
         <item
-            android:id="@id/settings_fragment"
+            android:id="@id/settings"
             android:icon="@drawable/ic_location_on_black_24dp"
             android:title="@string/menu_settings" />
         <item

@@ -3,33 +3,44 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_places">
+    app:startDestination="@+id/places">
 
     <fragment
-        android:id="@+id/navigation_places"
+        android:id="@+id/places"
         android:name="com.tabourless.queue.ui.places.PlacesFragment"
         android:label="@string/title_places"
-        tools:layout="@layout/fragment_places" />
+        tools:layout="@layout/fragment_places" >
+        <action
+            android:id="@+id/action_places_to_complete_profile"
+            app:destination="@id/complete_profile"
+            app:launchSingleTop="false"
+            app:popUpToInclusive="true" />
+    </fragment>
 
     <fragment
-        android:id="@+id/navigation_dashboard"
+        android:id="@+id/dashboard"
         android:name="com.tabourless.queue.ui.dashboard.DashboardFragment"
         android:label="@string/title_dashboard"
         tools:layout="@layout/fragment_dashboard" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
+        android:id="@+id/notifications"
         android:name="com.tabourless.queue.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications" />
     <fragment
-        android:id="@+id/profile_fragment"
+        android:id="@+id/profile"
         android:name="com.tabourless.queue.ui.profile.ProfileFragment"
         android:label="@string/title_profile"
         tools:layout="@layout/fragment_profile" />
     <fragment
-        android:id="@+id/settings_fragment"
+        android:id="@+id/settings"
         android:name="com.tabourless.queue.ui.settings.SettingsFragment"
         android:label="@string/title_settings"
         tools:layout="@layout/fragment_settings" />
+    <fragment
+        android:id="@+id/complete_profile"
+        android:name="com.tabourless.queue.ui.completeprofile.CompleteProfileFragment"
+        android:label="@string/title_complete_profile"
+        tools:layout="@layout/fragment_complete_profile" />
 </navigation>

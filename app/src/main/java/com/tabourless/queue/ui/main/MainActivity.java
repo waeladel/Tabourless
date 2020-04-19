@@ -1,14 +1,12 @@
 package com.tabourless.queue.ui.main;
 
-import android.app.NotificationManager;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -19,7 +17,6 @@ import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.badge.BadgeDrawable;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -32,17 +29,17 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.tabourless.queue.R;
 import com.tabourless.queue.databinding.ActivityMainBinding;
+import com.tabourless.queue.databinding.ToolbarBinding;
 import com.tabourless.queue.models.User;
+import com.tabourless.queue.ui.places.PlacesFragmentDirections;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.NavDirections;
@@ -52,6 +49,8 @@ import androidx.navigation.ui.NavigationUI;
 
 import java.util.Arrays;
 import java.util.List;
+
+import static com.tabourless.queue.Utils.MenuHelper.menuIconWithText;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -95,25 +94,25 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseReference connectedRef;//  = database.getReference(".info/connected");
     //private DatabaseReference connection;
 
-    private MainViewModel mMainViewModel;// ViewMode for getting the latest current user id
+    private MainViewModel mViewModel;// ViewMode for getting the latest current user id
     private Intent intent;
 
     private FragmentManager fragmentManager;
 
     // To navigate when item clicked
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+    /*private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
-                case R.id.navigation_places:
+                case R.id.places:
                     goToMain();
                     return true;
-                case R.id.navigation_dashboard:
+                case R.id.dashboard:
                     goToChats();
                     return true;
-                case R.id.navigation_notifications:
+                case R.id.notifications:
                     goToNotifications();
                     return true;
             }
@@ -122,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-    };
+    };*/
 
     // A listener for user's online statues
     private ValueEventListener onlineListener = new ValueEventListener() {
@@ -158,37 +157,38 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private ActivityMainBinding binding;
+    private ActivityMainBinding mBinding;
+    private ToolbarBinding mToolbarBinding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_main);
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-        View view = binding.getRoot();
+        mBinding = ActivityMainBinding.inflate(getLayoutInflater());
+        mToolbarBinding = mBinding.toolbar;
+        View view = mBinding.getRoot();
         setContentView(view);
-        //setSupportActionBar(binding.toolbar);
+        //setSupportActionBar(mToolbarBinding.toolbar);
 
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_places, R.id.navigation_dashboard, R.id.navigation_notifications)
-                .setDrawerLayout(binding.drawerLayout)
+                R.id.places, R.id.dashboard, R.id.notifications, R.id.complete_profile)
+                .setOpenableLayout(mBinding.drawerLayout)
                 .build();
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
 
         // Setup toolbar
         //NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(binding.toolbar, navController, appBarConfiguration);
+        NavigationUI.setupWithNavController(mToolbarBinding.toolbar, navController, appBarConfiguration);
 
         // Setup Drawer Navigation
-        NavigationUI.setupWithNavController(binding.drawerNavView, navController);
+        NavigationUI.setupWithNavController(mBinding.drawerNavView, navController);
         // Setup Button Navigation
-        NavigationUI.setupWithNavController(binding.bottomNavView, navController);
-
+        NavigationUI.setupWithNavController(mBinding.bottomNavView, navController);
 
         // update CurrentUserId for all observer fragments
-        mMainViewModel = new ViewModelProvider(MainActivity.this).get(MainViewModel.class);
+        mViewModel = new ViewModelProvider(MainActivity.this).get(MainViewModel.class);
 
         // update CurrentUserId for all observer fragments
         //mMainViewModel.updateCurrentUserId(currentUserId);
@@ -208,17 +208,29 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "destination Label= "+ destination.getLabel()+ " currentUserId="+ currentUserId);
                 Log.d(TAG, "destination id= "+ destination.getId());
 
-                if(TextUtils.equals("fragment_main", destination.getLabel())){
-                    binding.bottomNavView.setVisibility(View.VISIBLE);
-                    binding.bottomNavView.setSelectedItemId(R.id.navigation_places);
-                }else if(TextUtils.equals("chats_fragment", destination.getLabel())){
-                    binding.bottomNavView.setVisibility(View.VISIBLE);
-                    binding.bottomNavView.setSelectedItemId(R.id.navigation_dashboard);
-                }else if(TextUtils.equals("fragment_notification", destination.getLabel())) {
-                    binding.bottomNavView.setVisibility(View.VISIBLE);
-                    binding.bottomNavView.setSelectedItemId(R.id.navigation_notifications);
+                if(R.id.places == destination.getId()){
+                    //showMenuItem();
+                    mBinding.bottomNavView.setVisibility(View.VISIBLE);
+                    //mBinding.bottomNavView.setSelectedItemId(R.id.places);
+                }else if(R.id.dashboard == destination.getId()){
+                    //showMenuItem();
+                    mBinding.bottomNavView.setVisibility(View.VISIBLE);
+                    //mBinding.bottomNavView.setSelectedItemId(R.id.dashboard);
+                }else if(R.id.notifications == destination.getId()) {
+                    //showMenuItem();
+                    mBinding.bottomNavView.setVisibility(View.VISIBLE);
+                    //mBinding.bottomNavView.setSelectedItemId(R.id.notifications);
                 }else{
-                    binding.bottomNavView.setVisibility(View.GONE);
+                    //showMenuItem();
+                    mBinding.bottomNavView.setVisibility(View.GONE);
+                }
+
+                // Hide toolbar in complete profile fragment
+                if(R.id.complete_profile == destination.getId()){
+                    mToolbarBinding.toolbar.setVisibility(View.GONE);
+                    mBinding.bottomNavView.setVisibility(View.GONE);
+                }else{
+                    mToolbarBinding.toolbar.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -266,8 +278,8 @@ public class MainActivity extends AppCompatActivity {
                     // because it might be not showing due to previous log out
                     Log.d(TAG, "onAuthStateChanged: user is signed in. set binding.bottomNavView and ActionBar to visible");
                     if(navController != null && null != navController.getCurrentDestination()){
-                        if(R.id.navigation_places == navController.getCurrentDestination().getId()){
-                            binding.bottomNavView.setVisibility(View.VISIBLE);
+                        if(R.id.places == navController.getCurrentDestination().getId()){
+                            mBinding.bottomNavView.setVisibility(View.VISIBLE);
                             if(getSupportActionBar() != null){
                                 getSupportActionBar().show();
                             }
@@ -287,7 +299,7 @@ public class MainActivity extends AppCompatActivity {
                         }else{
                             // It's not the first time to open the app
                             // and the user is logged in. just updateCurrentUserId();
-                            mMainViewModel.updateCurrentUserId(user.getUid());
+                            mViewModel.updateCurrentUserId(user.getUid());
                             Log.d(TAG, "onAuthStateChanged: second time to log in. user was logged in. updateCurrentUserId. oldCurrentUserId = " + currentUserId+ " new id= "+user.getUid());
                         }
                     }// End of checking if it's the same user or not
@@ -315,8 +327,8 @@ public class MainActivity extends AppCompatActivity {
                     // If user is logged out, hide binding.bottomNavView and ActionBar
                     // because we don't want to show it before displaying login activity
                     if(navController != null && null != navController.getCurrentDestination()){
-                        if(R.id.navigation_places == navController.getCurrentDestination().getId()){
-                            binding.bottomNavView.setVisibility(View.GONE);
+                        if(R.id.places == navController.getCurrentDestination().getId()){
+                            mBinding.bottomNavView.setVisibility(View.GONE);
                             if(getSupportActionBar() != null){
                                 getSupportActionBar().hide();
                             }
@@ -369,7 +381,8 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "mAuthListener="+ mAuthListener);
 
         //add Listener for destination changes
-        //navController.addOnDestinationChangedListener(mDestinationListener);
+        navController.addOnDestinationChangedListener(mDestinationListener);
+
     }
 
     @Override
@@ -404,13 +417,15 @@ public class MainActivity extends AppCompatActivity {
             connectedRef.removeEventListener(onlineListener);
             Log.d(TAG, "Remove connectedRef onlineListener");
         }
+        mBinding = null;
+        mToolbarBinding = null;
     }
 
     // To close drawer when back pressed (if it's opened) instead of closing the app
     @Override
     public void onBackPressed() {
-        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            binding.drawerLayout.closeDrawer(GravityCompat.START);
+        if (mBinding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mBinding.drawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
@@ -505,13 +520,13 @@ public class MainActivity extends AppCompatActivity {
         // Get counts for unread chats. first use currentUserId then update it whenever it changed using AuthStateListener
         if(userKey != null){ // in case user is logged out, don't get notification count
             // initiate notifications count observer
-            mMainViewModel.getNotificationsCount(userKey).observe(this, new Observer<Long>() {
+            mViewModel.getNotificationsCount(userKey).observe(this, new Observer<Long>() {
                 @Override
                 public void onChanged(Long count) {
                     Log.d(TAG, "getNotificationsCount onChanged notifications count = "+ count + " currentUserId= "+userKey);
                     // Display chats count if > 0
                     if(count != null && count != 0){
-                        notificationsBadge = binding.bottomNavView.getOrCreateBadge(R.id.navigation_notifications); //showBadge() show badge over chats menu item
+                        notificationsBadge = mBinding.bottomNavView.getOrCreateBadge(R.id.notifications); //showBadge() show badge over chats menu item
                         notificationsBadge.setMaxCharacterCount(3); // Max number is 99
                         //chatsBadge.setBackgroundColor(R.drawable.badge_background_shadow);
                         /*notificationsBadge.setBackgroundColor(getResources().getColor(R.color.color_primary));
@@ -541,13 +556,13 @@ public class MainActivity extends AppCompatActivity {
         // Get counts for unread chats. first use currentUserId then update it whenever it changed using AuthStateListener
         if(userKey != null){ // in case user is logged out, don't get chat count
             // initiate chats count observer
-            mMainViewModel.getChatsCount(userKey).observe(this, new Observer<Long>() {
+            mViewModel.getChatsCount(userKey).observe(this, new Observer<Long>() {
                 @Override
                 public void onChanged(Long count) {
                     Log.d(TAG, "getChatsCount onChanged chats count = "+ count + " currentUserId= "+userKey);
                     // Display chats count if > 0
                     if(count != null && count != 0){
-                        chatsBadge = binding.bottomNavView.getOrCreateBadge(R.id.navigation_dashboard); // showBadge() show badge over chats menu item
+                        chatsBadge = mBinding.bottomNavView.getOrCreateBadge(R.id.dashboard); // showBadge() show badge over chats menu item
                         chatsBadge.setMaxCharacterCount(3); // Max number is 99
                         //chatsBadge.setBackgroundColor(R.drawable.badge_background_shadow);
                         /*chatsBadge.setBackgroundColor(getResources().getColor(R.color.color_primary));
@@ -659,31 +674,51 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void goToCompleteProfile() {
-
-    }
-
-    private void goToProfile() {
-
-    }
-
-    // Go to Chats fragment
-    private void goToChats() {
-
+        NavDirections direction = PlacesFragmentDirections.actionPlacesToCompleteProfile();
+        //check if we are on Main Fragment not on complete Profile already
+        if (null != navController.getCurrentDestination() && R.id.places == navController.getCurrentDestination().getId()) {
+            //navController.navigate(R.id.complete_profile_fragment);
+            // Must use direction to get the benefits of pop stack
+            navController.navigate(direction);
+        }
     }
 
     // Go to Chats fragment
     private void goToMain() {
-
+        if (null != navController.getCurrentDestination() && R.id.places != navController.getCurrentDestination().getId()) {
+            navController.navigate(R.id.places);
+        }
     }
 
-    // Go to Settings fragment
-    private void goToSettings() {
+    private void addMenuItem() {
+        Menu menu = mBinding.drawerNavView.getMenu();
+        MenuItem saveItem = menu.add(Menu.NONE, 1, 1, menuIconWithText(getResources().getDrawable(R.drawable.ic_save_black_24dp), getResources().getString(R.string.menu_save)));
+        //saveItem.setShowAsAction( MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 
+       /* Menu submenu = menu.addSubMenu("New Super SubMenu");
+        submenu.add("Super Item1");
+        submenu.add("Super Item2");
+        submenu.add("Super Item3");*/
+
+        //mBinding.drawerNavView.invalidate();
     }
 
-    // Go to notifications fragment
-    private void goToNotifications() {
+    private void hideMenuItem() {
+        Menu menu = mBinding.drawerNavView.getMenu();
+        MenuItem profile = menu.findItem(R.id.profile);
+        profile.setVisible(false);
 
+        MenuItem settings = menu.findItem(R.id.settings);
+        settings.setVisible(false);
+    }
+
+    private void showMenuItem() {
+        Menu menu = mBinding.drawerNavView.getMenu();
+        MenuItem profile = menu.findItem(R.id.profile);
+        profile.setVisible(true);
+
+        MenuItem settings = menu.findItem(R.id.settings);
+        settings.setVisible(true);
     }
 
 }// End of main

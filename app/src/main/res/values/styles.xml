@@ -9,6 +9,9 @@
 
         <!--Component styles-->
         <item name="toolbarStyle">@style/ToolbarStyle.Primary.MyTheme</item>
+
+        <!--Component styles-->
+        <item name="textInputStyle">@style/EditTextStyle.MyTheme</item>
     </style>
 
 
@@ -17,6 +20,11 @@
         <!--<item name="colorControlNormal">?colorOnPrimary</item>
         <item name="actionMenuTextColor">?colorOnPrimary</item>
         <item name="android:actionMenuTextColor">@color/color_on_primary</item>-->
+    </style>
+
+    <!--to make Edit text OutlinedBox-->
+    <style name="EditTextStyle.MyTheme" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <!--<item name="boxStrokeColor">?colorOnBackground</item>-->
     </style>
 
 </resources>
