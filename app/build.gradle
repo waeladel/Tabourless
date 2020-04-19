@@ -14,6 +14,7 @@ android {
         applicationId "com.tabourless.queue"
         minSdkVersion 17
         targetSdkVersion 29
+        multiDexEnabled true // Enabling multiDex support.
         versionCode 1
         versionName "0.0.1"
         vectorDrawables.useSupportLibrary = true
@@ -32,6 +33,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
+    implementation 'androidx.multidex:multidex:2.0.1' // multiDex support for below api 20
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.google.android.material:material:1.2.0-alpha06'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
@@ -53,6 +55,7 @@ dependencies {
     implementation 'com.yanzhenjie:album:2.0.2' //for gallery and camera
     api 'com.theartofdev.edmodo:android-image-cropper:2.8.0' // for cropping images
     implementation 'top.zibin:Luban:1.0.8' // for compressing original image
+    implementation "androidx.preference:preference:1.1.0" // For settings preference
 
     // Required only if Facebook login support is required. Find the latest Facebook SDK releases here: https://goo.gl/Ce5L94
     implementation 'com.facebook.android:facebook-android-sdk:5.5.1'
