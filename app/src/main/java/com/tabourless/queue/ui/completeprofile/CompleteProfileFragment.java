@@ -307,7 +307,7 @@ public class CompleteProfileFragment extends Fragment {
         }
 
         // Set disability value
-        if(user.isDisable()){
+        if(user.getDisabled()){
             mBinding.spinnerDisabilityValue.setSelection(1);
         }else{
             mBinding.spinnerDisabilityValue.setSelection(0);
@@ -555,11 +555,16 @@ public class CompleteProfileFragment extends Fragment {
         mViewModel.getUser().setLastOnline(0L);
         mViewModel.getUser().setName(mBinding.nameValue.getText().toString().trim());
         mViewModel.getUser().setBirthYear(Integer.parseInt(mBinding.spinnerBirthValue.getSelectedItem().toString()));
-        mViewModel.getUser().setGender(mBinding.spinnerGenderValue.getSelectedItem().toString());
-        if(mBinding.spinnerDisabilityValue.getSelectedItemPosition() == 0){
-            mViewModel.getUser().setDisability(false);
+        if(mBinding.spinnerGenderValue.getSelectedItemPosition() == 0){
+            mViewModel.getUser().setGender("male");
         }else{
-            mViewModel.getUser().setDisability(true);
+            mViewModel.getUser().setGender("female");
+        }
+
+        if(mBinding.spinnerDisabilityValue.getSelectedItemPosition() == 0){
+            mViewModel.getUser().setDisabled(false);
+        }else{
+            mViewModel.getUser().setDisabled(true);
         }
 
         // update the database

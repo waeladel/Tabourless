@@ -32,7 +32,12 @@
         android:id="@+id/profile"
         android:name="com.tabourless.queue.ui.profile.ProfileFragment"
         android:label="@string/title_profile"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_profile" >
+        <argument
+            android:name="userId"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
     <fragment
         android:id="@+id/settings"
         android:name="com.tabourless.queue.ui.settings.SettingsFragment"

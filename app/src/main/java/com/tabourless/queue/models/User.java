@@ -22,10 +22,7 @@ public class User {
     private String name;
     private String gender;
     private int birthYear;
-    private boolean disability;
-
-
-
+    private boolean disabled;
     public Map<String, Boolean> tokens = new HashMap<>();
 
     // startedAt: firebase.database.ServerValue.TIMESTAMP
@@ -47,8 +44,8 @@ public class User {
         result.put("coverImage", coverImage);
         result.put("name", name);
         result.put("gender", gender);
-        result.put("birthDate", birthYear);
-        result.put("horoscope", disability);
+        result.put("birthYear", birthYear);
+        result.put("disabled", disabled);
 
         return result;
     }
@@ -120,12 +117,20 @@ public class User {
         this.birthYear = birthYear;
     }
 
-    public boolean isDisable() {
-        return disability;
+    public boolean getDisabled() {
+        return disabled;
     }
 
-    public void setDisability(boolean disability) {
-        this.disability = disability;
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+    }
+
+    public Map<String, Boolean> getTokens() {
+        return tokens;
+    }
+
+    public void setTokens(Map<String, Boolean> tokens) {
+        this.tokens = tokens;
     }
 
     @Override
