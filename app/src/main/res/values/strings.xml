@@ -58,6 +58,14 @@
     <string name="cannot_toggle_speaker_toast">You don\'t have any calls or plugged headset.</string>
     <string name="muted_device_toast">Please disable total silence mode.</string>
 
+    <string name="confirm_block_dialog_message">You won\'t be able to exchange messages with this person anymore.</string>
+    <string name="confirm_block_delete_dialog_message">You won\'t be able to exchange messages with this person anymore and your conversation will be deleted.</string>
+    <string name="user_confirm_dialog_positive">Yes</string>
+    <string name="user_confirm_blocking_dialog">Block</string>
+    <string name="user_confirm_dialog_negative">Cancel</string>
+    <string name="confirm_dialog_positive_button">OK</string>
+    <string name="chat_blocked_dialog_message">Communication with this person is not allowed.</string>
+
     <!--Images content Description-->
     <string name="cover_image_description">Your cover image</string>
     <string name="profile_image_description">Your Profile picture</string>

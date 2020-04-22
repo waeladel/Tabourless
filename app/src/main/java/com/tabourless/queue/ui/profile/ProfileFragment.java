@@ -34,13 +34,16 @@ import com.tabourless.queue.R;
 import com.tabourless.queue.databinding.FragmentPlacesBinding;
 import com.tabourless.queue.databinding.FragmentProfileBinding;
 import com.tabourless.queue.interfaces.FirebaseUserCallback;
+import com.tabourless.queue.interfaces.ItemClickListener;
 import com.tabourless.queue.models.Relation;
 import com.tabourless.queue.models.User;
+import com.tabourless.queue.ui.BlockAlertFragment;
+import com.tabourless.queue.ui.BlockDeleteAlertFragment;
 
 import java.util.Calendar;
 import java.util.HashMap;
 
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends Fragment implements ItemClickListener {
 
     private final static String TAG = ProfileFragment.class.getSimpleName();
 
@@ -272,7 +275,82 @@ public class ProfileFragment extends Fragment {
             mBinding.messageText.setEnabled(false);
         }
 
+        mBinding.blockEditButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (null != mUserId && !mUserId.equals(mCurrentUserId)) { // it's not logged in user. It's another user
+                    Log.d(TAG, "blockUser clicked. mRelationStatus= "+mRelationStatus);
+                    switch (mRelationStatus) {
+                        case RELATION_STATUS_BLOCKING:
+                            Log.d(TAG, "mRelationStatus = RELATION_STATUS_BLOCKING");
+                            // If this selected user has blocked me
+                            //current user can't do anything about it
+                            break;
+                        case RELATION_STATUS_BLOCKED:
+                            Log.d(TAG, "mRelationStatus = RELATION_STATUS_BLOCKED");
+                            // If this selected user is blocked by me (current user)
+                            // the only option is to unblock him
+                            mViewModel.unblockUser(mCurrentUserId, mUserId);
+                            break;
+                        default:
+                            // There is no blocking relation, proceed with blocking
+                            // There is no blocking relation
+                            //showBlockDialog(); // To confirm blocking or cancel
+                            // Create a popup Menu if null. To show when block is clicked
+                            PopupMenu popupBlockMenu = new PopupMenu(mContext, view);
+                            popupBlockMenu.getMenu().add(Menu.NONE, 0, 0, R.string.popup_menu_block);
+                            popupBlockMenu.getMenu().add(Menu.NONE, 1, 1, R.string.popup_menu_block_delete);
+
+                            popupBlockMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                                @Override
+                                public boolean onMenuItemClick(MenuItem item) {
+                                    switch (item.getItemId()) {
+                                        case 0:
+                                            Log.i(TAG, "onMenuItemClick. item block clicked ");
+                                            //blockUser();
+                                            showBlockDialog();
+                                            return true;
+                                        case 1:
+                                            Log.i(TAG, "onMenuItemClick. item block and delete conversation clicked ");
+                                            //blockDelete();
+                                            showBlockDeleteDialog();
+                                            return true;
+                                        default:
+                                            return false;
+                                    }
+                                }
+                            });
+                            popupBlockMenu.show();
+                            break;
+                    }
+                } else {
+                    Log.i(TAG, "going to edit profile fragment= ");
+                    //NavDirections direction = ProfileFragmentDirections.actionProfileToEditProfile();
+                    NavController navController = Navigation.findNavController(view);
+                    //navController.navigate(R.id.editProfileFragment);
+                }
+            }
+        });
+
         return view;
+    }
+
+    // To listen to dialog clicked buttons
+    @Override
+    public void onClick(View view, int position, boolean isLongClick) {
+
+        switch (position) {
+              case 6:
+                // block is clicked
+                Log.i(TAG, "block is clicked, we must start blocking function");
+                  mViewModel.blockUser(mCurrentUserId, mUserId);
+                break;
+            case 7:
+                // block and delete is clicked
+                Log.i(TAG, "block and delete  is clicked, we must start blocking function");
+                mViewModel.blockDelete(mCurrentUserId, mUserId);
+                break;
+        }
     }
 
     @Override
@@ -357,6 +435,19 @@ public class ProfileFragment extends Fragment {
 
             // End of display parcelable data]
         }
+    }
+    //Show a dialog to confirm blocking user
+    private void showBlockDialog() {
+        BlockAlertFragment blockFragment = BlockAlertFragment.newInstance(mContext, this);
+        blockFragment.show(getParentFragmentManager(), CONFIRM_BLOCK_ALERT_FRAGMENT);
+        Log.i(TAG, "blockFragment show clicked ");
+    }
+
+    //Show a dialog to confirm blocking user and delete his conversation with us (current user)
+    private void showBlockDeleteDialog() {
+        BlockDeleteAlertFragment blockDeleteFragment = BlockDeleteAlertFragment.newInstance(mContext, this);
+        blockDeleteFragment.show(getParentFragmentManager(), CONFIRM_BLOCK_DELETE_ALERT_FRAGMENT);
+        Log.i(TAG, "blockDeleteFragment show clicked ");
     }
 
 }

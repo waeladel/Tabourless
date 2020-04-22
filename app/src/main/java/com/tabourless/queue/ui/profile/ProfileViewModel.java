@@ -41,6 +41,10 @@ public class ProfileViewModel extends ViewModel {
         relationRepository.blockUser(currentUserId, userId);
     }
 
+    public void blockDelete(String currentUserId, String userId) {
+        relationRepository.blockDelete(currentUserId, userId);
+    }
+
     public void unblockUser(String currentUserId, String userId) {
         relationRepository.unblockUser(currentUserId, userId);
     }
