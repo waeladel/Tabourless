@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
@@ -225,12 +226,20 @@ public class MainActivity extends AppCompatActivity {
                     mBinding.bottomNavView.setVisibility(View.GONE);
                 }
 
-                // Hide toolbar in complete profile fragment
+                // Hide toolbar in complete profile and message fragment
                 if(R.id.complete_profile == destination.getId()){
                     mToolbarBinding.toolbar.setVisibility(View.GONE);
-                    mBinding.bottomNavView.setVisibility(View.GONE);
-                }else{
+                }else if (R.id.messages_fragment == destination.getId()) {
+                    mToolbarBinding.toolbar.setVisibility(View.GONE);
+                } else{
                     mToolbarBinding.toolbar.setVisibility(View.VISIBLE);
+                }
+
+                // To only pan window in message fragment without effecting edit and complete profile
+                if(R.id.messages_fragment == destination.getId()){
+                    //getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+                }else{
+                    getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
                 }
             }
         });

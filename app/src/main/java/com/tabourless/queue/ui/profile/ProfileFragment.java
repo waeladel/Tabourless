@@ -13,6 +13,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import android.text.TextUtils;
@@ -108,12 +109,13 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
         }
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
 
+        mViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
+
     }
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        mViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
 
         mBinding = FragmentProfileBinding.inflate(inflater, container, false);
         View view = mBinding.getRoot();
@@ -210,7 +212,7 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
                                         (getResources().getColor(R.color.disabled_button)));
 
                                 //disable all FAB's hints
-                                mBinding.messageText.setEnabled(false);
+                                mBinding.messageButtonText.setEnabled(false);
                                 mBinding.blockEditText.setEnabled(false);
                                 break;
                             case RELATION_STATUS_BLOCKED:
@@ -228,7 +230,7 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
                                         (getResources().getColor(R.color.disabled_button)));
 
                                 ////disable all FAB's except block button
-                                mBinding.messageText.setEnabled(false);
+                                mBinding.messageButtonText.setEnabled(false);
 
                                 break;
                         }
@@ -256,7 +258,7 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
                         mBinding.messageButton.setClickable(true);
                         mBinding.messageButton.setBackgroundTintList(mFabDefaultColor);
 
-                        mBinding.messageText.setEnabled(true);
+                        mBinding.messageButtonText.setEnabled(true);
                         mBinding.blockEditText.setEnabled(true);
                     }
                 }
@@ -272,7 +274,7 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
             mBinding.messageButton.setBackgroundTintList(ColorStateList.valueOf
                     (getResources().getColor(R.color.disabled_button)));
 
-            mBinding.messageText.setEnabled(false);
+            mBinding.messageButtonText.setEnabled(false);
         }
 
         mBinding.blockEditButton.setOnClickListener(new View.OnClickListener() {
@@ -329,6 +331,22 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
                     NavController navController = Navigation.findNavController(view);
                     //navController.navigate(R.id.editProfileFragment);
                 }
+            }
+        });
+
+        mBinding.messageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (null != mUserId && !mUserId.equals(mCurrentUserId)) { // it's not logged in user. It's another user
+                    Log.d(TAG, "send message to user");
+                    NavDirections MessageDirection = ProfileFragmentDirections.actionProfileToMessages(null, mUserId, false);
+                    //NavController navController = Navigation.findNavController(this, R.id.host_fragment);
+                    //check if we are on Main Fragment not on complete Profile already
+                    Navigation.findNavController(view).navigate(MessageDirection);
+                } else {
+                    Log.i(TAG, "don't send message to current logged in user ");
+                }
+
             }
         });
 
@@ -439,15 +457,19 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
     //Show a dialog to confirm blocking user
     private void showBlockDialog() {
         BlockAlertFragment blockFragment = BlockAlertFragment.newInstance(mContext, this);
-        blockFragment.show(getParentFragmentManager(), CONFIRM_BLOCK_ALERT_FRAGMENT);
-        Log.i(TAG, "blockFragment show clicked ");
+        if(getParentFragmentManager() != null) {
+            blockFragment.show(getParentFragmentManager(), CONFIRM_BLOCK_ALERT_FRAGMENT);
+            Log.i(TAG, "blockFragment show clicked ");
+        }
+
     }
 
     //Show a dialog to confirm blocking user and delete his conversation with us (current user)
     private void showBlockDeleteDialog() {
         BlockDeleteAlertFragment blockDeleteFragment = BlockDeleteAlertFragment.newInstance(mContext, this);
-        blockDeleteFragment.show(getParentFragmentManager(), CONFIRM_BLOCK_DELETE_ALERT_FRAGMENT);
-        Log.i(TAG, "blockDeleteFragment show clicked ");
+        if(getParentFragmentManager() != null) {
+            blockDeleteFragment.show(getParentFragmentManager(), CONFIRM_BLOCK_DELETE_ALERT_FRAGMENT);
+            Log.i(TAG, "blockDeleteFragment show clicked ");
+        }
     }
-
 }

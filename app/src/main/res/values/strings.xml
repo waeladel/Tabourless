@@ -8,6 +8,8 @@
     <string name="title_profile">Profile</string>
     <string name="title_settings">Settings</string>
     <string name="title_complete_profile">Complete Profile</string>
+    <string name="title_messages">Direct messages</string>
+
     <string name="menu_save">Save</string>
     <string name="menu_search">Search</string>
 
@@ -35,7 +37,9 @@
     <string name="user_name_hint">Name</string>
     <string name="user_disability_headline">Disability</string>
     <string name="crop_activity_title">Crop</string>
-
+    <string name="send_message_hint">Type a message…</string>
+    <string name="user_active_now">Active Now</string>
+    <string name="user_active_ago">Active %1$s</string>
 
     <!--toast and error messages -->
     <string name="sign_in_cancelled">Sign in has been cancelled</string>
@@ -64,13 +68,16 @@
     <string name="user_confirm_blocking_dialog">Block</string>
     <string name="user_confirm_dialog_negative">Cancel</string>
     <string name="confirm_dialog_positive_button">OK</string>
-    <string name="chat_blocked_dialog_message">Communication with this person is not allowed.</string>
+    <string name="chat_blocked_alert_dialog_title">Conversation Disabled</string>
+    <string name="chat_blocked_dialog_message">Communication with this person is currently not allowed.</string>
 
     <!--Images content Description-->
     <string name="cover_image_description">Your cover image</string>
     <string name="profile_image_description">Your Profile picture</string>
     <string name="add_image_button_description">Add Profile picture</string>
     <string name="original_profile_image_description">Profile Image</string>
+    <string name="send_text_icon">Send message</string>
+    <string name="message_sent_icon">Message sent icon</string>
 
     <!--Input text helper-->
     <string name="required_helper">*Required</string>

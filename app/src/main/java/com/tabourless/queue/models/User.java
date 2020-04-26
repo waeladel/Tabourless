@@ -139,16 +139,18 @@ public class User {
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
         return
+                disabled == user.disabled &&
                 TextUtils.equals(avatar, user.avatar) &&
-                        TextUtils.equals(name, user.name) &&
-                        TextUtils.equals(gender, user.gender) &&
-                        (created == user.created || (created!=null && created.equals(user.created)));
+                TextUtils.equals(name, user.name) &&
+                TextUtils.equals(gender, user.gender) &&
+                (created == user.created || (created!=null && created.equals(user.created)));
     }
 
     @Override
     public int hashCode() {
         //return Objects.hash(created, avatar, name, biography, relationship, interestedIn, gender, birthDate, horoscope);
         int result = 1;
+        result = 31 * result + (disabled ? 1 : 0);
         result = 31 * result + (avatar == null ? 0 : avatar.hashCode());
         result = 31 * result + (name == null ? 0 : name.hashCode());
         result = 31 * result + (gender == null ? 0 : gender.hashCode());
