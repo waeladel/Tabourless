@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 123;
 
     private NavController navController ;
-    private BadgeDrawable chatsBadge, notificationsBadge;
+    private BadgeDrawable inboxBadge, notificationsBadge;
 
     //public String currentUserId;
     public String currentUserName;
@@ -302,7 +302,7 @@ public class MainActivity extends AppCompatActivity {
                         if(currentUserId == null){
                             // if currentUserId is null, it's the first time to open the app
                             // and the user is not logged in. initiateObserveChatCount();
-                            initiateObserveChatCount(user.getUid());
+                            initiateObserveInboxCount(user.getUid());
                             initiateObserveNotificationCount(user.getUid());
                             Log.d(TAG, "onAuthStateChanged: first time to log in. user wasn't logged in. initiateObserveChatCount. oldCurrentUserId = " + currentUserId+ " new id= "+user.getUid());
                         }else{
@@ -561,32 +561,32 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // start observation for chats count
-    private void initiateObserveChatCount(final String userKey) {
+    private void initiateObserveInboxCount(final String userKey) {
         // Get counts for unread chats. first use currentUserId then update it whenever it changed using AuthStateListener
         if(userKey != null){ // in case user is logged out, don't get chat count
             // initiate chats count observer
-            mViewModel.getChatsCount(userKey).observe(this, new Observer<Long>() {
+            mViewModel.getInboxCount(userKey).observe(this, new Observer<Long>() {
                 @Override
                 public void onChanged(Long count) {
                     Log.d(TAG, "getChatsCount onChanged chats count = "+ count + " currentUserId= "+userKey);
                     // Display chats count if > 0
                     if(count != null && count != 0){
-                        chatsBadge = mBinding.bottomNavView.getOrCreateBadge(R.id.inbox); // showBadge() show badge over chats menu item
-                        chatsBadge.setMaxCharacterCount(3); // Max number is 99
+                        inboxBadge = mBinding.bottomNavView.getOrCreateBadge(R.id.inbox); // showBadge() show badge over chats menu item
+                        inboxBadge.setMaxCharacterCount(3); // Max number is 99
                         //chatsBadge.setBackgroundColor(R.drawable.badge_background_shadow);
                         /*chatsBadge.setBackgroundColor(getResources().getColor(R.color.color_primary));
                         chatsBadge.setBadgeTextColor(getResources().getColor(R.color.color_on_primary));*/
-                        chatsBadge.setNumber(count.intValue());
+                        inboxBadge.setNumber(count.intValue());
                         // To show badge again if it was invisible due to being 0
-                        chatsBadge.setVisible(true);
+                        inboxBadge.setVisible(true);
 
                         // Display cut icon when chats count is more than 0
                         //binding.bottomNavView.getMenu().getItem(1).setIcon(R.drawable.ic_chat_outline_cut);
                     }else{
                         // Hide chat badge. check first if it's null or not
-                        if(chatsBadge != null){
-                            chatsBadge.setNumber(0);
-                            chatsBadge.setVisible(false);
+                        if(inboxBadge != null){
+                            inboxBadge.setNumber(0);
+                            inboxBadge.setVisible(false);
                         }
                         // Display normal icon because there is no chats
                         //binding.bottomNavView.getMenu().getItem(1).setIcon(R.drawable.ic_chat_outline);

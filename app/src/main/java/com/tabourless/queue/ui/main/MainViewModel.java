@@ -12,7 +12,7 @@ public class MainViewModel extends ViewModel {
     private UserRepository userRepository;
     private MutableLiveData<User> currentUser;
     private MutableLiveData<String> currentUserId;
-    private MutableLiveData<Long> chatCount, notificationCount;
+    private MutableLiveData<Long> inboxCount, notificationCount;
 
     public MainViewModel() {
 
@@ -45,11 +45,11 @@ public class MainViewModel extends ViewModel {
         // if currentUser id is changed, update chat count
         if(!userId.equals(currentUserId.getValue())){
             // Get the chat counts of the new user
-            if(chatCount == null){
-                chatCount = new MutableLiveData<>();
+            if(inboxCount == null){
+                inboxCount = new MutableLiveData<>();
             }
-            chatCount = userRepository.getChatsCount(userId);
-            Log.d(TAG, "updateCurrentUserId chatCount= "+ chatCount.getValue());
+            inboxCount = userRepository.getInboxCount(userId);
+            Log.d(TAG, "updateCurrentUserId chatCount= "+ inboxCount.getValue());
 
             // update notification count of the new user
             if(notificationCount == null){
@@ -69,15 +69,15 @@ public class MainViewModel extends ViewModel {
     }
 
     // Get counts for unread chats
-    public MutableLiveData<Long> getChatsCount(String userId) {
+    public MutableLiveData<Long> getInboxCount(String userId) {
         Log.d(TAG, "getChatsCount"+ userId);
-        if(chatCount == null){
+        if(inboxCount == null){
             Log.d(TAG, "chatCount is null, get relation from database");
-            chatCount = new MutableLiveData<>();
-            chatCount = userRepository.getChatsCount(userId);
+            inboxCount = new MutableLiveData<>();
+            inboxCount = userRepository.getInboxCount(userId);
         }
-        Log.d(TAG, "getChatsCount chatCount Count= "+ chatCount.getValue());
-        return chatCount;
+        Log.d(TAG, "getChatsCount chatCount Count= "+ inboxCount.getValue());
+        return inboxCount;
     }
 
     // Get counts for unread chats

@@ -76,8 +76,7 @@ public class MessagesListRepository {
     private static final String Message_STATUS_SENDING = "Sending";
     private static final String Message_STATUS_SENT = "Sent";
     private static final String Message_STATUS_DELIVERED = "Delivered";
-    private static final String Message_STATUS_SEEN = "Seen";
-    private static final String Message_STATUS_REVEALED = "Revealed";
+    private boolean isChatRead;
 
     private ValueEventListener afterMessagesListener = new ValueEventListener() {
         @Override
@@ -99,26 +98,12 @@ public class MessagesListRepository {
             if (dataSnapshot.exists()) {
                 List<Message> messagesList = new ArrayList<>();
 
-                // Create a map for all seen messages need to be updated
-                Map<String, Object> updateMap = new HashMap<>();
-
                 // loop throw users value
                 for (DataSnapshot snapshot: dataSnapshot.getChildren()){
                     if(!getLoadAfterKey().equals(snapshot.getKey())) { // if snapshot key = startAt key? don't add it again
                         Message message = snapshot.getValue(Message.class);
                         if (message != null) {
                             message.setKey(snapshot.getKey());
-
-                            // Add only seen messages by current user to seenItemsList
-                            // If current user is not the sender, the other user is seeing this message
-                            if(!TextUtils.equals(message.getSenderId(), currentUserId)){
-                                //seenItemsList.add(message);
-                                if(null == message.getStatus() || !TextUtils.equals(message.getStatus(), Message_STATUS_SEEN)){
-                                    Log.d(TAG, "getMessagesAfter. seen messages need to be updated = message"+ message.getMessage()+ "status"+ message.getStatus()+ "key"+ message.getKey());
-                                    updateMap.put(snapshot.getKey()+"/status", Message_STATUS_SEEN);
-                                    message.setStatus(Message_STATUS_SEEN);
-                                }
-                            }
                         }
                         messagesList.add(message);
                         // Add messages to totalItemsList ArrayList to be used to get the initial key position
@@ -127,11 +112,7 @@ public class MessagesListRepository {
                         //Log.d(TAG, "mama getMessage = "+ message.getMessage()+" getSnapshotKey= " +  snapshot.getKey());
                     }
                 }
-                // Update seen messages
-                if(updateMap.size() > 0){
-                    mMessagesRef.updateChildren(updateMap);
-                    return;
-                }
+
                 // Get TotalItems logs
                 printTotalItems();
                 //printSeenItems();
@@ -176,36 +157,16 @@ public class MessagesListRepository {
             if (dataSnapshot.exists()) {
                 List<Message> messagesList = new ArrayList<>();
 
-                // Create a map for all seen messages need to be updated
-                Map<String, Object> updateMap = new HashMap<>();
-
                 // loop throw users value
                 for (DataSnapshot snapshot: dataSnapshot.getChildren()){
                     if(!getLoadBeforeKey().equals(snapshot.getKey())) { // if snapshot key = startAt key? don't add it again
                         Message message = snapshot.getValue(Message.class);
                         if (message != null) {
                             message.setKey(snapshot.getKey());
-
-                            // Add only seen messages by current user to seenItemsList
-                            // If current user is not the sender, the other user is seeing this message
-                            if(!TextUtils.equals(message.getSenderId(), currentUserId)){
-                                //seenItemsList.add(message);
-                                if(null == message.getStatus() || !TextUtils.equals(message.getStatus(), Message_STATUS_SEEN)){
-                                    Log.d(TAG, "getMessagesBefore. seen messages need to be updated = message"+ message.getMessage()+ "status"+ message.getStatus()+ "key"+ message.getKey());
-                                    updateMap.put(snapshot.getKey()+"/status", Message_STATUS_SEEN);
-                                    message.setStatus(Message_STATUS_SEEN);
-                                }
-                            }
                         }
                         messagesList.add(message);
                         //Log.d(TAG, "mama getMessage = "+ message.getMessage()+" getSnapshotKey= " +  snapshot.getKey());
                     }
-                }
-
-                // Update seen messages
-                if(updateMap.size() > 0){
-                    mMessagesRef.updateChildren(updateMap);
-                    return;
                 }
 
                 if(messagesList.size() != 0){
@@ -386,13 +347,8 @@ public class MessagesListRepository {
                             // Add only seen messages by current user to seenItemsList
                             // If current user is not the sender, the other user is seeing this message
                             if(!TextUtils.equals(message.getSenderId(), currentUserId)){
-                                //seenItemsList.add(message);
-                                if(null == message.getStatus() || !TextUtils.equals(message.getStatus(), Message_STATUS_SEEN)){
-                                    Log.d(TAG, "initiated. seen messages need to be updated = message"+ message.getMessage()+ "status"+ message.getStatus()+ "key"+ message.getKey());
-                                    //updateMap.put(snapshot.getKey()+"/status", Message_STATUS_SEEN);
-                                    updateMap.put("/messages/" + chatKey + "/" +snapshot.getKey()+"/status", Message_STATUS_SEEN);
-                                    message.setStatus(Message_STATUS_SEEN);
-                                }
+                                //one of messages is not sent by me (Current user), chat should be read
+                                isChatRead = true;
                             }
                         }
                         messagesList.add(message);
@@ -403,15 +359,14 @@ public class MessagesListRepository {
                     }
 
                     // Update seen messages
-                    if(updateMap.size() > 0){
-                        // Update chats member saw
+                    if(isChatRead){
+                        // Update chats member read
                         updateMap.put("/userChats/" + currentUserId + "/" + chatKey + "/members/" +currentUserId+ "/read/" , true);
                         updateMap.put("/chats/" + chatKey + "/members/" +currentUserId+ "/read/" , true);
 
                        /* // Update seen chats count
                         updateMap.put("/counts/" + currentUserId + "/chats/" + chatKey, null);*/
                         mDatabaseRef.updateChildren(updateMap);
-                        return;
                     }
 
                     printTotalItems();
