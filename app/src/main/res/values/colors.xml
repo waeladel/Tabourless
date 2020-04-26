@@ -7,4 +7,7 @@
 
     <color name="disabled_button">#30E0E0E0</color>
     <color name="transparent_edit_image">#80000000</color>
+    <color name="color_highlighted_item">#335c648e</color> <!--#405c648e-->
+    <color name="color_on_surface_emphasis_high">#C7000000</color>
+    <color name="color_on_surface_emphasis_medium">#8A000000</color>
 </resources>

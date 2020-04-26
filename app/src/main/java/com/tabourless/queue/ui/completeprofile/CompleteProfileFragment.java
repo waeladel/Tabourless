@@ -2,9 +2,6 @@ package com.tabourless.queue.ui.completeprofile;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.ColorFilter;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -166,7 +163,7 @@ public class CompleteProfileFragment extends Fragment {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.places, R.id.dashboard, R.id.notifications, R.id.complete_profile)
+                R.id.places, R.id.inbox, R.id.notifications, R.id.complete_profile)
                 //.setOpenableLayout(mBinding.drawerLayout)
                 .build();
         navController = NavHostFragment.findNavController(this);

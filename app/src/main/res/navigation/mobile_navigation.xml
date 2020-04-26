@@ -22,10 +22,17 @@
     </fragment>
 
     <fragment
-        android:id="@+id/dashboard"
-        android:name="com.tabourless.queue.ui.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        android:id="@+id/inbox"
+        android:name="com.tabourless.queue.ui.inbox.InboxFragment"
+        android:label="@string/title_inbox"
+        tools:layout="@layout/fragment_inbox" >
+        <action
+            android:id="@+id/action_inbox_to_messages"
+            app:destination="@id/messages_fragment" />
+        <action
+            android:id="@+id/action_inbox_to_profile"
+            app:destination="@id/profile" />
+    </fragment>
 
     <fragment
         android:id="@+id/notifications"

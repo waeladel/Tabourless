@@ -325,21 +325,23 @@ public class UserRepository {
 
 
     public void removeListeners(){
-        for (int i = 0; i < mListenersList.size(); i++) {
-            //Log.d(TAG, "remove Listeners ref= "+ mListenersList.get(i).getReference()+ " Listener= "+ mListenersList.get(i).getListener());
-            //Log.d(TAG, "remove Listeners Query= "+ mListenersList.get(i).getQuery()+ " Listener= "+ mListenersList.get(i).getListener());
-            Log.d(TAG, "remove Listeners Query or Ref= "+ mListenersList.get(i).getQueryOrRef()+ " Listener= "+ mListenersList.get(i).getListener());
+        if(null != mListenersList){
+            for (int i = 0; i < mListenersList.size(); i++) {
+                //Log.d(TAG, "remove Listeners ref= "+ mListenersList.get(i).getReference()+ " Listener= "+ mListenersList.get(i).getListener());
+                //Log.d(TAG, "remove Listeners Query= "+ mListenersList.get(i).getQuery()+ " Listener= "+ mListenersList.get(i).getListener());
+                Log.d(TAG, "remove Listeners Query or Ref= "+ mListenersList.get(i).getQueryOrRef()+ " Listener= "+ mListenersList.get(i).getListener());
 
-            if(null != mListenersList.get(i).getListener()){
-                mListenersList.get(i).getQueryOrRef().removeEventListener(mListenersList.get(i).getListener());
-            }
+                if(null != mListenersList.get(i).getListener()){
+                    mListenersList.get(i).getQueryOrRef().removeEventListener(mListenersList.get(i).getListener());
+                }
             /*if(null != mListenersList.get(i).getReference()){
                 mListenersList.get(i).getReference().removeEventListener(mListenersList.get(i).getListener());
             }else if(null != mListenersList.get(i).getQuery()){
                 mListenersList.get(i).getQuery().removeEventListener(mListenersList.get(i).getListener());
             }*/
+            }
+            mListenersList.clear();
         }
-        mListenersList.clear();
     }
  }
 

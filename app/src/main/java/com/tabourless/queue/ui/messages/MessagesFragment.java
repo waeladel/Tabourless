@@ -166,7 +166,7 @@ public class MessagesFragment extends Fragment {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.places, R.id.dashboard, R.id.notifications, R.id.complete_profile)
+                R.id.places, R.id.inbox, R.id.notifications, R.id.complete_profile)
                 .build();
         navController = NavHostFragment.findNavController(this);
 
@@ -796,8 +796,8 @@ public class MessagesFragment extends Fragment {
 
 
         // Create members Hash list, it's better to loop throw  selected members
-        ChatMember currentMember = new ChatMember(mCurrentUserId, mCurrentUser.getName(), mCurrentUser.getAvatar(), mCurrentUser.getLastOnline());
-        ChatMember chatMember = new ChatMember(mChatUserId, mChatUser.getName(), mChatUser.getAvatar(), mChatUser.getLastOnline());
+        ChatMember currentMember = new ChatMember(mCurrentUserId, mCurrentUser.getName(), mCurrentUser.getAvatar(), mCurrentUser.getLastOnline(), true);
+        ChatMember chatMember = new ChatMember(mChatUserId, mChatUser.getName(), mChatUser.getAvatar(), mChatUser.getLastOnline(), false);
 
 
         Map<String, ChatMember> members = new HashMap<>();

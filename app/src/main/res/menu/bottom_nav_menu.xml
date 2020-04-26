@@ -7,9 +7,9 @@
         android:title="@string/title_places" />
 
     <item
-        android:id="@+id/dashboard"
-        android:icon="@drawable/ic_dashboard_black_24dp"
-        android:title="@string/title_dashboard" />
+        android:id="@+id/inbox"
+        android:icon="@drawable/ic_mail_24dp"
+        android:title="@string/title_inbox" />
 
     <item
         android:id="@+id/notifications"

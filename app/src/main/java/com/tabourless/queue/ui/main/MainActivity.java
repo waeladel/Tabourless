@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.places, R.id.dashboard, R.id.notifications, R.id.complete_profile)
+                R.id.places, R.id.inbox, R.id.notifications, R.id.complete_profile)
                 .setOpenableLayout(mBinding.drawerLayout)
                 .build();
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
@@ -213,7 +213,7 @@ public class MainActivity extends AppCompatActivity {
                     //showMenuItem();
                     mBinding.bottomNavView.setVisibility(View.VISIBLE);
                     //mBinding.bottomNavView.setSelectedItemId(R.id.places);
-                }else if(R.id.dashboard == destination.getId()){
+                }else if(R.id.inbox == destination.getId()){
                     //showMenuItem();
                     mBinding.bottomNavView.setVisibility(View.VISIBLE);
                     //mBinding.bottomNavView.setSelectedItemId(R.id.dashboard);
@@ -571,7 +571,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "getChatsCount onChanged chats count = "+ count + " currentUserId= "+userKey);
                     // Display chats count if > 0
                     if(count != null && count != 0){
-                        chatsBadge = mBinding.bottomNavView.getOrCreateBadge(R.id.dashboard); // showBadge() show badge over chats menu item
+                        chatsBadge = mBinding.bottomNavView.getOrCreateBadge(R.id.inbox); // showBadge() show badge over chats menu item
                         chatsBadge.setMaxCharacterCount(3); // Max number is 99
                         //chatsBadge.setBackgroundColor(R.drawable.badge_background_shadow);
                         /*chatsBadge.setBackgroundColor(getResources().getColor(R.color.color_primary));
