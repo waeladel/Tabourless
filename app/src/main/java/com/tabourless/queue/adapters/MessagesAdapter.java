@@ -252,7 +252,7 @@ public class MessagesAdapter extends PagedListAdapter<Message, RecyclerView.View
                     //mStorageRef.child("images/"+message.getSenderId()+"/"+ AVATAR_THUMBNAIL_NAME).getFile()
                     Picasso.get()
                             .load(message.getSenderAvatar())
-                            .placeholder(R.mipmap.ic_round_account_filled_72)
+                            .placeholder(R.mipmap.account_circle_72dp)
                             .error(R.drawable.ic_round_broken_image_72px)
                             .into(ReceivedHolder.mAvatar , new com.squareup.picasso.Callback() {
                                 @Override
@@ -340,7 +340,7 @@ public class MessagesAdapter extends PagedListAdapter<Message, RecyclerView.View
                 // Got the download URL for 'users/me/profile.png'
                 Picasso.get()
                         .load(uri)
-                        .placeholder(R.mipmap.ic_round_account_filled_72)
+                        .placeholder(R.mipmap.account_circle_72dp)
                         .error(R.drawable.ic_round_broken_image_72px)
                         .into(avatar);
                 //updateAvatarUri(key, uri);

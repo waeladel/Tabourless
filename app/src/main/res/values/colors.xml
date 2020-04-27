@@ -4,6 +4,8 @@
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
     <color name="colorError">#FA297E</color> <!--#fa297e  EB3B81-->
+    <color name="color_on_background">#000000</color>
+
 
     <color name="disabled_button">#30E0E0E0</color>
     <color name="transparent_edit_image">#80000000</color>

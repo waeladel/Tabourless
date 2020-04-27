@@ -7,10 +7,10 @@
     android:layout_marginTop="24dp">
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/avatar_image"
+        android:id="@+id/header_avatar_image"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="16dp"
         android:contentDescription="@string/profile_image_description"
         android:scaleType="centerCrop"
         app:layout_constraintEnd_toEndOf="parent"
@@ -19,26 +19,26 @@
         app:srcCompat="@drawable/ic_round_account_filled_72" />
 
     <TextView
-        android:id="@+id/user_name"
+        android:id="@+id/header_user_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/avatar_image"
+        app:layout_constraintTop_toBottomOf="@id/header_avatar_image"
         tools:text="@tools:sample/full_names" />
 
     <View
         android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginTop="8dp"
         android:background="?android:attr/listDivider"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/user_name" />
+        app:layout_constraintTop_toBottomOf="@id/header_user_name" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

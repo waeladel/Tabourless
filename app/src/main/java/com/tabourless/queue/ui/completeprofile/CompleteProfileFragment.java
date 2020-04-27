@@ -268,7 +268,7 @@ public class CompleteProfileFragment extends Fragment {
             mBinding.avatarImage.setImageResource(R.drawable.ic_round_account_filled_72);
             Picasso.get()
                     .load(user.getAvatar())
-                    .placeholder(R.mipmap.ic_round_account_filled_72)
+                    .placeholder(R.mipmap.account_circle_72dp)
                     .error(R.drawable.ic_round_broken_image_72px)
                     .into(mBinding.avatarImage);
         }else{
@@ -278,14 +278,14 @@ public class CompleteProfileFragment extends Fragment {
 
         // Display cover
         if (null != user.getCoverImage()) {
-            mBinding.coverImage.setImageResource(R.drawable.ic_picture_gallery_white);
+            mBinding.coverImage.setImageResource(R.drawable.ic_picture_gallery);
             Picasso.get()
                     .load(user.getCoverImage())
                     .placeholder(R.mipmap.ic_picture_gallery_white_512px)
                     .error(R.drawable.ic_broken_image_512px)
                     .into(mBinding.coverImage);
         }else{
-            mBinding.coverImage.setImageResource(R.drawable.ic_picture_gallery_white);
+            mBinding.coverImage.setImageResource(R.drawable.ic_picture_gallery);
         }
 
         //Set gender value
@@ -495,14 +495,14 @@ public class CompleteProfileFragment extends Fragment {
                                 mBinding.avatarImage.setImageResource(R.drawable.ic_round_account_filled_72);
                                 Picasso.get()
                                         .load(mViewModel.getUser().getAvatar())
-                                        .placeholder(R.mipmap.ic_round_account_filled_72)
+                                        .placeholder(R.mipmap.account_circle_72dp)
                                         .error(R.drawable.ic_round_broken_image_72px)
                                         .into(mBinding.avatarImage);
                                 break;
                             case "coverImage":
                                 mViewModel.getUser().setCoverImage(String.valueOf(downloadUri));
                                 // Display cover
-                                mBinding.coverImage.setImageResource(R.drawable.ic_picture_gallery_white);
+                                mBinding.coverImage.setImageResource(R.drawable.ic_picture_gallery);
                                 Picasso.get()
                                         .load(mViewModel.getUser().getCoverImage())
                                         .placeholder(R.mipmap.ic_picture_gallery_white_512px)

@@ -134,7 +134,7 @@
                 android:layout_marginTop="8dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/cover_top_divider"
-                app:srcCompat="@drawable/ic_picture_gallery_white"
+                app:srcCompat="@drawable/ic_picture_gallery"
                 tools:ignore="ContentDescription" />
 
             <TextView
@@ -165,7 +165,7 @@
                     android:contentDescription="@string/add_image_button_description"
                     android:scaleType="centerCrop"
                     android:tint="@color/transparent_edit_image"
-                    app:srcCompat="@drawable/ic_picture_gallery_white" />
+                    app:srcCompat="@drawable/ic_picture_gallery" />
 
                 <ImageView
                     android:id="@+id/add_cover_icon"

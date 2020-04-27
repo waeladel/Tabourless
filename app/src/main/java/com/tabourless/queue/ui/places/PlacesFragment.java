@@ -38,20 +38,6 @@ public class PlacesFragment extends Fragment {
         });
 
         navController = NavHostFragment.findNavController(this);
-        // just to test profiles
-        mBinding.textHome.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                NavDirections direction = PlacesFragmentDirections.actionPlacesToProfile("uZUsaqEbfpTbFuO3mzcIeuiVqcx1");
-                //check if we are on Main Fragment not on complete Profile already
-                if (null != navController.getCurrentDestination() && R.id.places == navController.getCurrentDestination().getId()) {
-                    //navController.navigate(R.id.complete_profile_fragment);
-                    // Must use direction to get the benefits of pop stack
-                    navController.navigate(direction);
-                }
-            }
-        });
         return view;
     }
 

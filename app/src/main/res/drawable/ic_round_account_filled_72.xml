@@ -3,8 +3,9 @@
     android:height="72dp"
     android:viewportWidth="72"
     android:viewportHeight="72"
-    >
+    android:tint="?attr/colorControlNormal">
   <path
+      android:fillColor="?attr/colorOnBackground"
       android:pathData="M36,0C16.1,0 0,16.1 0,36s16.1,36 36,36s36,-16.1 36,-36S55.9,0 36,0zM36,10.8c6,0 10.8,4.8 10.8,10.8S42,32.4 36,32.4s-10.8,-4.8 -10.8,-10.8S30,10.8 36,10.8zM36,61.9c-9,0 -17,-4.6 -21.6,-11.6c0.1,-7.2 14.4,-11.1 21.6,-11.1c7.2,0 21.5,3.9 21.6,11.1C53,57.3 45,61.9 36,61.9z"
-      android:fillAlpha="@dimen/my_icons_emphasis_medium" android:fillColor="#FF000000"/>
+      />
 </vector>

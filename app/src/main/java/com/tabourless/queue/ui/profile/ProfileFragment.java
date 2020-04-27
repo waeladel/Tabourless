@@ -5,11 +5,8 @@ import android.content.res.ColorStateList;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -23,16 +20,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 import com.tabourless.queue.R;
-import com.tabourless.queue.databinding.FragmentPlacesBinding;
 import com.tabourless.queue.databinding.FragmentProfileBinding;
 import com.tabourless.queue.interfaces.FirebaseUserCallback;
 import com.tabourless.queue.interfaces.ItemClickListener;
@@ -42,7 +36,6 @@ import com.tabourless.queue.ui.BlockAlertFragment;
 import com.tabourless.queue.ui.BlockDeleteAlertFragment;
 
 import java.util.Calendar;
-import java.util.HashMap;
 
 public class ProfileFragment extends Fragment implements ItemClickListener {
 
@@ -382,21 +375,21 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
         if (mUser != null) {
             // Get user values
             if (null != mUser.getCoverImage()) {
-                mBinding.coverImage.setImageResource(R.drawable.ic_picture_gallery_white);
+                mBinding.coverImage.setImageResource(R.drawable.ic_picture_gallery);
                 Picasso.get()
                         .load(mUser.getCoverImage())
                         .placeholder(R.mipmap.ic_picture_gallery_white_512px)
                         .error(R.drawable.ic_broken_image_512px)
                         .into(mBinding.coverImage);
             }else{
-                mBinding.coverImage.setImageResource(R.drawable.ic_picture_gallery_white);
+                mBinding.coverImage.setImageResource(R.drawable.ic_picture_gallery);
             }
 
             if (null != mUser.getAvatar()) {
                 mBinding.userImage.setImageResource(R.drawable.ic_round_account_filled_72);
                 Picasso.get()
                         .load(mUser.getAvatar())
-                        .placeholder(R.mipmap.ic_round_account_filled_72)
+                        .placeholder(R.mipmap.account_circle_72dp)
                         .error(R.drawable.ic_round_broken_image_72px)
                         .into(mBinding.userImage);
             }else{

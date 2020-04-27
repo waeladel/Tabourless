@@ -685,7 +685,7 @@ public class MessagesFragment extends Fragment {
             if (null != mChatUser.getAvatar()) {
                 Picasso.get()
                         .load(mChatUser.getAvatar())
-                        .placeholder(R.mipmap.ic_round_account_filled_72)
+                        .placeholder(R.mipmap.account_circle_72dp)
                         .error(R.drawable.ic_round_broken_image_72px)
                         .into(mBinding.userImage);
             }else{

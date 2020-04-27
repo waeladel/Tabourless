@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
@@ -28,8 +29,10 @@ import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
+import com.squareup.picasso.Picasso;
 import com.tabourless.queue.R;
 import com.tabourless.queue.databinding.ActivityMainBinding;
+import com.tabourless.queue.databinding.NavHeaderMainBinding;
 import com.tabourless.queue.databinding.ToolbarBinding;
 import com.tabourless.queue.models.User;
 import com.tabourless.queue.ui.places.PlacesFragmentDirections;
@@ -50,6 +53,8 @@ import androidx.navigation.ui.NavigationUI;
 
 import java.util.Arrays;
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 import static com.tabourless.queue.Utils.MenuHelper.menuIconWithText;
 
@@ -160,6 +165,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding mBinding;
     private ToolbarBinding mToolbarBinding;
+    private CircleImageView mHeaderAvatar;
+    private TextView mHeaderName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,6 +174,9 @@ public class MainActivity extends AppCompatActivity {
         //setContentView(R.layout.activity_main);
         mBinding = ActivityMainBinding.inflate(getLayoutInflater());
         mToolbarBinding = mBinding.toolbar;
+        mHeaderAvatar = mBinding.drawerNavView.getHeaderView(0).findViewById(R.id.header_avatar_image);
+        mHeaderName = mBinding.drawerNavView.getHeaderView(0).findViewById(R.id.header_user_name);
+
         View view = mBinding.getRoot();
         setContentView(view);
         //setSupportActionBar(mToolbarBinding.toolbar);
@@ -622,6 +632,22 @@ public class MainActivity extends AppCompatActivity {
                         goToCompleteProfile();
                         //return;
                     }
+
+                    //Display header avatar
+                    if (null != mUser.getAvatar()) {
+                        mHeaderAvatar.setImageResource(R.drawable.ic_round_account_filled_72);
+                        Picasso.get()
+                                .load(mUser.getAvatar())
+                                .placeholder(R.mipmap.account_circle_72dp)
+                                .error(R.drawable.ic_round_broken_image_72px)
+                                .into(mHeaderAvatar);
+                    }else{
+                        // end of user avatar
+                        mHeaderAvatar.setImageResource(R.drawable.ic_round_account_filled_72);
+                    }
+
+                    // Display header avatar
+                    mHeaderName.setText(mUser.getName());
 
                     // Don't update tokens or lastOnline unless user exist, that's why references are moved here
                     // database references for online

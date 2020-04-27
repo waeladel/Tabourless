@@ -218,7 +218,7 @@ public class InboxAdapter extends PagedListAdapter<Chat, InboxAdapter.ViewHolder
                             holder.mAvatar.setImageResource(R.drawable.ic_round_account_filled_72);
                             Picasso.get()
                                     .load(membersList.get(0).getAvatar())
-                                    .placeholder(R.mipmap.ic_round_account_filled_72)
+                                    .placeholder(R.mipmap.account_circle_72dp)
                                     .error(R.drawable.ic_round_broken_image_72px)
                                     .into(holder.mAvatar , new com.squareup.picasso.Callback() {
                                 @Override
@@ -282,7 +282,7 @@ public class InboxAdapter extends PagedListAdapter<Chat, InboxAdapter.ViewHolder
                 // Got the download URL for 'users/me/profile.png'
                 Picasso.get()
                         .load(uri)
-                        .placeholder(R.mipmap.ic_round_account_filled_72)
+                        .placeholder(R.mipmap.account_circle_72dp)
                         .error(R.drawable.ic_round_broken_image_72px)
                         .into(avatar);
                 //updateAvatarUri(key, uri);

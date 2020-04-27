@@ -15,10 +15,6 @@
             app:destination="@id/complete_profile"
             app:launchSingleTop="false"
             app:popUpToInclusive="true" />
-        <action
-            android:id="@+id/action_places_to_profile"
-            app:destination="@id/profile"
-            app:enterAnim="@anim/fragment_open_enter" />
     </fragment>
 
     <fragment
