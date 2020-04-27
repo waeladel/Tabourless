@@ -14,7 +14,7 @@
             android:icon="@drawable/ic_location_on_black_24dp"
             android:title="@string/menu_settings" />
         <item
-            android:id="@+id/action_logout"
+            android:id="@+id/logout"
             android:icon="@drawable/ic_location_on_black_24dp"
             android:title="@string/menu_log_out" />
     </group>

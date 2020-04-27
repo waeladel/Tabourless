@@ -32,7 +32,6 @@ import com.google.firebase.iid.InstanceIdResult;
 import com.squareup.picasso.Picasso;
 import com.tabourless.queue.R;
 import com.tabourless.queue.databinding.ActivityMainBinding;
-import com.tabourless.queue.databinding.NavHeaderMainBinding;
 import com.tabourless.queue.databinding.ToolbarBinding;
 import com.tabourless.queue.models.User;
 import com.tabourless.queue.ui.places.PlacesFragmentDirections;
@@ -239,17 +238,23 @@ public class MainActivity extends AppCompatActivity {
                 // Hide toolbar in complete profile and message fragment
                 if(R.id.complete_profile == destination.getId()){
                     mToolbarBinding.toolbar.setVisibility(View.GONE);
-                }else if (R.id.messages_fragment == destination.getId()) {
+                }else if (R.id.messages == destination.getId()) {
                     mToolbarBinding.toolbar.setVisibility(View.GONE);
                 } else{
                     mToolbarBinding.toolbar.setVisibility(View.VISIBLE);
                 }
 
                 // To only pan window in message fragment without effecting edit and complete profile
-                if(R.id.messages_fragment == destination.getId()){
+                if(R.id.messages == destination.getId()){
                     //getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
                 }else{
                     getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+                }
+
+                // To log out
+                if(R.id.logout == destination.getId()){
+                    mToolbarBinding.toolbar.setTitle(null);
+                    AuthUI.getInstance().signOut(MainActivity.this);
                 }
             }
         });
@@ -373,6 +378,24 @@ public class MainActivity extends AppCompatActivity {
         //navController = Navigation.findNavController(this, R.id.host_fragment);
         Log.d(TAG, "onCreate handleDeepLink. notification intent = "+intent);
         navController.handleDeepLink(intent);
+
+        /*mBinding.drawerNavView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                if(item.getItemId() == R.id.action_logout){
+                    Log.d(TAG, "MenuItem = logout");
+
+                    AuthUI.getInstance().signOut(MainActivity.this);
+                }
+
+                //This is for maintaining the behavior of the Navigation view
+                NavigationUI.onNavDestinationSelected(item, navController);
+
+                //This is for closing the drawer after acting on it
+                mBinding.drawerLayout.closeDrawer(GravityCompat.START);
+                return true;
+            }
+        });*/
 
     }// End of on create
 

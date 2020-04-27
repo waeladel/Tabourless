@@ -24,7 +24,7 @@
         tools:layout="@layout/fragment_inbox" >
         <action
             android:id="@+id/action_inbox_to_messages"
-            app:destination="@id/messages_fragment" />
+            app:destination="@id/messages" />
         <action
             android:id="@+id/action_inbox_to_profile"
             app:destination="@id/profile" />
@@ -46,7 +46,7 @@
             app:nullable="true" />
         <action
             android:id="@+id/action_profile_to_messages"
-            app:destination="@id/messages_fragment" />
+            app:destination="@id/messages" />
     </fragment>
     <fragment
         android:id="@+id/settings"
@@ -59,7 +59,7 @@
         android:label="@string/title_complete_profile"
         tools:layout="@layout/fragment_complete_profile" />
     <fragment
-        android:id="@+id/messages_fragment"
+        android:id="@+id/messages"
         android:name="com.tabourless.queue.ui.messages.MessagesFragment"
         android:label="@string/title_messages"
         tools:layout="@layout/fragment_messages">
@@ -77,4 +77,8 @@
             android:id="@+id/action_messages_to_profile"
             app:destination="@id/profile" />
     </fragment>
+    <fragment
+        android:id="@+id/logout"
+        android:name="com.tabourless.queue.ui.LogoutFragment"
+        android:label="@string/title_logout" />
 </navigation>
