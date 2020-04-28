@@ -731,7 +731,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void goToCompleteProfile() {
-        NavDirections direction = PlacesFragmentDirections.actionPlacesToCompleteProfile();
+        NavDirections direction = PlacesFragmentDirections.actionPlacesToCompleteProfile(false);
         //check if we are on Main Fragment not on complete Profile already
         if (null != navController.getCurrentDestination() && R.id.places == navController.getCurrentDestination().getId()) {
             //navController.navigate(R.id.complete_profile_fragment);

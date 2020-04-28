@@ -47,6 +47,12 @@
         <action
             android:id="@+id/action_profile_to_messages"
             app:destination="@id/messages" />
+        <action
+            android:id="@+id/action_profile_to_photo"
+            app:destination="@id/photo" />
+        <action
+            android:id="@+id/action_profile_to_complete_profile"
+            app:destination="@id/complete_profile" />
     </fragment>
     <fragment
         android:id="@+id/settings"
@@ -57,7 +63,11 @@
         android:id="@+id/complete_profile"
         android:name="com.tabourless.queue.ui.completeprofile.CompleteProfileFragment"
         android:label="@string/title_complete_profile"
-        tools:layout="@layout/fragment_complete_profile" />
+        tools:layout="@layout/fragment_complete_profile" >
+        <argument
+            android:name="isEdit"
+            app:argType="boolean" />
+    </fragment>
     <fragment
         android:id="@+id/messages"
         android:name="com.tabourless.queue.ui.messages.MessagesFragment"
@@ -81,4 +91,16 @@
         android:id="@+id/logout"
         android:name="com.tabourless.queue.ui.LogoutFragment"
         android:label="@string/title_logout" />
+    <fragment
+        android:id="@+id/photo"
+        android:name="com.tabourless.queue.ui.PhotoFragment"
+        android:label="@string/title_Photo"
+        tools:layout="@layout/fragment_photo" >
+        <argument
+            android:name="userId"
+            app:argType="string" />
+        <argument
+            android:name="imageName"
+            app:argType="string" />
+    </fragment>
 </navigation>

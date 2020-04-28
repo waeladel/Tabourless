@@ -320,9 +320,9 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
                     }
                 } else {
                     Log.i(TAG, "going to edit profile fragment= ");
-                    //NavDirections direction = ProfileFragmentDirections.actionProfileToEditProfile();
+                    NavDirections direction = ProfileFragmentDirections.actionProfileToCompleteProfile(true);
                     NavController navController = Navigation.findNavController(view);
-                    //navController.navigate(R.id.editProfileFragment);
+                    navController.navigate(direction);
                 }
             }
         });
@@ -334,12 +334,45 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
                     Log.d(TAG, "send message to user");
                     NavDirections MessageDirection = ProfileFragmentDirections.actionProfileToMessages(null, mUserId, false);
                     //NavController navController = Navigation.findNavController(this, R.id.host_fragment);
-                    //check if we are on Main Fragment not on complete Profile already
                     Navigation.findNavController(view).navigate(MessageDirection);
                 } else {
                     Log.i(TAG, "don't send message to current logged in user ");
                 }
 
+            }
+        });
+
+        mBinding.coverImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (null != mUserId && !mUserId.equals(mCurrentUserId)) { // it's not logged in user. It's another user
+                    Log.i(TAG, "going to Cover image view");
+                    NavDirections direction = ProfileFragmentDirections.actionProfileToPhoto(mUserId, COVER_ORIGINAL_NAME);
+                    NavController navController = Navigation.findNavController(view);
+                    navController.navigate(direction);
+                } else {
+                    Log.i(TAG, "going to Cover image view");
+                    NavDirections direction = ProfileFragmentDirections.actionProfileToPhoto(mCurrentUserId, COVER_ORIGINAL_NAME);
+                    NavController navController = Navigation.findNavController(view);
+                    navController.navigate(direction);
+                }
+            }
+        });
+
+        mBinding.userImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (null != mUserId && !mUserId.equals(mCurrentUserId)) { // it's not logged in user. It's another user
+                    Log.i(TAG, "going to Avatar image view");
+                    NavDirections direction = ProfileFragmentDirections.actionProfileToPhoto(mUserId, AVATAR_ORIGINAL_NAME);
+                    NavController navController = Navigation.findNavController(view);
+                    navController.navigate(direction);
+                } else {
+                    Log.i(TAG, "going to Avatar image view");
+                    NavDirections direction = ProfileFragmentDirections.actionProfileToPhoto(mCurrentUserId, AVATAR_ORIGINAL_NAME);
+                    NavController navController = Navigation.findNavController(view);
+                    navController.navigate(direction);
+                }
             }
         });
 

@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -42,8 +43,10 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 import com.tabourless.queue.R;
 import com.tabourless.queue.databinding.FragmentCompleteProfileBinding;
+import com.tabourless.queue.databinding.ToolbarBinding;
 import com.tabourless.queue.interfaces.FirebaseUserCallback;
 import com.tabourless.queue.models.User;
+import com.tabourless.queue.ui.profile.ProfileFragmentArgs;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 import com.yanzhenjie.album.Action;
@@ -66,6 +69,7 @@ public class CompleteProfileFragment extends Fragment {
     private ArrayAdapter<Integer> spinnerAdapter;
     private Context mContext;
     private String currentUserId;
+    private boolean isEdit;
     private FirebaseUser mFirebaseCurrentUser;
     private StorageReference mStorageRef;
     private StorageReference mImagesRef;
@@ -109,6 +113,11 @@ public class CompleteProfileFragment extends Fragment {
         //Get current logged in user
         mFirebaseCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
         currentUserId = mFirebaseCurrentUser!= null ? mFirebaseCurrentUser.getUid() : null;
+
+        if(getArguments() != null && getArguments().containsKey("isEdit")) {
+            // Check if should display Edit profile
+            isEdit = CompleteProfileFragmentArgs.fromBundle(getArguments()).getIsEdit();
+        }
 
         // [START database reference]
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
@@ -253,6 +262,17 @@ public class CompleteProfileFragment extends Fragment {
 
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        // fragment title should be edit profile if we pass a user id
+        Log.d(TAG,  "isEdit = "+isEdit);
+        if(isEdit){
+            mBinding.toolbarSave.setTitle(R.string.title_edit_profile);
+        }else{
+            mBinding.toolbarSave.setTitle(R.string.title_complete_profile);
+        }
+    }
 
     @Override
     public void onDestroyView() {
@@ -295,19 +315,19 @@ public class CompleteProfileFragment extends Fragment {
             mBinding.spinnerGenderValue.setSelection(1);
         }
 
+        // Set disability value
+        if(user.getDisabled()){
+            mBinding.spinnerDisabilityValue.setSelection(1);
+        }else{
+            mBinding.spinnerDisabilityValue.setSelection(0);
+        }
+
         //Set year of birth value
         for (int year: mViewModel.getYears()) {
             if(year == user.getBirthYear()){
                 mBinding.spinnerBirthValue.setSelection(mViewModel.getYears().indexOf(year));
                 return;
             }
-        }
-
-        // Set disability value
-        if(user.getDisabled()){
-            mBinding.spinnerDisabilityValue.setSelection(1);
-        }else{
-            mBinding.spinnerDisabilityValue.setSelection(0);
         }
     }
 
@@ -535,32 +555,34 @@ public class CompleteProfileFragment extends Fragment {
 
     private void saveProfile() {
 
-        // chaeck if name and avatar are not empty
-        if(TextUtils.isEmpty(mBinding.nameValue.getText())){
+        // check if name and avatar are not empty
+        if (TextUtils.isEmpty(mBinding.nameValue.getText())) {
             Toast.makeText(getActivity(), R.string.empty_profile_name_error,
                     Toast.LENGTH_LONG).show();
             return;
         }
 
-        if(TextUtils.isEmpty(mViewModel.getUser().getAvatar())){
+        if (TextUtils.isEmpty(mViewModel.getUser().getAvatar())) {
             Toast.makeText(getActivity(), R.string.empty_profile_avatar_error,
                     Toast.LENGTH_LONG).show();
             return;
         }
 
-        mViewModel.getUser().setCreated(ServerValue.TIMESTAMP);
+        if (!isEdit) {
+            mViewModel.getUser().setCreated(ServerValue.TIMESTAMP);
+        }
         mViewModel.getUser().setLastOnline(0L);
         mViewModel.getUser().setName(mBinding.nameValue.getText().toString().trim());
         mViewModel.getUser().setBirthYear(Integer.parseInt(mBinding.spinnerBirthValue.getSelectedItem().toString()));
-        if(mBinding.spinnerGenderValue.getSelectedItemPosition() == 0){
+        if (mBinding.spinnerGenderValue.getSelectedItemPosition() == 0) {
             mViewModel.getUser().setGender("male");
-        }else{
+        } else {
             mViewModel.getUser().setGender("female");
         }
 
-        if(mBinding.spinnerDisabilityValue.getSelectedItemPosition() == 0){
+        if (mBinding.spinnerDisabilityValue.getSelectedItemPosition() == 0) {
             mViewModel.getUser().setDisabled(false);
-        }else{
+        } else {
             mViewModel.getUser().setDisabled(true);
         }
 
@@ -570,24 +592,28 @@ public class CompleteProfileFragment extends Fragment {
             public void onSuccess(Void aVoid) {
                 // Write was successful!
                 Log.i(TAG, "mUserRef onSuccess");
-                // Set user's notification tokens
-                FirebaseInstanceId.getInstance().getInstanceId()
-                        .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                                if (!task.isSuccessful()) {
-                                    Log.w(TAG, "getInstanceId failed", task.getException());
-                                    return;
-                                }
 
-                                if(null != task.getResult()){
-                                    // Get new Instance ID token
-                                    String token = task.getResult().getToken();
-                                    //mTokensRef.child(mUserId).child(token).setValue(true);
-                                    mUserRef.child("tokens").child(token).setValue(true);
+                if (!isEdit) {
+                    // Set user's notification tokens
+                    FirebaseInstanceId.getInstance().getInstanceId()
+                            .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                                    if (!task.isSuccessful()) {
+                                        Log.w(TAG, "getInstanceId failed", task.getException());
+                                        return;
+                                    }
+
+                                    if (null != task.getResult()) {
+                                        // Get new Instance ID token
+                                        String token = task.getResult().getToken();
+                                        //mTokensRef.child(mUserId).child(token).setValue(true);
+                                        mUserRef.child("tokens").child(token).setValue(true);
+                                    }
                                 }
-                            }
-                        });
+                            });
+                }
+
                 // Return to main fragment
                 if (null != navController.getCurrentDestination() && R.id.places != navController.getCurrentDestination().getId()) {
                     navController.navigateUp();
@@ -595,13 +621,13 @@ public class CompleteProfileFragment extends Fragment {
 
             }
         }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // Write failed
-                        Toast.makeText(getActivity(), R.string.update_profile_error,
-                                Toast.LENGTH_LONG).show();
-                    }
-                });
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                // Write failed
+                Toast.makeText(getActivity(), R.string.update_profile_error,
+                        Toast.LENGTH_LONG).show();
+            }
+        });
 
 
     }
