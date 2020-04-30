@@ -3,13 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/places">
+    app:startDestination="@+id/queues">
 
     <fragment
-        android:id="@+id/places"
-        android:name="com.tabourless.queue.ui.places.PlacesFragment"
-        android:label="@string/title_places"
-        tools:layout="@layout/fragment_places" >
+        android:id="@+id/queues"
+        android:name="com.tabourless.queue.ui.queues.QueuesFragment"
+        android:label="@string/title_queues"
+        tools:layout="@layout/fragment_queues" >
         <action
             android:id="@+id/action_places_to_complete_profile"
             app:destination="@id/complete_profile"
@@ -103,4 +103,9 @@
             android:name="imageName"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/search"
+        android:name="com.tabourless.queue.ui.search.SearchFragment"
+        android:label="@string/title_search"
+        tools:layout="@layout/fragment_search" />
 </navigation>

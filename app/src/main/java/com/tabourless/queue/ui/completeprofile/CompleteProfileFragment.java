@@ -43,10 +43,8 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 import com.tabourless.queue.R;
 import com.tabourless.queue.databinding.FragmentCompleteProfileBinding;
-import com.tabourless.queue.databinding.ToolbarBinding;
 import com.tabourless.queue.interfaces.FirebaseUserCallback;
 import com.tabourless.queue.models.User;
-import com.tabourless.queue.ui.profile.ProfileFragmentArgs;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 import com.yanzhenjie.album.Action;
@@ -172,7 +170,7 @@ public class CompleteProfileFragment extends Fragment {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.places, R.id.inbox, R.id.notifications, R.id.complete_profile)
+                R.id.queues, R.id.inbox, R.id.notifications, R.id.complete_profile)
                 //.setOpenableLayout(mBinding.drawerLayout)
                 .build();
         navController = NavHostFragment.findNavController(this);
@@ -615,7 +613,7 @@ public class CompleteProfileFragment extends Fragment {
                 }
 
                 // Return to main fragment
-                if (null != navController.getCurrentDestination() && R.id.places != navController.getCurrentDestination().getId()) {
+                if (null != navController.getCurrentDestination() && R.id.queues != navController.getCurrentDestination().getId()) {
                     navController.navigateUp();
                 }
 

@@ -34,7 +34,7 @@ import com.tabourless.queue.R;
 import com.tabourless.queue.databinding.ActivityMainBinding;
 import com.tabourless.queue.databinding.ToolbarBinding;
 import com.tabourless.queue.models.User;
-import com.tabourless.queue.ui.places.PlacesFragmentDirections;
+import com.tabourless.queue.ui.queues.QueuesFragmentDirections;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.places, R.id.inbox, R.id.notifications, R.id.complete_profile)
+                R.id.queues, R.id.inbox, R.id.notifications, R.id.complete_profile)
                 .setOpenableLayout(mBinding.drawerLayout)
                 .build();
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
@@ -218,7 +218,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "destination Label= "+ destination.getLabel()+ " currentUserId="+ currentUserId);
                 Log.d(TAG, "destination id= "+ destination.getId());
 
-                if(R.id.places == destination.getId()){
+                if(R.id.queues == destination.getId()){
                     //showMenuItem();
                     mBinding.bottomNavView.setVisibility(View.VISIBLE);
                     //mBinding.bottomNavView.setSelectedItemId(R.id.places);
@@ -302,7 +302,7 @@ public class MainActivity extends AppCompatActivity {
                     // because it might be not showing due to previous log out
                     Log.d(TAG, "onAuthStateChanged: user is signed in. set binding.bottomNavView and ActionBar to visible");
                     if(navController != null && null != navController.getCurrentDestination()){
-                        if(R.id.places == navController.getCurrentDestination().getId()){
+                        if(R.id.queues == navController.getCurrentDestination().getId()){
                             mBinding.bottomNavView.setVisibility(View.VISIBLE);
                             if(getSupportActionBar() != null){
                                 getSupportActionBar().show();
@@ -351,7 +351,7 @@ public class MainActivity extends AppCompatActivity {
                     // If user is logged out, hide binding.bottomNavView and ActionBar
                     // because we don't want to show it before displaying login activity
                     if(navController != null && null != navController.getCurrentDestination()){
-                        if(R.id.places == navController.getCurrentDestination().getId()){
+                        if(R.id.queues == navController.getCurrentDestination().getId()){
                             mBinding.bottomNavView.setVisibility(View.GONE);
                             if(getSupportActionBar() != null){
                                 getSupportActionBar().hide();
@@ -731,9 +731,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void goToCompleteProfile() {
-        NavDirections direction = PlacesFragmentDirections.actionPlacesToCompleteProfile(false);
+        NavDirections direction = QueuesFragmentDirections.actionPlacesToCompleteProfile(false);
         //check if we are on Main Fragment not on complete Profile already
-        if (null != navController.getCurrentDestination() && R.id.places == navController.getCurrentDestination().getId()) {
+        if (null != navController.getCurrentDestination() && R.id.queues == navController.getCurrentDestination().getId()) {
             //navController.navigate(R.id.complete_profile_fragment);
             // Must use direction to get the benefits of pop stack
             navController.navigate(direction);
@@ -742,8 +742,8 @@ public class MainActivity extends AppCompatActivity {
 
     // Go to Chats fragment
     private void goToMain() {
-        if (null != navController.getCurrentDestination() && R.id.places != navController.getCurrentDestination().getId()) {
-            navController.navigate(R.id.places);
+        if (null != navController.getCurrentDestination() && R.id.queues != navController.getCurrentDestination().getId()) {
+            navController.navigate(R.id.queues);
         }
     }
 

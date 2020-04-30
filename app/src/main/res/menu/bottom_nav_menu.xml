@@ -2,9 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/places"
-        android:icon="@drawable/ic_location_on_black_24dp"
-        android:title="@string/title_places" />
+        android:id="@+id/queues"
+        android:icon="@drawable/ic_people_queue"
+        android:title="@string/title_queues" />
 
     <item
         android:id="@+id/inbox"

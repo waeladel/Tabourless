@@ -1,4 +1,4 @@
-package com.tabourless.queue.ui.places;
+package com.tabourless.queue.ui.queues;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,33 +11,33 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
-import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.tabourless.queue.R;
-import com.tabourless.queue.databinding.FragmentPlacesBinding;
+import com.tabourless.queue.databinding.FragmentQueuesBinding;
 
-public class PlacesFragment extends Fragment {
+public class QueuesFragment extends Fragment {
 
-    private PlacesViewModel mViewModel;
-    private FragmentPlacesBinding mBinding;
+    private QueuesViewModel mViewModel;
+    private FragmentQueuesBinding mBinding;
     private NavController navController;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        mViewModel = new ViewModelProvider(this).get(PlacesViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(QueuesViewModel.class);
 
-        mBinding = FragmentPlacesBinding.inflate(inflater, container, false);
+        mBinding = FragmentQueuesBinding.inflate(inflater, container, false);
         View view = mBinding.getRoot();
 
-        mViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+        navController = NavHostFragment.findNavController(this);
+
+        mBinding.searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onChanged(@Nullable String s) {
-                mBinding.textHome.setText(s);
+            public void onClick(View v) {
+                navController.navigate(R.id.search);
             }
         });
 
-        navController = NavHostFragment.findNavController(this);
         return view;
     }
 

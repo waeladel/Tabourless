@@ -12,7 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.tabourless.queue.databinding.FragmentPlacesBinding;
+import com.tabourless.queue.databinding.FragmentQueuesBinding;
 import com.tabourless.queue.databinding.FragmentSettingsBinding;
 
 public class SettingsFragment extends Fragment {

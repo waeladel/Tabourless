@@ -166,7 +166,7 @@ public class MessagesFragment extends Fragment {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.places, R.id.inbox, R.id.notifications, R.id.complete_profile)
+                R.id.queues, R.id.inbox, R.id.notifications, R.id.complete_profile)
                 .build();
         navController = NavHostFragment.findNavController(this);
 
