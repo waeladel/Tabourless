@@ -35,13 +35,15 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.SettingsClient;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.tabourless.queue.R;
 import com.tabourless.queue.databinding.FragmentSearchBinding;
 import com.tabourless.queue.ui.DeniedPermissionAlertFragment;
 import com.tabourless.queue.ui.ExplainPermissionAlertFragment;
@@ -52,7 +54,10 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SearchFragment extends Fragment implements OnMapReadyCallback {
+public class SearchFragment extends Fragment implements OnMapReadyCallback
+        , GoogleMap.OnMapLongClickListener
+        , GoogleMap.OnMapClickListener
+        , GoogleMap.OnInfoWindowClickListener {
     
     private final static String TAG = SearchFragment.class.getSimpleName();
 
@@ -128,6 +133,32 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback {
         navController = NavHostFragment.findNavController(this);
 
         Log.d(TAG, "onCreateView: ");
+
+        // change icon of add place FAB
+        if(null != mViewModel.getAddPlaceMarker()){
+            mBinding.addQueueButton.setImageResource(R.drawable.ic_select_this_location_24px);
+        }else{
+            mBinding.addQueueButton.setImageResource(R.drawable.ic_add_location_24px);
+        }
+        // Add new queue
+        mBinding.addQueueButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // change button icon to save place
+                mBinding.addQueueButton.setImageResource(R.drawable.ic_select_this_location_24px);
+
+                // if there are no markers add marker
+                if(null == mViewModel.getAddPlaceMarker()){
+                    LatLng currentLocationLatLng = new LatLng(mViewModel.getCurrentLocation().getLatitude(), mViewModel.getCurrentLocation().getLongitude());
+                    addPlaceMarker(currentLocationLatLng);
+                }else{
+                    // if there is a place marker go to save place
+                    goToAddQueue(mViewModel.getAddPlaceMarker().getPosition());
+                }
+
+            }
+        });
+
         return view;
     }
 
@@ -197,12 +228,71 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback {
             if(checkPermissions() && isGooglePlayServicesAvailable()) {
                 mViewModel.getMap().setMyLocationEnabled(true);
                 mViewModel.getMap().getUiSettings().setMyLocationButtonEnabled(true);
+                mViewModel.getMap().setIndoorEnabled(true);
+
                 //mMap.getUiSettings().setMapToolbarEnabled(true);
                 //mMap.getUiSettings().setZoomControlsEnabled(true);
-                getLastLocation();
+
                 //startLocationUpdates();
+                // A listener to add marker on user's long click
+                mViewModel.getMap().setOnMapLongClickListener(this);
+                mViewModel.getMap().setOnMapClickListener(this);
+                mViewModel.getMap().setOnInfoWindowClickListener(this);
+
+                // add previous place marker
+                if(null != mViewModel.getAddPlaceMarker()){
+                    addPlaceMarker(mViewModel.getAddPlaceMarker().getPosition());
+                }
+
+                // only move camera to current location if we don't have current location yet
+                if(null == mViewModel.getCurrentLocation()){
+                    getLastLocation();
+                }
+
             }
         }
+    }
+
+    // Add new queue when long click
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+        addPlaceMarker(latLng);
+    }
+
+    // get queue id when click on a place
+    @Override
+    public void onMapClick(LatLng latLng) {
+
+    }
+
+    // Go to add queue when user click marker info
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        goToAddQueue(marker.getPosition());
+    }
+
+    private void addPlaceMarker(LatLng latLng) {
+        if(mViewModel.getMap() != null){
+
+            if (null != mViewModel.getAddPlaceMarker()){
+                mViewModel.getAddPlaceMarker().remove();// remove existing marker
+            }
+
+            // Create new marker
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(latLng)
+                    .title(getString(R.string.add_marker_title))
+                    //.icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_front_car_black))
+                    .draggable(true)
+                    .snippet(getString(R.string.add_marker_snippet));
+
+            mViewModel.setAddPlaceMarker(mViewModel.getMap().addMarker(markerOptions));
+
+            mViewModel.moveToLatLng(latLng);
+        }
+    }
+
+    private void goToAddQueue(LatLng latLng) {
     }
 
     private boolean checkPermissions() {
@@ -412,4 +502,5 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback {
             }
         }
     }
+
 }

@@ -28,6 +28,8 @@
     <string name="block_button">Block</string>
     <string name="unblock_button">Unblock</string>
     <string name="edit_profile_button">Edit Profile</string>
+    <string name="add_marker_title">Add Queue</string>
+    <string name="add_marker_snippet">Hold to change position</string>
 
     <!--buttons and menus -->
 
