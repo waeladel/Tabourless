@@ -24,6 +24,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 import com.tabourless.queue.R;
+import com.tabourless.queue.databinding.InboxItemBinding;
 import com.tabourless.queue.interfaces.ItemClickListener;
 import com.tabourless.queue.models.Chat;
 import com.tabourless.queue.models.ChatMember;
@@ -55,6 +56,9 @@ public class InboxAdapter extends PagedListAdapter<Chat, InboxAdapter.ViewHolder
     private List<ChatMember> brokenAvatarsList;// = new ArrayList<>();
 
     private Fragment fragment;
+
+    private InboxItemBinding mBinding;
+
     public InboxAdapter(Fragment fragment) {
         super(DIFF_CALLBACK);
         // [START create_storage_reference]
@@ -84,8 +88,8 @@ public class InboxAdapter extends PagedListAdapter<Chat, InboxAdapter.ViewHolder
     @Override
     public InboxAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_item, parent, false);
-        return new ViewHolder(view);
+        mBinding = InboxItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        return new ViewHolder(mBinding);
     }
 
 
@@ -97,9 +101,9 @@ public class InboxAdapter extends PagedListAdapter<Chat, InboxAdapter.ViewHolder
         if (chat != null) {
             // LastMessage text value
             if (null != chat.getLastMessage()) {
-                holder.mLastMessage.setText(chat.getLastMessage());
+                holder.mBinding.lastMessage.setText(chat.getLastMessage());
             }else{
-                holder.mLastMessage.setText(null);
+                holder.mBinding.lastMessage.setText(null);
             }
 
             // LastSentTime text value
@@ -107,9 +111,9 @@ public class InboxAdapter extends PagedListAdapter<Chat, InboxAdapter.ViewHolder
                 Calendar c = Calendar.getInstance();
                 c.setTimeInMillis(chat.getLastSentLong());
                 String sentTime = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(c.getTime());
-                holder.mLastSentTime.setText(sentTime);
+                holder.mBinding.lastSent.setText(sentTime);
             }else{
-                holder.mLastSentTime.setText(null);
+                holder.mBinding.lastSent.setText(null);
             }
 
             // participants' avatars and names
@@ -138,8 +142,8 @@ public class InboxAdapter extends PagedListAdapter<Chat, InboxAdapter.ViewHolder
                             if(!currentMember.isRead()){
                                 // Bold text
                                 Log.d(TAG, "currentMember=" + currentMember.getName() + " isRead= "+ currentMember.isRead() + " message= "+ chat.getLastMessage() );
-                                holder.mLastMessage.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
-                                holder.mLastMessage.setTextColor(fragment.getResources().getColor(R.color.color_on_surface_emphasis_high));
+                                holder.mBinding.lastMessage.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+                                holder.mBinding.lastMessage.setTextColor(fragment.getResources().getColor(R.color.color_on_surface_emphasis_high));
                                 /*holder.mLastMessage.setTextAppearance(App.getContext(), R.style.TextAppearance_MyTheme_Headline5);
                                 holder.mLastMessage.setTextColor(R.drawable.my_on_surface_emphasis_high_type);*/
                                 //holder.mLastMessage.setAlpha(0.78f);
@@ -149,8 +153,8 @@ public class InboxAdapter extends PagedListAdapter<Chat, InboxAdapter.ViewHolder
                             }else{
                                 // Normal text
                                 Log.d(TAG, "currentMember=" + currentMember.getName() + " isRead= "+ currentMember.isRead() + " message= "+ chat.getLastMessage() );
-                                holder.mLastMessage.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
-                                holder.mLastMessage.setTextColor(fragment.getResources().getColor(R.color.color_on_surface_emphasis_medium));
+                                holder.mBinding.lastMessage.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+                                holder.mBinding.lastMessage.setTextColor(fragment.getResources().getColor(R.color.color_on_surface_emphasis_medium));
                                 //holder.mLastMessage.setTextAppearance(App.getContext(), R.style.TextAppearance_MyTheme_Body2);
                                 //holder.mLastMessage.setTextColor(App.getContext().getResources().getColor(R.color.color_on_background));
                                 //holder.mLastMessage.setAlpha(0.54f);
@@ -208,19 +212,19 @@ public class InboxAdapter extends PagedListAdapter<Chat, InboxAdapter.ViewHolder
                         Log.d(TAG, "mama getItems membersList avatar= "+membersList.get(0).getAvatar());
                         // names text value
                         if (null != membersList.get(0).getName()) {
-                            holder.mChatTitle.setText(membersList.get(0).getName());
+                            holder.mBinding.userName.setText(membersList.get(0).getName());
                         }else{
-                            holder.mChatTitle.setText(null);
+                            holder.mBinding.userName.setText(null);
                         }
 
                         // Avatar
                         if (null != membersList.get(0).getAvatar()) {
-                            holder.mAvatar.setImageResource(R.drawable.ic_round_account_filled_72);
+                            holder.mBinding.userImage.setImageResource(R.drawable.ic_round_account_filled_72);
                             Picasso.get()
                                     .load(membersList.get(0).getAvatar())
                                     .placeholder(R.mipmap.account_circle_72dp)
                                     .error(R.drawable.ic_round_broken_image_72px)
-                                    .into(holder.mAvatar , new com.squareup.picasso.Callback() {
+                                    .into(holder.mBinding.userImage , new com.squareup.picasso.Callback() {
                                 @Override
                                 public void onSuccess() {
                                     // loading avatar succeeded, do nothing
@@ -228,12 +232,12 @@ public class InboxAdapter extends PagedListAdapter<Chat, InboxAdapter.ViewHolder
                                 @Override
                                 public void onError(Exception e) {
                                     // loading avatar failed, lets try to get the avatar from storage instead of database link
-                                    loadStorageImage(chat.getKey(), membersList.get(0), holder.mAvatar);
+                                    loadStorageImage(chat.getKey(), membersList.get(0), holder.mBinding.userImage);
                                 }
                             });
                         }else{
                             // end of user avatar
-                            holder.mAvatar.setImageResource(R.drawable.ic_round_account_filled_72);
+                            holder.mBinding.userImage.setImageResource(R.drawable.ic_round_account_filled_72);
                         }
 
                         /*// [START create_storage_reference]
@@ -266,7 +270,7 @@ public class InboxAdapter extends PagedListAdapter<Chat, InboxAdapter.ViewHolder
 
             }else{
                 Log.d(TAG, "mama Chats= null");
-                holder.mAvatar.setImageResource(R.drawable.ic_round_account_filled_72);
+                holder.mBinding.userImage.setImageResource(R.drawable.ic_round_account_filled_72);
             }
 
         }
@@ -365,24 +369,15 @@ public class InboxAdapter extends PagedListAdapter<Chat, InboxAdapter.ViewHolder
     /// ViewHolder for ReceivedMessages list /////
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
-        View row;
-        private TextView mLastMessage, mLastSentTime, mChatTitle;
-        private CircleImageView mAvatar;
         ItemClickListener itemClickListener;
+        private InboxItemBinding mBinding;
 
+        public ViewHolder(InboxItemBinding binding) {
+            super(binding.getRoot());
+            this.mBinding = binding;
 
-        public ViewHolder(View itemView) {
-            super(itemView);
-            //itemView = row;
-
-            row = itemView;
-            mLastMessage = row.findViewById(R.id.chat_text);
-            mAvatar = row.findViewById(R.id.user_image);
-            mLastSentTime = row.findViewById(R.id.last_sent);
-            mChatTitle = row.findViewById(R.id.user_name);
-
-            mAvatar.setOnClickListener(this);
-            row.setOnClickListener(this);
+            mBinding.userImage.setOnClickListener(this);
+            mBinding.getRoot().setOnClickListener(this);
         }
 
 

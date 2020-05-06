@@ -26,6 +26,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 import com.tabourless.queue.R;
+import com.tabourless.queue.databinding.MessageReceivedItemBinding;
 import com.tabourless.queue.databinding.MessageSentItemBinding;
 import com.tabourless.queue.interfaces.ItemClickListener;
 import com.tabourless.queue.models.Chat;
@@ -46,8 +47,6 @@ public class MessagesAdapter extends PagedListAdapter<Message, RecyclerView.View
     private final static String TAG = MessagesAdapter.class.getSimpleName();
     private FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
     private String currentUserId = currentUser != null ? currentUser.getUid() : null;
-
-    private MessageSentItemBinding mSentBinding;
 
     private static final String AVATAR_THUMBNAIL_NAME = "avatar.jpg";
     private static final String COVER_THUMBNAIL_NAME = "cover.jpg";
@@ -75,6 +74,10 @@ public class MessagesAdapter extends PagedListAdapter<Message, RecyclerView.View
     private List<Message> brokenAvatarsList;// = new ArrayList<>();
 
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+
+    // View binding
+    private MessageSentItemBinding mSentBinding;
+    private MessageReceivedItemBinding mReceivedBinding;
 
     public MessagesAdapter() {
         super(DIFF_CALLBACK);
@@ -200,15 +203,12 @@ public class MessagesAdapter extends PagedListAdapter<Message, RecyclerView.View
         switch (viewType){
             case VIEW_TYPE_MESSAGE_SENT:
                 // // If the current user is the sender of the message;
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_sent_item , parent, false);
-                //mSentBinding = MessageSentItemBinding.inflate(LayoutInflater.from(parent.getContext()).inflate(R.layout.message_sent_item , parent, false));
-                //mSentBinding = MessageSentItemBinding.bind(view);
-                return new SentMessageHolder(view);
+                mSentBinding = MessageSentItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+                return new SentMessageHolder(mSentBinding);
             default:
                 //// If some other user sent the message
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_received_item, parent, false);
-                return new ReceivedMessageHolder(view);
-
+                mReceivedBinding = MessageReceivedItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+                return new ReceivedMessageHolder(mReceivedBinding);
         }
         // default
         /*view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_received_item, parent, false);
@@ -234,15 +234,15 @@ public class MessagesAdapter extends PagedListAdapter<Message, RecyclerView.View
                     // Message can't be empty because scratch view width will crash the app if it's width is < 0
                     if(!message.getMessage().isEmpty()){
                         // Only display message text if it's not empty
-                        ReceivedHolder.mMessage.setText(message.getMessage());
+                        ReceivedHolder.mReceivedBinding.messageText.setText(message.getMessage());
                     }else{
                         // if message is empty we must display empty space to have a width for scratch view
-                        ReceivedHolder.mMessage.setText(" ");
+                        ReceivedHolder.mReceivedBinding.messageText.setText(" ");
                     }
                     //ReceivedHolder.mScratch.setText(message.getMessage()+ message.getKey());
                 }else{
                     // if message is null (not set) we must display empty space to have a width for scratch view
-                    ReceivedHolder.mMessage.setText(" ");
+                    ReceivedHolder.mReceivedBinding.messageText.setText(" ");
                     //ReceivedHolder.mScratch.setText(null);
                 }
 
@@ -254,7 +254,7 @@ public class MessagesAdapter extends PagedListAdapter<Message, RecyclerView.View
                             .load(message.getSenderAvatar())
                             .placeholder(R.mipmap.account_circle_72dp)
                             .error(R.drawable.ic_round_broken_image_72px)
-                            .into(ReceivedHolder.mAvatar , new com.squareup.picasso.Callback() {
+                            .into(ReceivedHolder.mReceivedBinding.userImage , new com.squareup.picasso.Callback() {
                                 @Override
                                 public void onSuccess() {
                                     // loading avatar succeeded, do nothing
@@ -262,21 +262,21 @@ public class MessagesAdapter extends PagedListAdapter<Message, RecyclerView.View
                                 @Override
                                 public void onError(Exception e) {
                                     // loading avatar failed, lets try to get the avatar from storage instead of database link
-                                    loadStorageImage(message, ReceivedHolder.mAvatar);
+                                    loadStorageImage(message, ReceivedHolder.mReceivedBinding.userImage);
                                 }
                             });
                 }else{
                     // Handle if getSenderId() is null
-                    ReceivedHolder.mAvatar.setImageResource(R.drawable.ic_round_account_filled_72);
+                    ReceivedHolder.mReceivedBinding.userImage.setImageResource(R.drawable.ic_round_account_filled_72);
                 }
 
                 if (null != message.getCreated()) {
                     Calendar c = Calendar.getInstance();
                     c.setTimeInMillis(message.getCreatedLong());
                     String sentTime = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(c.getTime());
-                    ReceivedHolder.mSentTime.setText(sentTime);
+                    ReceivedHolder.mReceivedBinding.sentTime.setText(sentTime);
                 }else{
-                    ReceivedHolder.mSentTime.setText(null);
+                    ReceivedHolder.mReceivedBinding.sentTime.setText(null);
                 }
 
                 /*ReceivedHolder.setItemClickListener(new ItemClickListener(){
@@ -302,19 +302,19 @@ public class MessagesAdapter extends PagedListAdapter<Message, RecyclerView.View
                 // click listener using interface
                 // user name text value
                 if (null != message.getMessage()) {
-                    SentHolder.mMessage.setText(message.getMessage());
+                    SentHolder.mSentBinding.messageText.setText(message.getMessage());
                     //SentHolder.mMessage.setText(message.getMessage()+ message.getKey());
                 }else{
-                    SentHolder.mMessage.setText(null);
+                    SentHolder.mSentBinding.messageText.setText(null);
                 }
 
                 if (null != message.getCreated()) {
                     Calendar c = Calendar.getInstance();
                     c.setTimeInMillis(message.getCreatedLong());
                     String sentTime = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(c.getTime());
-                    SentHolder.mSentTime.setText(sentTime);
+                    SentHolder.mSentBinding.sentTime.setText(sentTime);
                 }else{
-                    SentHolder.mSentTime.setText(null);
+                    SentHolder.mSentBinding.sentTime.setText(null);
                 }
 
                 // update sent icon according to message's sent boolean
@@ -322,10 +322,10 @@ public class MessagesAdapter extends PagedListAdapter<Message, RecyclerView.View
                 // if message is sent show send icon
                 if(null != message.getStatus() && message.getStatus().equals(Message_STATUS_SENT)){
                     // Show seen sent icon
-                    SentHolder.mSentIcon.setImageResource(R.drawable.ic_sent_message_thick);
+                    SentHolder.mSentBinding.sendingIcon.setImageResource(R.drawable.ic_sent_message_thick);
                 }else{
                     // Show sending sent icon
-                    SentHolder.mSentIcon.setImageResource(R.drawable.ic_sending_message_thick);
+                    SentHolder.mSentBinding.sendingIcon.setImageResource(R.drawable.ic_sending_message_thick);
                 }
             }
         }
@@ -510,69 +510,25 @@ public class MessagesAdapter extends PagedListAdapter<Message, RecyclerView.View
     /// ViewHolder for ReceivedMessages list /////
     public class ReceivedMessageHolder extends RecyclerView.ViewHolder {
 
-        View row;
-        private TextView mMessage, mSentTime, mResetView;
-        private CircleImageView mAvatar;
         ItemClickListener itemClickListener;
+        private MessageReceivedItemBinding mReceivedBinding;
 
-        private ReceivedMessageHolder(View itemView) {
-            super(itemView);
-            //itemView = row;
+        private ReceivedMessageHolder(MessageReceivedItemBinding binding) {
+            super(binding.getRoot());
+            this.mReceivedBinding = binding;
 
-            row = itemView;
-            mMessage = row.findViewById(R.id.message_text);
-            mAvatar = row.findViewById(R.id.user_image);
-            mSentTime = row.findViewById(R.id.sent_time);
-
-            /*itemClickListener= new ItemClickListener() {
-                @Override
-                public void onClick(View view, int position, boolean isLongClick) {
-
-                }
-            };*/
         }
-
-
-       /* @Override
-        public boolean onLongClick(View v) {
-            Log.d(TAG, "onDrag ");
-            //return false;
-            //itemClickListener.onClick(v, getAdapterPosition(), true);
-            return false;
-        }*/
-
-       /* @Override
-        public boolean onHover(View v, MotionEvent event) {
-            Log.d(TAG, "onDrag ");
-            return true;
-        }*/
-
-
-        // needed only if i want the listener to be inside the adapter
-        public void setItemClickListener(ItemClickListener itemClickListener) {
-            this.itemClickListener = itemClickListener;
-        }
-
     }
 
     /// ViewHolder for SentMessages list /////
     public class SentMessageHolder extends RecyclerView.ViewHolder {
 
-        View row;
-        private TextView mMessage, mSentTime;
-        private CircleImageView mAvatar;
-        private ImageView mSentIcon;
+        // View binding
+        private MessageSentItemBinding mSentBinding;
 
-
-        public SentMessageHolder(View itemView) {
-            super(itemView);
-            //itemView = row;
-
-            row = itemView;
-            mMessage = row.findViewById(R.id.message_text);
-            mAvatar = row.findViewById(R.id.user_image);
-            mSentTime = row.findViewById(R.id.sent_time);
-            mSentIcon = row.findViewById(R.id.sending_icon);
+        public SentMessageHolder(MessageSentItemBinding binding) {
+            super(binding.getRoot());
+            this.mSentBinding = binding;
         }
 
     }
