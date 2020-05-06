@@ -22,9 +22,14 @@ public class QueuesFragment extends Fragment {
     private FragmentQueuesBinding mBinding;
     private NavController navController;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mViewModel = new ViewModelProvider(this).get(QueuesViewModel.class);
+    }
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        mViewModel = new ViewModelProvider(this).get(QueuesViewModel.class);
 
         mBinding = FragmentQueuesBinding.inflate(inflater, container, false);
         View view = mBinding.getRoot();

@@ -14,6 +14,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
+import com.tabourless.queue.ui.queues.*;
+
 import androidx.navigation.fragment.NavHostFragment;
 
 import android.os.Handler;
@@ -154,6 +157,7 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                 }else{
                     // if there is a place marker go to save place
                     goToAddQueue(mViewModel.getAddPlaceMarker().getPosition());
+                    Log.d(TAG, "marker getPosition: "+mViewModel.getAddPlaceMarker().getPosition());
                 }
 
             }
@@ -293,6 +297,8 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
     }
 
     private void goToAddQueue(LatLng latLng) {
+        NavDirections direction = SearchFragmentDirections.actionSearchToAddQueue(latLng);
+        navController.navigate(direction);
     }
 
     private boolean checkPermissions() {

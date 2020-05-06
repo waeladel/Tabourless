@@ -11,6 +11,7 @@
     <string name="title_edit_profile">Edit Profile</string>
     <string name="title_messages">Direct messages</string>
     <string name="title_search">Search</string>
+    <string name="title_add_queue">Add Queue</string>
     <string name="title_logout">Logout</string>
     <string name="title_Photo">Photo Display</string>
 
