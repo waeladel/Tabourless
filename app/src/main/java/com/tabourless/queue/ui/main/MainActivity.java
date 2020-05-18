@@ -251,6 +251,13 @@ public class MainActivity extends AppCompatActivity {
                     getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
                 }
 
+                // Only show save button in add or edit place
+                if(R.id.add_place == destination.getId()){
+                    mBinding.saveButton.setVisibility(View.VISIBLE);
+                } else{
+                    mBinding.saveButton.setVisibility(View.GONE);
+                }
+
                 // To log out
                 if(R.id.logout == destination.getId()){
                     mToolbarBinding.toolbar.setTitle(null);

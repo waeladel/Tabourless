@@ -11,7 +11,7 @@
     <string name="title_edit_profile">Edit Profile</string>
     <string name="title_messages">Direct messages</string>
     <string name="title_search">Search</string>
-    <string name="title_add_queue">Add Queue</string>
+    <string name="title_add_place">Add A Place</string>
     <string name="title_logout">Logout</string>
     <string name="title_Photo">Photo Display</string>
 
@@ -29,8 +29,11 @@
     <string name="block_button">Block</string>
     <string name="unblock_button">Unblock</string>
     <string name="edit_profile_button">Edit Profile</string>
-    <string name="add_marker_title">Add Queue</string>
+    <string name="add_marker_title">Add Place</string>
     <string name="add_marker_snippet">Hold to change position</string>
+
+    <string name="add_service_button_title">add more services</string>
+    <string name="add_counter_button_title">add more counters</string>
 
     <!--buttons and menus -->
 
@@ -46,6 +49,26 @@
     <string name="send_message_hint">Type a message…</string>
     <string name="user_active_now">Active Now</string>
     <string name="user_active_ago">Active %1$s</string>
+
+    <string name="add_place_name_title">Name</string>
+    <string name="add_place_name_hint">Pizza Hut, Galaxy cineplex cinema, Emigration Administration</string>
+    <string name="add_place_name_helper">Place\'s name will help others to search for it.</string>
+
+    <string name="add_place_parent_title">Container place</string>
+    <string name="add_place_parent_hint">Carrefour, Mall of Arabia, The Mogamma</string>
+    <string name="add_place_parent_helper">Only add a container place if this place is located within another bigger place.</string>
+
+    <string name="add_place_queue_title">Service</string>
+    <string name="add_place_queue_hint">Customer service, Tickets booking</string>
+    <string name="add_place_queue_helper">If this place provides multiple services, add them all to create separate waiting list for each service.</string>
+
+
+    <string name="add_place_counter_title">Service counter*</string>
+    <string name="add_place_counter_hint">Main, Counter A, Elderly Counter</string>
+    <string name="add_place_counter_helper">Only add multiple counters if this service can serve more than one customer simultaneously. If you see multiple queues in front of a single counter, add only one counter then use filters to separate the queues</string>
+
+    <string name="add_place_add_counter_title">Add A Counter</string>
+
 
     <!--toast and error messages -->
     <string name="sign_in_cancelled">Sign in has been cancelled</string>
@@ -85,6 +108,14 @@
     <string name="permission_not_granted">We are sorry, we cannot access this feature until you grant us permission.</string>
     <string name="permission_not_granted_title">Permission not granted</string>
 
+    <string name="add_place_name_error">Place\'s name can\'t be empty</string>
+    <string name="add_place_service_error">Service\'s name can\'t be empty</string>
+    <string name="add_place_service_empty_error">You must add at least one service</string>
+    <string name="add_place_counter_empty_error">You must add at least one counter for each service.</string>
+    <string name="add_place_counter_error">Counter\'s name can\'t be empty</string>
+
+
+
     <!--Images content Description-->
     <string name="cover_image_description">Your cover image</string>
     <string name="profile_image_description">Your Profile picture</string>
@@ -92,6 +123,8 @@
     <string name="original_profile_image_description">Profile Image</string>
     <string name="send_text_icon">Send message</string>
     <string name="message_sent_icon">Message sent icon</string>
+    <string name="remove_counter_icon">Remove counter</string>
+
 
     <!--Input text helper-->
     <string name="required_helper">*Required</string>
@@ -107,5 +140,22 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="title_activity_maps">Map</string>
+
+    <!-- counter gender spinner array -->
+    <string name="counter_gender_only_males">Males Only</string>
+    <string name="counter_gender_only_females">Females Only</string>
+    <string name="counter_any">Any</string>
+    <string name="counter_both">Both in separate queues</string>
+    <!-- gender type array -->
+
+    <!-- counter age spinner array -->
+    <string name="counter_age_only_old">Seniors only</string>
+    <string name="counter_age_only_young">juniors only</string>
+    <!-- gender age array -->
+
+    <!-- counter disability spinner array -->
+    <string name="counter_age_only_disabled">Disabled only</string>
+    <string name="counter_age_only_able">Able-bodied only</string>
+    <!-- gender disability array -->
 
 </resources>

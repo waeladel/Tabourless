@@ -109,14 +109,14 @@
         android:label="@string/title_search"
         tools:layout="@layout/fragment_search" >
         <action
-            android:id="@+id/action_search_to_add_queue"
-            app:destination="@id/add_queue" />
+            android:id="@+id/action_search_to_add_place"
+            app:destination="@id/add_place" />
     </fragment>
     <fragment
-        android:id="@+id/add_queue"
-        android:name="com.tabourless.queue.ui.addqueue.AddQueueFragment"
-        android:label="@string/title_add_queue"
-        tools:layout="@layout/fragment_add_queue">
+        android:id="@+id/add_place"
+        android:name="com.tabourless.queue.ui.addplace.AddPlaceFragment"
+        android:label="@string/title_add_place"
+        tools:layout="@layout/fragment_add_place">
         <argument
             android:name="point"
             app:argType="com.google.android.gms.maps.model.LatLng" />

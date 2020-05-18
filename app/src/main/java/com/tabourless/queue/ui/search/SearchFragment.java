@@ -15,8 +15,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
-import com.tabourless.queue.ui.queues.*;
-
 import androidx.navigation.fragment.NavHostFragment;
 
 import android.os.Handler;
@@ -194,7 +192,7 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (mBinding.map != null) {
+        if (null != mBinding && null != mBinding.map) {
             mBinding.map.onSaveInstanceState(outState);
         }
     }
@@ -202,7 +200,7 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        if (mBinding.map != null) {
+        if (null != mBinding &&  null != mBinding.map) {
             mBinding.map.onLowMemory();
         }
     }
@@ -210,7 +208,7 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mBinding.map != null) {
+        if (null != mBinding &&  null != mBinding.map) {
             mBinding.map.onDestroy();
         }
     }
@@ -291,13 +289,14 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                     .snippet(getString(R.string.add_marker_snippet));
 
             mViewModel.setAddPlaceMarker(mViewModel.getMap().addMarker(markerOptions));
+            mViewModel.getAddPlaceMarker().showInfoWindow(); // To display add new place window
 
             mViewModel.moveToLatLng(latLng);
         }
     }
 
     private void goToAddQueue(LatLng latLng) {
-        NavDirections direction = SearchFragmentDirections.actionSearchToAddQueue(latLng);
+        NavDirections direction = SearchFragmentDirections.actionSearchToAddPlace(latLng);
         navController.navigate(direction);
     }
 
