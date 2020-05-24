@@ -7,7 +7,9 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseError;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -15,6 +17,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.tabourless.queue.interfaces.FirebaseOnCompleteCallback;
 import com.tabourless.queue.interfaces.FirebasePlaceCallback;
 import com.tabourless.queue.interfaces.FirebaseUserCallback;
 import com.tabourless.queue.models.FirebaseListeners;
@@ -164,10 +167,10 @@ public class AddPlaceRepository {
         });
     }
 
-    public void addPlace(final Place place){
+    public void addPlace(final Place place, final FirebaseOnCompleteCallback callback){
 
-        // Add geofire fist then place data
-        GeoFire geoFire = new GeoFire(mPlacesRef);
+        // Add GeoFire fist then place data
+        /*GeoFire geoFire = new GeoFire(mPlacesRef);
         geoFire.setLocation(place.getKey(), new GeoLocation(place.getLatitude(), place.getLongitude()), new GeoFire.CompletionListener() {
             @Override
             public void onComplete(String key, DatabaseError error) {
@@ -180,17 +183,18 @@ public class AddPlaceRepository {
                     System.err.println("There was an error saving the location to GeoFire: " + error);
                 }
             }
-        });
-
-        /*mPlacesRef.child(place.getKey()).setValue(place).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                // place is added successfully, we need to add GeoFire lat and lng
-                Log.d(TAG, "onSuccess: data added");
-                GeoFire geoFire = new GeoFire(mPlacesRef.child(place.getKey()));
-                geoFire.setLocation(place.getKey(), new GeoLocation(place.getLatitude(), place.getLongitude()));
-            }
         });*/
+
+        //String pushKey = place.getKey(); // Save key to another string because we are about to delete it
+        //place.setKey(null); // no need to insert a key value to place object too
+        mPlacesRef.child(place.getKey()).setValue(place).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task task) {
+                callback.onCallback(task);
+                //GeoFire geoFire = new GeoFire(mPlacesRef.child(place.getKey()));
+                //geoFire.setLocation(place.getKey(), new GeoLocation(place.getLatitude(), place.getLongitude()));
+            }
+        });
     }
 
 

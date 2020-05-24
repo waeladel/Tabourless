@@ -5,6 +5,7 @@ import android.util.Log;
 import androidx.lifecycle.ViewModel;
 
 import com.tabourless.queue.data.AddPlaceRepository;
+import com.tabourless.queue.interfaces.FirebaseOnCompleteCallback;
 import com.tabourless.queue.interfaces.FirebasePlaceCallback;
 import com.tabourless.queue.models.Place;
 
@@ -37,8 +38,8 @@ public class AddPlaceViewModel extends ViewModel {
     }
 
     // To add saved place to database
-    public void addPlace(){
-        mAddPlaceRepository.addPlace(mPlace);
+    public void addPlace(FirebaseOnCompleteCallback callback){
+        mAddPlaceRepository.addPlace(mPlace, callback);
     }
 
     @Override

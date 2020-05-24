@@ -527,7 +527,7 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                         public void onCallback(@NonNull Task<Void> task) {
                             if(task.isSuccessful()){
                                 // Go to customers recycler
-                                Log.d(TAG, "onCallback: "+task.getResult());
+                                Log.d(TAG, "FirebaseOnCompleteCallback onCallback: "+task.isSuccessful());
                             }else{
                                 Toast.makeText(mContext, R.string.book_queue_error, Toast.LENGTH_LONG).show();
                             }

@@ -3,12 +3,15 @@ package com.tabourless.queue.models;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.firebase.geofire.core.GeoHash;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 import com.google.firebase.database.ServerValue;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @IgnoreExtraProperties
@@ -23,8 +26,21 @@ public class Place {
 
     private Map<String, Queue> queues = new LinkedHashMap<>();
 
+    private String g; // for GeoFire index
+    private List<Double> l; // for GeoFire coordinates
 
+
+    // An Empty constructor needed for firebase
     public Place() {
+    }
+
+    public Place(double latitude, double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.g = new GeoHash(this.latitude, this.longitude).getGeoHashString();
+        this.l = new ArrayList<>();
+        l.add(this.latitude);
+        l.add(this.longitude);
     }
 
     public Place(String name, double latitude, double longitude ,String parent, String parentId, Map<String, Queue> queues) {
@@ -40,6 +56,8 @@ public class Place {
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
+        result.put("g", g);
+        result.put("l", l);
         result.put("name", name);
         result.put("latitude", latitude);
         result.put("longitude", longitude);
@@ -51,11 +69,12 @@ public class Place {
     }
 // [END post_to_map]
 
-
+    @Exclude
     public String getKey() {
         return key;
     }
 
+    @Exclude
     public void setKey(String key) {
         this.key = key;
     }
@@ -106,6 +125,22 @@ public class Place {
 
     public void setQueues(Map<String, Queue> queues) {
         this.queues = queues;
+    }
+
+    public String getG() {
+        return g;
+    }
+
+    public void setG(String g) {
+        this.g = g;
+    }
+
+    public List<Double> getL() {
+        return l;
+    }
+
+    public void setL(List<Double> l) {
+        this.l = l;
     }
 
     @Override

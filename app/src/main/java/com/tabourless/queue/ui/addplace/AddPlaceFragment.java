@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -27,6 +28,7 @@ import com.tabourless.queue.R;
 import com.tabourless.queue.adapters.AddPlaceAdapter;
 import com.tabourless.queue.databinding.ActivityMainBinding;
 import com.tabourless.queue.databinding.FragmentAddPlaceBinding;
+import com.tabourless.queue.interfaces.FirebaseOnCompleteCallback;
 import com.tabourless.queue.interfaces.FirebasePlaceCallback;
 import com.tabourless.queue.interfaces.ItemClickListener;
 import com.tabourless.queue.models.Counter;
@@ -136,7 +138,7 @@ public class AddPlaceFragment extends Fragment implements ItemClickListener {
             }else{
                 // Place key in null, We must create a temp place because we are adding a new place
                 // let's create a temp place as we couldn't get it form database
-                Place tempPlace = new Place();
+                Place tempPlace = new Place(point.latitude, point.longitude);
                 mViewModel.setPlace(tempPlace);
 
                 // Only create place's key if it's the first time to add this place
@@ -405,7 +407,17 @@ public class AddPlaceFragment extends Fragment implements ItemClickListener {
         }
 
         // Let's save place to database
-        mViewModel.addPlace();
+        mViewModel.addPlace(new FirebaseOnCompleteCallback() {
+            @Override
+            public void onCallback(@NonNull Task<Void> task) {
+                if(task.isSuccessful()){
+                    // Go to customers recycler
+                    Log.d(TAG, "FirebaseOnCompleteCallback onCallback: "+task.isSuccessful());
+                }else{
+                    Toast.makeText(mContext, R.string.save_place_error, Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
 
     // get Item click from add place adapter
