@@ -58,8 +58,7 @@ public class AddPlaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private DatabaseReference mDatabaseRef;
     private DatabaseReference mPlacesRef; // for all places which have queues and counters within
 
-    public AddPlaceAdapter(ArrayList<PlaceItem> arrayList, Fragment fragment, ItemClickListener itemClickListener) {
-        this.placeItemsList = arrayList;
+    public AddPlaceAdapter(Fragment fragment, ItemClickListener itemClickListener) {
         this.itemClickListener = itemClickListener;
         Log.d(TAG, "AddPlaceAdapter: constructor init");
 
@@ -69,10 +68,26 @@ public class AddPlaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         mViewModel = new ViewModelProvider(mFragment).get(AddPlaceViewModel.class);
 
         // get Map of queues inside the place
-        mPlaceQueuesMap = mViewModel.getPlace().getQueues();
+        //mPlaceQueuesMap = mViewModel.getPlace().getQueues();
 
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
         mPlacesRef = mDatabaseRef.child("places");
+    }
+
+    public ArrayList<PlaceItem> getPlaceItemsList() {
+        return placeItemsList;
+    }
+
+    public void setPlaceItemsList(ArrayList<PlaceItem> placeItemsList) {
+        this.placeItemsList = placeItemsList;
+    }
+
+    public Map<String, Queue> getPlaceQueuesMap() {
+        return mPlaceQueuesMap;
+    }
+
+    public void setPlaceQueuesMap(Map<String, Queue> mPlaceQueuesMap) {
+        this.mPlaceQueuesMap = mPlaceQueuesMap;
     }
 
     @NonNull
@@ -157,7 +172,12 @@ public class AddPlaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public int getItemCount() {
         //Log.d(TAG, "getItemCount: "+ placeItemsList.size());
-        return placeItemsList.size();
+        if(placeItemsList != null){
+            return placeItemsList.size();
+        }else{
+            return 0;
+        }
+
     }
 
     /// ViewHolder for services list /////

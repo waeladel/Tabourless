@@ -61,6 +61,7 @@ dependencies {
     implementation 'top.zibin:Luban:1.0.8' // for compressing original image
     implementation 'io.reactivex:rxandroid:1.2.1' // RxJava for compressing original image
     implementation "androidx.preference:preference:1.1.1" // For settings preference
+    implementation 'com.firebase:geofire-android:3.0.0' // For GeoFire
 
     // Required only if Facebook login support is required. Find the latest Facebook SDK releases here: https://goo.gl/Ce5L94
     implementation 'com.facebook.android:facebook-android-sdk:5.5.1'

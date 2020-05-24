@@ -16,7 +16,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -28,6 +27,7 @@ import com.tabourless.queue.R;
 import com.tabourless.queue.adapters.AddPlaceAdapter;
 import com.tabourless.queue.databinding.ActivityMainBinding;
 import com.tabourless.queue.databinding.FragmentAddPlaceBinding;
+import com.tabourless.queue.interfaces.FirebasePlaceCallback;
 import com.tabourless.queue.interfaces.ItemClickListener;
 import com.tabourless.queue.models.Counter;
 import com.tabourless.queue.models.Place;
@@ -53,6 +53,7 @@ public class AddPlaceFragment extends Fragment implements ItemClickListener {
     private ActivityMainBinding mActivityBinding;
     private NavController navController;
     private String currentUserId;
+    private String PlaceKey;
     private LatLng point;
 
     private AddPlaceAdapter mAddPlaceAdapter;
@@ -62,7 +63,7 @@ public class AddPlaceFragment extends Fragment implements ItemClickListener {
 
     private DatabaseReference mDatabaseRef;
     private DatabaseReference mPlacesRef; // for all places which have services and counters within (like chats in basbes)
-    private DatabaseReference mQueuesRef; // for all queues (like messages in basbes)
+    private DatabaseReference mCustomersRef; // for all queues (like messages in basbes)
 
 
 
@@ -85,34 +86,90 @@ public class AddPlaceFragment extends Fragment implements ItemClickListener {
         if(getArguments() != null && getArguments().containsKey("point")) {
             // get latLng of this place
             point = AddPlaceFragmentArgs.fromBundle(getArguments()).getPoint();
-            Log.d(TAG, "point: "+point);
+            Log.d(TAG, "getArguments point: "+point);
+        }
+
+        if(getArguments() != null && getArguments().containsKey("placeKey")) {
+            // get latLng of this place
+            if(null != AddPlaceFragmentArgs.fromBundle(getArguments()).getPlaceKey()){
+                PlaceKey = AddPlaceFragmentArgs.fromBundle(getArguments()).getPlaceKey();
+                Log.d(TAG, "getArguments PlaceKey: "+PlaceKey);
+            }
         }
 
         mViewModel = new ViewModelProvider(this).get(AddPlaceViewModel.class);
 
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
         mPlacesRef = mDatabaseRef.child("places");
-        mQueuesRef = mDatabaseRef.child("queues");
+        mCustomersRef = mDatabaseRef.child("customers");
 
+        // Create the adapter first then set it's data
+        mAddPlaceAdapter = new AddPlaceAdapter(this,this);
 
         // We can't display fields unless there is a place object,
         // lets create a place to use it's fields to get dynamic methods working
-        // Only create place's key if it's the first time to add this place
-        if(null == mViewModel.getPlace().getKey()){
-            String placeKey =  mPlacesRef.push().getKey(); // The key of place to be added
-            mViewModel.getPlace().setKey(placeKey); // set the key to place object in the view model
+
+        // Check if we have a place key, it means we should edit this existing place, not adding a new one
+        // Get place from database if it we have place key
+        if(mViewModel.getPlace() == null){
+            if(PlaceKey != null){
+                mViewModel.getPlaceOnce(PlaceKey, new FirebasePlaceCallback() {
+                    @Override
+                    public void onCallback(Place place) {
+                        if(place != null){
+                            Log.d(TAG,  "FirebasePlaceCallback onCallback. name= " + place.getName()+ " key= "+place.getKey());
+                            mViewModel.setPlace(place);
+
+                            if(point != null && mViewModel.getPlace().getLatitude() == 0.0){
+                                // Set lat and lng of this place
+                                mViewModel.getPlace().setLatitude(point.latitude);
+                                mViewModel.getPlace().setLongitude(point.longitude);
+                            }
+                            // Display the fetched place
+                            showPlace(mViewModel.getPlace());
+                        }else{
+                            // couldn't get place from database, toast error message
+                            Toast.makeText(mContext, R.string.fetch_place_error, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }else{
+                // Place key in null, We must create a temp place because we are adding a new place
+                // let's create a temp place as we couldn't get it form database
+                Place tempPlace = new Place();
+                mViewModel.setPlace(tempPlace);
+
+                // Only create place's key if it's the first time to add this place
+                if(null == mViewModel.getPlace().getKey()){
+                    String placeKey =  mPlacesRef.push().getKey(); // The key of place to be added
+                    mViewModel.getPlace().setKey(placeKey); // set the key to place object in the view model
+                }
+
+                if(point != null && mViewModel.getPlace().getLatitude() == 0.0){
+                    // Set lat and lng of this place
+                    mViewModel.getPlace().setLatitude(point.latitude);
+                    mViewModel.getPlace().setLongitude(point.longitude);
+                }
+
+                showPlace(mViewModel.getPlace());
+            }
+
+        }else{
+            // mViewModel.getPlace() is not null, we don't need to fetch data again
+            Log.d(TAG,  "getPlace is not null. no need to get user from database "+mViewModel.getPlace().getKey());
+
+            if(point != null && mViewModel.getPlace().getLatitude() == 0.0){
+                // Set lat and lng of this place
+                mViewModel.getPlace().setLatitude(point.latitude);
+                mViewModel.getPlace().setLongitude(point.longitude);
+            }
+
+            // Display the fetched place
+            showPlace(mViewModel.getPlace());
         }
 
-        if(point != null){
-            // Set lat and lng of this place
-            mViewModel.getPlace().setLatitude(point.latitude);
-            mViewModel.getPlace().setLongitude(point.longitude);
-        }
         // Display the temp empty place that has only key, or complete place object if it's not the first time to create it
-        showPlace(mViewModel.getPlace());
-
-        // Add fragment to the recycler adapter to access it's view model
-        mAddPlaceAdapter = new AddPlaceAdapter(placeItemsList, this, this);
+        //showPlace(mViewModel.getPlace());
     }
 
     @Override
@@ -130,6 +187,7 @@ public class AddPlaceFragment extends Fragment implements ItemClickListener {
 
         /*DividerItemDecoration divider = new DividerItemDecoration(mBinding.addPlaceRecycler.getContext(), DividerItemDecoration.VERTICAL);
         mBinding.addPlaceRecycler.addItemDecoration(divider);*/
+
         return view;
     }
 
@@ -158,8 +216,10 @@ public class AddPlaceFragment extends Fragment implements ItemClickListener {
                 //Log.d(TAG, "fields="+f.get);
                 getDynamicMethod(f.getName(), place);
             }
-            //restoreLayoutManagerPosition();
-            //mAddPlaceAdapter.notifyDataSetChanged();
+            //Update adapter's data and notify changes
+            mAddPlaceAdapter.setPlaceItemsList(placeItemsList);
+            mAddPlaceAdapter.setPlaceQueuesMap(mViewModel.getPlace().getQueues());
+            mAddPlaceAdapter.notifyDataSetChanged();
         }
     }
 
@@ -200,7 +260,7 @@ public class AddPlaceFragment extends Fragment implements ItemClickListener {
                                 showQueue(null,2);
                             }else{
                                 // show queues data, each queue in a separate item
-                                // loop to get all chat members HashMap
+                                // loop to get all queues HashMap
                                 int QueuesStartPosition = 2;
                                 for (Object o : place.getQueues().entrySet()) {
                                     Map.Entry pair = (Map.Entry) o;
@@ -232,7 +292,6 @@ public class AddPlaceFragment extends Fragment implements ItemClickListener {
                 }
             }
         }
-
     }
 
     private void showQueue(Queue queue, int position) {
@@ -240,7 +299,7 @@ public class AddPlaceFragment extends Fragment implements ItemClickListener {
         // check if queue is null it means we had to add a new temp queue
         if(queue == null){
             // Create keys for queues inside queue child (places/placeId/queues/queueKey1,2,3). it must be the same key in queues column
-            String queueKey = mQueuesRef.push().getKey();
+            String queueKey = mCustomersRef.push().getKey();
             queue = new Queue();  // create new temp queue object
             queue.setKey(queueKey); //  set Queue key, it will help us saving queue data to queue map when saving
         }

@@ -334,10 +334,14 @@ public class AddCounterAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                     Counter counterItem = mQueueCountersMap.get(mCountersMapKeys[getAdapterPosition()]);
                     //Log.d(TAG, "onClick: counterItem key= "+counterItem.getKey());
 
-                    // Open edit counter dialog
-                    CountersDialogFragment dialogFragment = CountersDialogFragment.newInstance(counterItem, getAdapterPosition(), AddCounterAdapter.this);
-                    if (mFragment.getParentFragmentManager() != null) {
-                        dialogFragment.show(mFragment.getParentFragmentManager(), COUNTER_DIALOG_FRAGMENT_TAG);
+                    // Must set key to get counter data instead of start from blank
+                    if(counterItem != null){
+                        counterItem.setKey(String.valueOf(mCountersMapKeys[getAdapterPosition()]));
+                        // Open edit counter dialog
+                        CountersDialogFragment dialogFragment = CountersDialogFragment.newInstance(counterItem, getAdapterPosition(), AddCounterAdapter.this);
+                        if (mFragment.getParentFragmentManager() != null) {
+                            dialogFragment.show(mFragment.getParentFragmentManager(), COUNTER_DIALOG_FRAGMENT_TAG);
+                        }
                     }
                 }
             });

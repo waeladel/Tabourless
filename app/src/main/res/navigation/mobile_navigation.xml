@@ -119,6 +119,11 @@
         tools:layout="@layout/fragment_add_place">
         <argument
             android:name="point"
-            app:argType="com.google.android.gms.maps.model.LatLng" />
+            app:argType="com.google.android.gms.maps.model.LatLng"
+            app:nullable="true" />
+        <argument
+            android:name="placeKey"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
 </navigation>

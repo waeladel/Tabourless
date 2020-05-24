@@ -7,16 +7,21 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.GeoQuery;
+import com.firebase.geofire.GeoQueryDataEventListener;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.FirebaseError;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.tabourless.queue.interfaces.FirebaseOnCompleteCallback;
 import com.tabourless.queue.interfaces.FirebasePlaceCallback;
 import com.tabourless.queue.interfaces.FirebaseUserCallback;
+import com.tabourless.queue.models.Customer;
 import com.tabourless.queue.models.FirebaseListeners;
 import com.tabourless.queue.models.Place;
 import com.tabourless.queue.models.User;
@@ -26,20 +31,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AddPlaceRepository {
+public class SearchRepository {
 
-    private final static String TAG = AddPlaceRepository.class.getSimpleName();
+    private final static String TAG = SearchRepository.class.getSimpleName();
 
     // [START declare_database_ref]
     private DatabaseReference mDatabaseRef;
-    private DatabaseReference mPlacesRef; // to get place
+    private DatabaseReference mPlacesRef , mCustomersRef, mUsersRef; // to get place, to add customer to queue, to get current user
+    private  GeoFire mGeoFire; // GeoFire database reference
+    private GeoQuery mGeoQuery; // GeoFire Query
 
     private MutableLiveData<Place> mPlace; // return place object
-
+    private MutableLiveData<Map<String, Place>> mNearbyPlaces; // to observe nearby places
+    //private List<Place> mPlacesArrayList;// an array list to add all matched places
+    private Map<String, Place> mPlacesMap;
     // HashMap to keep track of Firebase Listeners
     //private HashMap< DatabaseReference , ValueEventListener> mListenersMap;
     // Change mListenersList to static so that it's the same for all instance
-    private  List<FirebaseListeners> mListenersList;// = new ArrayList<>();
+    private  List<FirebaseListeners> mListenersList; // = new ArrayList<>();
 
     // A listener for places changes
     private ValueEventListener placeListener = new ValueEventListener() {
@@ -64,13 +73,74 @@ public class AddPlaceRepository {
         }
     };
 
+    private GeoQueryDataEventListener mGeoQueryListener = new GeoQueryDataEventListener() {
+        @Override
+        public void onDataEntered(DataSnapshot dataSnapshot, GeoLocation location) {
+            // The location of a dataSnapshot now matches the query criteria.
+            Log.d(TAG, "onDataEntered: dataSnapshot key = "+dataSnapshot.getKey());
+            final Place place = dataSnapshot.getValue(Place.class);
+            if(place != null){
+                place.setKey(dataSnapshot.getKey());
+                mPlacesMap.put(place.getKey(), place);
+                mNearbyPlaces.postValue(mPlacesMap);
+            }
+        }
+
+        @Override
+        public void onDataExited(DataSnapshot dataSnapshot) {
+            // The location of a dataSnapshot no longer matches the query criteria.
+            Place place = dataSnapshot.getValue(Place.class);
+            if(place != null){
+                place.setKey(dataSnapshot.getKey());
+                mPlacesMap.remove(place.getKey());
+                mNearbyPlaces.postValue(mPlacesMap);
+                Log.d(TAG, "onDataExited: dataSnapshot key = "+dataSnapshot.getKey()+ " mPlacesArrayList size= "+place.getName());
+            }
+        }
+
+        @Override
+        public void onDataMoved(DataSnapshot dataSnapshot, GeoLocation location) {
+            // The location of a dataSnapshot changed but the location still matches the query criteria
+        }
+
+        @Override
+        public void onDataChanged(DataSnapshot dataSnapshot, GeoLocation location) {
+            // The dataSnapshot is changed
+            /*Place place = dataSnapshot.getValue(Place.class);
+            if(place != null){
+                place.setKey(dataSnapshot.getKey());
+                mNearbyPlace.postValue(place);
+                Log.d(TAG, "onDataChanged: dataSnapshot key = "+dataSnapshot.getKey()+ " mPlacesArrayList size= "+place.getName());
+            }*/
+        }
+
+        @Override
+        public void onGeoQueryReady() {
+            // All current data has been loaded from the server and all initial events have been fired
+            Log.d(TAG, "onGeoQueryReady:" );
+        }
+
+        @Override
+        public void onGeoQueryError(DatabaseError error) {
+            // There was an error while performing this query, e.g. a violation of security rules
+            Log.e(TAG, "onGeoQueryError: "+ error.getMessage());
+        }
+
+    };
 
 
-    public AddPlaceRepository(){
+    public SearchRepository(){
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
         mPlacesRef = mDatabaseRef.child("places");
+        mCustomersRef = mDatabaseRef.child("customers");;
+        mUsersRef = mDatabaseRef.child("users");
+        mGeoFire = new GeoFire(mPlacesRef);
 
-        mPlace = new MutableLiveData<>();
+        mPlace = new MutableLiveData<>(); // to get a specific place
+        mNearbyPlaces = new MutableLiveData<Map<String, Place>>(); // to get nearby markers
+        //mPlacesArrayList = new ArrayList<>(); // An array list to add all matched places
+        mNearbyPlaces = new MutableLiveData<>();  // a MutableLiveData place to update the found place when entered
+        mPlacesMap = new HashMap<>(); // A map to add found places
 
         if(mListenersList == null){
             mListenersList = new ArrayList<>();
@@ -131,7 +201,7 @@ public class AddPlaceRepository {
 
         DatabaseReference placeRef = mPlacesRef.child(placeId);
         //final MutableLiveData<User> mCurrentUser = new MutableLiveData<>();
-        Log.d(TAG, "getPlaceOnce initiated: " + placeId);
+        Log.d(TAG, "getUser initiated: " + placeId);
 
         placeRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -164,33 +234,76 @@ public class AddPlaceRepository {
         });
     }
 
+    public MutableLiveData<Map<String, Place>> getNearbyPlaces(LatLng point){
+
+        // creates a new query around the selected place with a radius of 0.6 kilometers
+        if(null == mGeoQuery){
+            mGeoQuery = mGeoFire.queryAtLocation(new GeoLocation(point.latitude, point.longitude), 2);
+            mGeoQuery.addGeoQueryDataEventListener(mGeoQueryListener);
+        }else{
+            mGeoQuery.setCenter(new GeoLocation(point.latitude, point.longitude));
+        }
+
+        //mGeoQuery.removeAllListeners();
+        //mPlacesArrayList.clear();
+        return mNearbyPlaces;
+    }
+
     public void addPlace(final Place place){
 
-        // Add geofire fist then place data
-        GeoFire geoFire = new GeoFire(mPlacesRef);
-        geoFire.setLocation(place.getKey(), new GeoLocation(place.getLatitude(), place.getLongitude()), new GeoFire.CompletionListener() {
-            @Override
-            public void onComplete(String key, DatabaseError error) {
-                if (error == null) {
-                    // Location saved on server successfully! lets update place info
-                    Map<String, Object> childUpdates = place.toMap(); // Map to update place info
-                    mPlacesRef.child(place.getKey()).updateChildren(childUpdates);
-                } else {
-                    // There was an error saving the location to GeoFire
-                    System.err.println("There was an error saving the location to GeoFire: " + error);
-                }
-            }
-        });
-
-        /*mPlacesRef.child(place.getKey()).setValue(place).addOnSuccessListener(new OnSuccessListener<Void>() {
+        mPlacesRef.child(place.getKey()).setValue(place).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 // place is added successfully, we need to add GeoFire lat and lng
                 Log.d(TAG, "onSuccess: data added");
                 GeoFire geoFire = new GeoFire(mPlacesRef.child(place.getKey()));
-                geoFire.setLocation(place.getKey(), new GeoLocation(place.getLatitude(), place.getLongitude()));
+                geoFire.setLocation("location", new GeoLocation(place.getLatitude(), place.getLongitude()));
+
             }
-        });*/
+        });
+    }
+
+    // To add the user who booked the queue to customers column
+    public void addCustomer(String queueKey, Customer customer, final FirebaseOnCompleteCallback callback) {
+        DatabaseReference targetQueue = mCustomersRef.child(queueKey);
+        targetQueue.push().setValue(customer).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                callback.onCallback(task);
+            }
+        });
+
+    }
+
+    public void getUserOnce(String userId, final FirebaseUserCallback callback){
+
+        DatabaseReference UserRef = mUsersRef.child(userId);
+        //final MutableLiveData<User> mCurrentUser = new MutableLiveData<>();
+        Log.d(TAG, "getUser initiated: " + userId);
+
+        UserRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // Get user value
+                    User user = dataSnapshot.getValue(User.class);
+                    if(user != null){
+                        user.setKey(dataSnapshot.getKey());
+                    }
+                    callback.onCallback(user);
+                } else {
+                    // Return a null user to view model to know when user doesn't exist,
+                    // So we don't create or update tokens and online presence
+                    callback.onCallback(null);
+                    Log.w(TAG, "getUserOnce User is null, no such user");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.w(TAG, "getUserOnce User onCancelled" +databaseError);
+            }
+        });
     }
 
 
@@ -208,7 +321,13 @@ public class AddPlaceRepository {
                 }
             }
             mListenersList.clear();
+
+            // Clear geo fire Listeners and places arrayList
+            mGeoQuery.removeAllListeners();
+            //mPlacesArrayList.clear();
+            //mPlacesMap.clear();
         }
     }
- }
+
+}
 

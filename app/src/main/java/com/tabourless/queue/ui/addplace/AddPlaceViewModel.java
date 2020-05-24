@@ -5,6 +5,7 @@ import android.util.Log;
 import androidx.lifecycle.ViewModel;
 
 import com.tabourless.queue.data.AddPlaceRepository;
+import com.tabourless.queue.interfaces.FirebasePlaceCallback;
 import com.tabourless.queue.models.Place;
 
 public class AddPlaceViewModel extends ViewModel {
@@ -17,11 +18,18 @@ public class AddPlaceViewModel extends ViewModel {
     public AddPlaceViewModel() {
 
         mAddPlaceRepository = new AddPlaceRepository();
-        mPlace = new Place();
    }
 
     public Place getPlace() {
         return mPlace;
+    }
+
+    public void getPlaceOnce(String placeKey, FirebasePlaceCallback callback) {
+        if(mPlace == null){
+            mAddPlaceRepository.getPlaceOnce(placeKey, callback);
+        }else{
+            callback.onCallback(mPlace);
+        }
     }
 
     public void setPlace(Place mPlace) {

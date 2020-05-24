@@ -140,7 +140,7 @@ public class CompleteProfileFragment extends Fragment {
         spinnerAdapter = new ArrayAdapter<Integer>(mContext, android.R.layout.simple_spinner_item, mViewModel.getYears());
         mBinding.spinnerBirthValue.setAdapter(spinnerAdapter);
 
-        // Get EditProfileViewModel.User from database if it's null
+        // Get User from database if it's null
         if(mViewModel.getUser() == null){
             mViewModel.getUserOnce(currentUserId, new FirebaseUserCallback() {
                 @Override

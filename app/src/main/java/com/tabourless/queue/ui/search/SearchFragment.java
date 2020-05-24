@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
@@ -19,10 +20,12 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -44,10 +47,23 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.tabourless.queue.R;
+import com.tabourless.queue.databinding.ChipItemBinding;
 import com.tabourless.queue.databinding.FragmentSearchBinding;
+import com.tabourless.queue.interfaces.FirebaseOnCompleteCallback;
+import com.tabourless.queue.interfaces.FirebaseUserCallback;
+import com.tabourless.queue.models.Customer;
+import com.tabourless.queue.models.Place;
+import com.tabourless.queue.models.PlaceMarker;
+import com.tabourless.queue.models.Queue;
+import com.tabourless.queue.models.User;
 import com.tabourless.queue.ui.DeniedPermissionAlertFragment;
 import com.tabourless.queue.ui.ExplainPermissionAlertFragment;
+
+import java.util.Calendar;
+import java.util.Map;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
@@ -58,12 +74,15 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
 public class SearchFragment extends Fragment implements OnMapReadyCallback
         , GoogleMap.OnMapLongClickListener
         , GoogleMap.OnMapClickListener
-        , GoogleMap.OnInfoWindowClickListener {
+        , GoogleMap.OnInfoWindowClickListener, GoogleMap.OnCameraIdleListener, GoogleMap.OnMarkerClickListener {
     
     private final static String TAG = SearchFragment.class.getSimpleName();
+    private FirebaseUser mFirebaseCurrentUser;
+    private String mCurrentUserId;
 
     private SearchViewModel mViewModel;
     private FragmentSearchBinding mBinding;
+    private ChipItemBinding mChipBinding;
     private NavController navController;
     private Context mContext;
     private Activity mActivity;
@@ -72,6 +91,7 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
     private LocationRequest mLocationRequest;
     private LocationCallback mLocationCallback;
     private boolean isLocationUpdatesRequested;
+    private String mSelectedPlaceKey; // to save selected place when marker is clicked
 
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 7000;
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 7001;
@@ -88,6 +108,9 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
     private static final long EXPIRATION_DURATION = 30 * 60 * 1000L;
     private static final int DISPLACEMENT = 10;
 
+    private static final String CUSTOMER_STATUS_WAITING = "Waiting";
+    private static final String CUSTOMER_STATUS_NEXT = "Next";
+    private static final String CUSTOMER_STATUS_FRONT = "Front";
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -103,6 +126,10 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate: ");
+        //Get current logged in user
+        mFirebaseCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
+        mCurrentUserId = mFirebaseCurrentUser!= null ? mFirebaseCurrentUser.getUid() : null;
+
         mViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
 
         mLocationCallback = new LocationCallback() {
@@ -115,7 +142,7 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
 
                 }*/
                 mViewModel.setCurrentLocation(locationResult.getLastLocation());
-                mViewModel.moveToLocation(mViewModel.getCurrentLocation());
+                mViewModel.moveToLocation(mViewModel.getCurrentLocation(), true);
             }
         };
 
@@ -126,6 +153,7 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         mBinding = FragmentSearchBinding.inflate(inflater, container, false);
+        mChipBinding = ChipItemBinding.inflate(inflater, container, false);
         View view = mBinding.getRoot();
 
         // To get notified when the map is ready to be used.
@@ -154,10 +182,39 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                     addPlaceMarker(currentLocationLatLng);
                 }else{
                     // if there is a place marker go to save place
-                    goToAddQueue(mViewModel.getAddPlaceMarker().getPosition());
+                    goToAddPlace(mViewModel.getAddPlaceMarker().getPosition());
                     Log.d(TAG, "marker getPosition: "+mViewModel.getAddPlaceMarker().getPosition());
                 }
 
+            }
+        });
+
+        // Listener for book button
+        mBinding.bookButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // make sure that there a selected service
+                if(mBinding.servicesChipGroup.getCheckedChipId() == -1){
+                    Toast.makeText(mContext, R.string.select_service_error, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                // get selected service/queue
+                Log.d(TAG, "onClick: CheckedChipId = "+ mBinding.servicesChipGroup.getCheckedChipId());
+                //Chip selectedChip = mBinding.servicesChipGroup.getCheckedChipId();
+                Queue selectedQueue = mViewModel.chipsQueuesMap.get(mBinding.servicesChipGroup.getCheckedChipId());
+                if(selectedQueue != null){
+                    Log.d(TAG, "onClick: selectedQueue key= "+ selectedQueue.getKey() + " name= "+ selectedQueue.getName());
+                    bookQueue(selectedQueue);
+                }
+
+                // join customer to queue key
+            }
+        });
+
+        mBinding.editButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToEditPlace(mSelectedPlaceKey);
             }
         });
 
@@ -231,8 +288,7 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                 mViewModel.getMap().setMyLocationEnabled(true);
                 mViewModel.getMap().getUiSettings().setMyLocationButtonEnabled(true);
                 mViewModel.getMap().setIndoorEnabled(true);
-
-                //mMap.getUiSettings().setMapToolbarEnabled(true);
+                mViewModel.getMap().getUiSettings().setMapToolbarEnabled(false); // to disable acees to Google Maps mobile app when click on a marker
                 //mMap.getUiSettings().setZoomControlsEnabled(true);
 
                 //startLocationUpdates();
@@ -240,16 +296,33 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                 mViewModel.getMap().setOnMapLongClickListener(this);
                 mViewModel.getMap().setOnMapClickListener(this);
                 mViewModel.getMap().setOnInfoWindowClickListener(this);
+                mViewModel.getMap().setOnCameraIdleListener(this);
+                mViewModel.getMap().setOnMarkerClickListener(this);
 
-                // add previous place marker
+                // add previous add place marker
                 if(null != mViewModel.getAddPlaceMarker()){
                     addPlaceMarker(mViewModel.getAddPlaceMarker().getPosition());
                 }
 
-                // only move camera to current location if we don't have current location yet
-                if(null == mViewModel.getCurrentLocation()){
-                    getLastLocation();
+                // add previous markers
+                if(mViewModel.placesMarkersMap.size() != 0){
+                    showMarkers();
                 }
+
+                // Always user cameraPosition instead of currentLocation if not null
+                if(null == mViewModel.getCameraPosition()){
+                    // only get location if we don't have user's current location yet
+                    if(null == mViewModel.getCurrentLocation()){
+                        getLastLocation();
+                    }else{
+                        // Just move to location without request it
+                        mViewModel.moveToLocation(mViewModel.getCurrentLocation(), false);
+                    }
+                }else{
+                    // User camera position instead of user's current location
+                    mViewModel.moveToLatLng(mViewModel.getCameraPosition().target, false);
+                }
+
 
             }
         }
@@ -258,19 +331,90 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
     // Add new queue when long click
     @Override
     public void onMapLongClick(LatLng latLng) {
+        mBinding.placeInfo.setVisibility(View.INVISIBLE);
         addPlaceMarker(latLng);
     }
 
     // get queue id when click on a place
     @Override
     public void onMapClick(LatLng latLng) {
+        mBinding.placeInfo.setVisibility(View.INVISIBLE);
+    }
+
+    // listen to camera idle to update nearby places
+    @Override
+    public void onCameraIdle() {
+        Log.d(TAG, "onCameraIdle: ");
+        // Save camera position
+        mViewModel.setCameraPosition(mViewModel.getMap().getCameraPosition());
+        // Load nearby places
+        //mViewModel.getNearbyPlaces(mViewModel.getMap().getCameraPosition().target);
+        mViewModel.getNearbyPlaces(mViewModel.getMap().getCameraPosition().target).observe(getViewLifecycleOwner(), new Observer<Map<String, Place>>() {
+            @Override
+            public void onChanged(Map<String, Place> placeMap) {
+                if(placeMap != null){
+                    // show a marker for the place
+                    Log.d(TAG, "getNearbyPlaces onChanged: "+ placeMap.size());
+                    // Loop throw all places
+                    for (Object o : placeMap.entrySet()) {
+                        Map.Entry pair = (Map.Entry) o;
+                        Log.d(TAG, "onCameraIdle placeMap map key/val = " + pair.getKey() + " = " + pair.getValue());
+                        Place place = placeMap.get(String.valueOf(pair.getKey()));
+                        if (place != null) {
+                            place.setKey(String.valueOf(pair.getKey()));
+                            Log.d(TAG, "place name=" + place.getName());
+                            // Create new marker
+                            MarkerOptions markerOptions = new MarkerOptions();
+                            markerOptions.position(new LatLng(place.getLatitude(), place.getLongitude()))
+                                    .title(place.getName())
+                                    //.icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_front_car_black))
+                                    .draggable(false);
+                                    //.snippet(place.getQueues().size());
+                            // Only add place's marker if it wasn't added before
+                            if(null == mViewModel.placesMarkersMap.get(place.getKey())){
+                                Marker marker = mViewModel.getMap().addMarker(markerOptions);
+                                //mViewModel.displayedMarkers.put(place.getKey(), marker);
+                                //mViewModel.displayedPlaces.put(marker, place);
+                                PlaceMarker placeMarker = new PlaceMarker(place.getKey(), place, marker);
+                                mViewModel.placesMarkersMap.put(place.getKey(), placeMarker);
+                                Log.d(TAG, "onChanged: marker id= "+ marker.getId());
+                            }
+                        }
+                    }
+                }
+            }
+        });
 
     }
 
-    // Go to add queue when user click marker info
     @Override
+    public boolean onMarkerClick(Marker marker) {
+        Log.d(TAG, "onMarkerClick: marker id= "+marker.getId());
+        // Don't show place info if maker is add place marker
+        if(null == mViewModel.getAddPlaceMarker() || !TextUtils.equals(marker.getId(), mViewModel.getAddPlaceMarker().getId())){
+            //Place place = mViewModel.displayedPlaces.get(marker);
+            for (Object o : mViewModel.placesMarkersMap.entrySet()) {
+                Map.Entry pair = (Map.Entry) o;
+                Log.d(TAG, "onMarkerClick displayedPlaces Map key/val = " + pair.getKey() + " = " + pair.getValue());
+                PlaceMarker placeMarker = mViewModel.placesMarkersMap.get(String.valueOf(pair.getKey()));
+                if(placeMarker != null && marker.equals(placeMarker.getMarker())){
+                    showPlaceInfo(placeMarker.getPlace()); // Display info window to select book or edit place
+                }
+            }
+        }else{
+            // Hide place info card
+            mBinding.placeInfo.setVisibility(View.INVISIBLE);
+        }
+
+        return false; // return false if you want map to keep handling click listeners
+    }
+
+    // Go to add queue when user click marker info
+     @Override
     public void onInfoWindowClick(Marker marker) {
-        goToAddQueue(marker.getPosition());
+        if(null != mViewModel.getAddPlaceMarker() && TextUtils.equals(marker.getId(), mViewModel.getAddPlaceMarker().getId())){
+            goToAddPlace(marker.getPosition());
+        }
     }
 
     private void addPlaceMarker(LatLng latLng) {
@@ -290,14 +434,112 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
 
             mViewModel.setAddPlaceMarker(mViewModel.getMap().addMarker(markerOptions));
             mViewModel.getAddPlaceMarker().showInfoWindow(); // To display add new place window
-
-            mViewModel.moveToLatLng(latLng);
+            mViewModel.moveToLatLng(latLng, true);
         }
     }
 
-    private void goToAddQueue(LatLng latLng) {
-        NavDirections direction = SearchFragmentDirections.actionSearchToAddPlace(latLng);
+    private void showMarkers() {
+
+        for (Object o : mViewModel.placesMarkersMap.entrySet()) {
+            Map.Entry pair = (Map.Entry) o;
+            Log.d(TAG, "showMarkers PlacesMarkersMap map key/val = " + pair.getKey() + " = " + pair.getValue());
+            PlaceMarker placeMarker =  mViewModel.placesMarkersMap.get(String.valueOf(pair.getKey()));
+            if (placeMarker != null && placeMarker.getMarker() != null) {
+                // Create new marker
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.position(placeMarker.getMarker().getPosition())
+                        .title(placeMarker.getMarker().getTitle())
+                        //.icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_front_car_black))
+                        .draggable(false);
+                //.snippet(place.getQueues().size());
+
+                //mViewModel.displayedPlaces.remove(marker); // remove previous place associated with the old marker
+
+                Marker marker = mViewModel.getMap().addMarker(markerOptions);
+                //mViewModel.displayedMarkers.put(String.valueOf(pair.getKey()), marker);
+                //mViewModel.displayedPlaces.put(marker, place);
+                placeMarker.setMarker(marker);
+                mViewModel.placesMarkersMap.put(placeMarker.getKey(), placeMarker);
+                Log.d(TAG, "showMarkers: maker name = "+placeMarker.getMarker().getTitle()+ " marker id= "+ placeMarker.getMarker().getId());
+
+            }
+        }
+    }
+
+    private void goToAddPlace(LatLng latLng) {
+        NavDirections direction = SearchFragmentDirections.actionSearchToAddPlace(latLng, null);
         navController.navigate(direction);
+    }
+
+    private void goToEditPlace(String placeKey) {
+        NavDirections direction = SearchFragmentDirections.actionSearchToAddPlace(null, placeKey);
+        navController.navigate(direction);
+    }
+
+    private void showPlaceInfo(Place place) {
+        mSelectedPlaceKey = place.getKey(); // will be used when click on edit place
+        mBinding.placeInfo.setVisibility(View.VISIBLE); // Make info card view visible
+        mBinding.placeName.setText(place.getName()); // set selected place's name
+
+        mBinding.servicesChipGroup.clearCheck();
+        mBinding.servicesChipGroup.removeAllViews(); // remove all previous views to start fresh
+        mViewModel.chipsQueuesMap.clear(); // To remove all chips associations with queues
+
+        // Loop throw queues to display it's chips
+        for (Object o : place.getQueues().entrySet()) {
+            Map.Entry pair = (Map.Entry) o;
+            Log.d(TAG, "showPlaceInfo place.getQueues() map key/val = " + pair.getKey() + " = " + pair.getValue());
+            Queue queue = place.getQueues().get(String.valueOf(pair.getKey()));
+            if(null != queue){
+                queue.setKey(String.valueOf(pair.getKey()));
+                // Don't display more than 30 character
+                String shortenString = queue.getName().substring(0, Math.min(queue.getName().length(), 30));
+                mChipBinding.chipItem.setText(shortenString);
+                mBinding.servicesChipGroup.addView(mChipBinding.chipItem);
+                mViewModel.chipsQueuesMap.put(mChipBinding.chipItem.getId(), queue); // a map to get selected service
+                /*mBinding.servicesChipGroup.setOnCheckedChangeListener(new ChipGroup.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(ChipGroup group, int checkedId) {
+
+                    }
+                });*/
+            }
+        }
+    }
+
+    // To add customer to queue
+    private void bookQueue(final Queue queue) {
+        // Get current user once, to get currentUser's name and avatar for notifications
+        mViewModel.getUserOnce(mCurrentUserId, new FirebaseUserCallback() {
+            @Override
+            public void onCallback(User user) {
+                if(user != null){
+                    Log.d(TAG,  "FirebaseUserCallback onCallback. name= " + user.getName() + " hashcode= "+ hashCode());
+                    // Set customer object properties
+                    // set user age
+                    Calendar c = Calendar.getInstance();
+                    int year = c.get(Calendar.YEAR);
+                    int age = year- user.getBirthYear();
+
+                    Customer customer = new Customer(user.getKey(), user.getAvatar(), user.getName(), user.getGender(), age, user.getDisabled(), CUSTOMER_STATUS_WAITING);
+                    mViewModel.addCustomer(queue.getKey(), customer, new FirebaseOnCompleteCallback() {
+                        @Override
+                        public void onCallback(@NonNull Task<Void> task) {
+                            if(task.isSuccessful()){
+                                // Go to customers recycler
+                                Log.d(TAG, "onCallback: "+task.getResult());
+                            }else{
+                                Toast.makeText(mContext, R.string.book_queue_error, Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+
+                }else{
+                    Toast.makeText(mContext, R.string.fetch_profile_error, Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
     }
 
     private boolean checkPermissions() {
@@ -401,7 +643,7 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                                             // Logic to handle location object
                                             mViewModel.setCurrentLocation(location);
                                             // Move camera to location
-                                            mViewModel.moveToLocation(mViewModel.getCurrentLocation());
+                                            mViewModel.moveToLocation(mViewModel.getCurrentLocation(), true);
                                         }else{
                                             getLocationUpdates();
                                         }
@@ -507,5 +749,4 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
             }
         }
     }
-
 }

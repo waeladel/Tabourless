@@ -95,6 +95,7 @@ public class CountersDialogFragment extends DialogFragment  {
         //windowManagerLayout.gravity = Gravity.LEFT;
 
         // if counter key is not null, display data
+        Log.d(TAG, "onCreateView: counter key ="+ sCounter.getKey());
         if(sCounter != null && sCounter.getKey() != null){
             mBinding.valueText.setText(sCounter.getName());
 
