@@ -11,20 +11,21 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @IgnoreExtraProperties
-public class Queue {
+public class UserQueue {
 
     // This is an object for queues map inside place object
     private String key;
     private String name;
-    private Map<String, Counter> counters = new LinkedHashMap<>();
+    private String placeId;
+    private Object joined;
 
-
-    public Queue() {
+    public UserQueue() {
     }
 
-    public Queue(String name, Map<String, Counter> counters) {
+    public UserQueue(String key, String name, String placeId) {
+        this.key = key;
         this.name = name;
-        this.counters = counters;
+        this.placeId = placeId;
     }
 
     // [START post_to_map]
@@ -32,7 +33,8 @@ public class Queue {
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
         result.put("name", name);
-        result.put("counters", counters);
+        result.put("joined", ServerValue.TIMESTAMP);
+        result.put("placeId", placeId);
 
         return result;
     }
@@ -51,23 +53,36 @@ public class Queue {
         this.name = name;
     }
 
-
-    public Map<String, Counter> getCounters() {
-        return counters;
+    public String getPlaceId() {
+        return placeId;
     }
 
-    public void setCounters(Map<String, Counter> counters) {
-        this.counters = counters;
+    public void setPlaceId(String placeId) {
+        this.placeId = placeId;
     }
+
+    public Object getJoined() {
+        return joined;
+    }
+
+    public long getJoinedLong() {
+        return (long) joined;
+    }
+
+    public void setJoined(Object joined) {
+        this.joined = joined;
+    }
+
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Queue queue1 = (Queue) o;
+        UserQueue queue1 = (UserQueue) o;
         return
                 TextUtils.equals(name, queue1.name)&&
-                (counters == queue1.counters || (counters!=null && counters.equals(queue1.counters)));
+                TextUtils.equals(placeId, queue1.placeId)&&
+                (joined == queue1.joined || (joined!=null && joined.equals(queue1.joined)));
     }
 
     @Override
@@ -75,7 +90,8 @@ public class Queue {
         //return Objects.hash(key, avatar, name, read);
         int result = 1;
         result = 31 * result + (name == null ? 0 : name.hashCode());
-        result = 31 * result + (counters == null ? 0 : counters.hashCode());
+        result = 31 * result + (placeId == null ? 0 : placeId.hashCode());
+        result = 31 * result + (joined == null ? 0 : joined.hashCode());
         return result;
     }
 }

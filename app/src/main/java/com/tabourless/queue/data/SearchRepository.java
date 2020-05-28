@@ -13,6 +13,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -24,7 +26,9 @@ import com.tabourless.queue.interfaces.FirebaseUserCallback;
 import com.tabourless.queue.models.Customer;
 import com.tabourless.queue.models.FirebaseListeners;
 import com.tabourless.queue.models.Place;
+import com.tabourless.queue.models.Queue;
 import com.tabourless.queue.models.User;
+import com.tabourless.queue.models.UserQueue;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,6 +53,10 @@ public class SearchRepository {
     //private HashMap< DatabaseReference , ValueEventListener> mListenersMap;
     // Change mListenersList to static so that it's the same for all instance
     private  List<FirebaseListeners> mListenersList; // = new ArrayList<>();
+
+    private FirebaseUser mFirebaseCurrentUser;
+    private String mCurrentUserId;
+
 
     // A listener for places changes
     private ValueEventListener placeListener = new ValueEventListener() {
@@ -135,6 +143,10 @@ public class SearchRepository {
         mCustomersRef = mDatabaseRef.child("customers");;
         mUsersRef = mDatabaseRef.child("users");
         mGeoFire = new GeoFire(mPlacesRef);
+
+        //Get current logged in user
+        mFirebaseCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
+        mCurrentUserId = mFirebaseCurrentUser != null ? mFirebaseCurrentUser.getUid() : null;
 
         mPlace = new MutableLiveData<>(); // to get a specific place
         mNearbyPlaces = new MutableLiveData<Map<String, Place>>(); // to get nearby markers
@@ -264,9 +276,17 @@ public class SearchRepository {
     }
 
     // To add the user who booked the queue to customers column
-    public void addCustomer(String queueKey, Customer customer, final FirebaseOnCompleteCallback callback) {
-        DatabaseReference targetQueue = mCustomersRef.child(queueKey);
-        targetQueue.push().setValue(customer).addOnCompleteListener(new OnCompleteListener<Void>() {
+    public void addCustomer(UserQueue userQueue, Customer customer, final FirebaseOnCompleteCallback callback) {
+
+        String customerPushKey = mCustomersRef.child(userQueue.getKey()).push().getKey();
+        Map<String, Object> childUpdates = new HashMap<>();// Map to update all
+        Map<String, Object> customerValues = customer.toMap();
+        Map<String, Object> queueValues = userQueue.toMap();
+
+        childUpdates.put("/customers/" + userQueue.getPlaceId() + "/"+ userQueue.getKey() + "/" + customerPushKey, customerValues);
+        childUpdates.put("/userQueues/" + mCurrentUserId+ "/" + userQueue.getKey() ,queueValues);
+
+        mDatabaseRef.updateChildren(childUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 callback.onCallback(task);

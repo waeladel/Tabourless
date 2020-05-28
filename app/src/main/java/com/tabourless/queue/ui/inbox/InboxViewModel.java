@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.tabourless.queue.data.InboxDataFactory;
@@ -24,16 +26,26 @@ public class InboxViewModel extends ViewModel {
     private DatabaseReference mDatabaseRef;
     private DatabaseReference mUserChatsRef;
 
-    public InboxViewModel(String currentUserId) {
+    //Get current logged in user
+    private FirebaseUser mFirebaseCurrentUser;
+    private String mCurrentUserId;
+
+    public InboxViewModel() {
+
+        //Get current logged in user
+        mFirebaseCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
+        mCurrentUserId = mFirebaseCurrentUser != null ? mFirebaseCurrentUser.getUid() : null;
 
         Log.d(TAG, "InboxViewModel: initiated");
-        mInboxDataFactory = new InboxDataFactory(currentUserId);
+        mInboxDataFactory = new InboxDataFactory(mCurrentUserId);
 
         //Enabling Offline Capabilities//
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
         // keepSync UserChatsRef to work offline
-        mUserChatsRef = mDatabaseRef.child("userChats").child(currentUserId);
-        mUserChatsRef.keepSynced(true);
+        if(mCurrentUserId != null){
+            mUserChatsRef = mDatabaseRef.child("userChats").child(mCurrentUserId);
+            mUserChatsRef.keepSynced(true);
+        }
 
         config = (new PagedList.Config.Builder())
                 .setPageSize(10)//10

@@ -76,13 +76,7 @@ public class InboxFragment extends Fragment {
         mChatsArrayList = new ArrayList<>();
         mInboxAdapter = new InboxAdapter(this);
 
-        mViewModel = new ViewModelProvider(this,  new ViewModelProvider.Factory() {
-            @NonNull
-            @Override
-            public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-                return (T)new InboxViewModel (mCurrentUserId);
-            }
-        }).get(InboxViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(InboxViewModel.class);
 
     }
 

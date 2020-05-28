@@ -59,6 +59,7 @@ import com.tabourless.queue.models.Place;
 import com.tabourless.queue.models.PlaceMarker;
 import com.tabourless.queue.models.Queue;
 import com.tabourless.queue.models.User;
+import com.tabourless.queue.models.UserQueue;
 import com.tabourless.queue.ui.DeniedPermissionAlertFragment;
 import com.tabourless.queue.ui.ExplainPermissionAlertFragment;
 
@@ -201,12 +202,11 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                 // get selected service/queue
                 Log.d(TAG, "onClick: CheckedChipId = "+ mBinding.servicesChipGroup.getCheckedChipId());
                 //Chip selectedChip = mBinding.servicesChipGroup.getCheckedChipId();
-                Queue selectedQueue = mViewModel.chipsQueuesMap.get(mBinding.servicesChipGroup.getCheckedChipId());
-                if(selectedQueue != null){
-                    Log.d(TAG, "onClick: selectedQueue key= "+ selectedQueue.getKey() + " name= "+ selectedQueue.getName());
-                    bookQueue(selectedQueue);
+                UserQueue selectedUserQueue = mViewModel.chipsQueuesMap.get(mBinding.servicesChipGroup.getCheckedChipId());
+                if(selectedUserQueue != null){
+                    Log.d(TAG, "onClick: selectedQueue key= "+ selectedUserQueue.getKey() + " name= "+ selectedUserQueue.getName()+ " Place Id " + selectedUserQueue.getPlaceId());
+                    bookQueue(selectedUserQueue);
                 }
-
                 // join customer to queue key
             }
         });
@@ -392,7 +392,7 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
         Log.d(TAG, "onMarkerClick: marker id= "+marker.getId());
         // Don't show place info if maker is add place marker
         if(null == mViewModel.getAddPlaceMarker() || !TextUtils.equals(marker.getId(), mViewModel.getAddPlaceMarker().getId())){
-            //Place place = mViewModel.displayedPlaces.get(marker);
+            //Loop throw all places markers map to get selected place
             for (Object o : mViewModel.placesMarkersMap.entrySet()) {
                 Map.Entry pair = (Map.Entry) o;
                 Log.d(TAG, "onMarkerClick displayedPlaces Map key/val = " + pair.getKey() + " = " + pair.getValue());
@@ -492,11 +492,13 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
             Queue queue = place.getQueues().get(String.valueOf(pair.getKey()));
             if(null != queue){
                 queue.setKey(String.valueOf(pair.getKey()));
+                // set PlaceId inside userQueue object, it helps to access queues inside place node later
+                UserQueue userQueue = new UserQueue(queue.getKey(), queue.getName(), place.getKey());
                 // Don't display more than 30 character
                 String shortenString = queue.getName().substring(0, Math.min(queue.getName().length(), 30));
                 mChipBinding.chipItem.setText(shortenString);
                 mBinding.servicesChipGroup.addView(mChipBinding.chipItem);
-                mViewModel.chipsQueuesMap.put(mChipBinding.chipItem.getId(), queue); // a map to get selected service
+                mViewModel.chipsQueuesMap.put(mChipBinding.chipItem.getId(), userQueue); // a map to get selected service
                 /*mBinding.servicesChipGroup.setOnCheckedChangeListener(new ChipGroup.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(ChipGroup group, int checkedId) {
@@ -508,7 +510,7 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
     }
 
     // To add customer to queue
-    private void bookQueue(final Queue queue) {
+    private void bookQueue(final UserQueue userQueue) {
         // Get current user once, to get currentUser's name and avatar for notifications
         mViewModel.getUserOnce(mCurrentUserId, new FirebaseUserCallback() {
             @Override
@@ -522,7 +524,7 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                     int age = year- user.getBirthYear();
 
                     Customer customer = new Customer(user.getKey(), user.getAvatar(), user.getName(), user.getGender(), age, user.getDisabled(), CUSTOMER_STATUS_WAITING);
-                    mViewModel.addCustomer(queue.getKey(), customer, new FirebaseOnCompleteCallback() {
+                    mViewModel.addCustomer(userQueue, customer, new FirebaseOnCompleteCallback() {
                         @Override
                         public void onCallback(@NonNull Task<Void> task) {
                             if(task.isSuccessful()){

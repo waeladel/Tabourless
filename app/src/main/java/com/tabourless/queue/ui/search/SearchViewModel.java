@@ -19,6 +19,7 @@ import com.tabourless.queue.models.Customer;
 import com.tabourless.queue.models.Place;
 import com.tabourless.queue.models.PlaceMarker;
 import com.tabourless.queue.models.Queue;
+import com.tabourless.queue.models.UserQueue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +36,7 @@ public class SearchViewModel extends ViewModel {
     //public Map<String, Marker> displayedMarkers;
     //public Map<Marker, Place> displayedPlaces;
     public Map<String, PlaceMarker> placesMarkersMap;
-    public Map<Integer, Queue> chipsQueuesMap;
+    public Map<Integer, UserQueue> chipsQueuesMap;
     private CameraPosition mCameraPosition; // To save camera position to reuse it when clicking back arrow or rotate device
 
     public SearchViewModel() {
@@ -71,8 +72,8 @@ public class SearchViewModel extends ViewModel {
         this.mAddPlaceMarker = marker;
     }
 
-    public void addCustomer(String queueKey, Customer customer, FirebaseOnCompleteCallback callback) {
-        mSearchRepository.addCustomer(queueKey, customer, callback);
+    public void addCustomer(UserQueue userQueue, Customer customer, FirebaseOnCompleteCallback callback) {
+        mSearchRepository.addCustomer(userQueue, customer, callback);
     }
 
     public void moveToLocation(Location location, boolean animate) {

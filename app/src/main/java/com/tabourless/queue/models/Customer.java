@@ -32,7 +32,7 @@ public class Customer {
 
     public Customer() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
-        //this.created = ServerValue.TIMESTAMP;
+        this.joined = ServerValue.TIMESTAMP;
     }
 
     public Customer(String userId, String avatar, String name, String gender, int age, boolean disabled, String status) {

@@ -73,7 +73,6 @@
 
     <string name="add_place_add_counter_title">Add A Counter</string>
 
-
     <!--toast and error messages -->
     <string name="sign_in_cancelled">Sign in has been cancelled</string>
     <string name="no_internet_connection">No internet connection</string>
@@ -122,6 +121,7 @@
     <string name="send_text_icon">Send message</string>
     <string name="message_sent_icon">Message sent icon</string>
     <string name="remove_counter_icon">Remove counter</string>
+    <string name="queue_item_location_icon">Place icon</string>
 
 
     <!--Input text helper-->

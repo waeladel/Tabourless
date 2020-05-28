@@ -300,7 +300,7 @@ public class AddPlaceFragment extends Fragment implements ItemClickListener {
 
         // check if queue is null it means we had to add a new temp queue
         if(queue == null){
-            // Create keys for queues inside queue child (places/placeId/queues/queueKey1,2,3). it must be the same key in queues column
+            // Create keys for queues inside queue child (places/placeId/queues/queueKey1,2,3). it must be the same key in customers and userQueues nods
             String queueKey = mCustomersRef.push().getKey();
             queue = new Queue();  // create new temp queue object
             queue.setKey(queueKey); //  set Queue key, it will help us saving queue data to queue map when saving
