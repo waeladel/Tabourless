@@ -1,52 +1,62 @@
-package com.tabourless.queue.ui.queues;
+package com.tabourless.queue.ui.customers;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.paging.PagedList;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.tabourless.queue.R;
-import com.tabourless.queue.adapters.QueuesAdapter;
-import com.tabourless.queue.databinding.FragmentQueuesBinding;
+import com.tabourless.queue.adapters.CustomersAdapter;
+import com.tabourless.queue.databinding.FragmentCustomersBinding;
+import com.tabourless.queue.interfaces.FirebaseOnCompleteCallback;
 import com.tabourless.queue.interfaces.ItemClickListener;
+import com.tabourless.queue.models.Customer;
 import com.tabourless.queue.models.UserQueue;
-import com.tabourless.queue.ui.inbox.InboxFragment;
+import com.tabourless.queue.ui.messages.MessagesFragment;
+import com.tabourless.queue.ui.messages.MessagesViewModel;
+import com.tabourless.queue.ui.queues.QueuesFragmentDirections;
 
 import java.util.ArrayList;
 
-public class QueuesFragment extends Fragment implements ItemClickListener {
 
-    private final static String TAG = QueuesFragment.class.getSimpleName();
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class CustomersFragment extends Fragment implements ItemClickListener {
 
-    private QueuesViewModel mViewModel;
-    private FragmentQueuesBinding mBinding;
-    private NavController navController;
+    private final static String TAG = CustomersFragment.class.getSimpleName();
+
+    private FragmentCustomersBinding mBinding;
+    private CustomersViewModel mViewModel;
+    private NavController navController ;
     private Context mContext;
 
+    private ArrayList<Customer> mArrayList;
+    private CustomersAdapter mAdapter;
     private LinearLayoutManager mLinearLayoutManager;
 
+    private String mCurrentUserId, mPlaceId, mQueueId;
     private FirebaseUser mFirebaseCurrentUser;
-    private String mCurrentUserId;
-
-    private ArrayList<UserQueue> mArrayList;
-    private QueuesAdapter mAdapter;
 
     private static final int REACHED_THE_TOP = 2;
     private static final int SCROLLING_UP = 1;
@@ -55,8 +65,12 @@ public class QueuesFragment extends Fragment implements ItemClickListener {
     private static int mScrollDirection;
     private static int mLastVisibleItem;
 
+    public CustomersFragment() {
+        // Required empty public constructor
+    }
+
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         mContext = context;
     }
@@ -70,35 +84,52 @@ public class QueuesFragment extends Fragment implements ItemClickListener {
         mFirebaseCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
         mCurrentUserId = mFirebaseCurrentUser != null ? mFirebaseCurrentUser.getUid() : null;
 
-        // prepare the Adapter in onCreate to use only one Adapter
-        mArrayList = new ArrayList<>();
-        mAdapter = new QueuesAdapter(this);
+        // Get placeId and queueId from Arguments
+        if(null != getArguments() && getArguments().containsKey("placeId")) {
+            // Get PlaceID
+            mPlaceId = CustomersFragmentArgs.fromBundle(getArguments()).getPlaceId();
+        }
 
-        mViewModel = new ViewModelProvider(this).get(QueuesViewModel.class);
+        if(null != getArguments() && getArguments().containsKey("queueId")){
+            // Get Queue
+            mQueueId = CustomersFragmentArgs.fromBundle(getArguments()).getQueueId();
+        }
+        Log.d(TAG, "placeId = " + mPlaceId + " queueId= " + mQueueId);
+
+        // prepare the Adapter
+        mArrayList = new ArrayList<>();
+        mAdapter = new CustomersAdapter(mContext,this); // Pass itemClickListener to open user profile when clicked
+
+        // start init  mViewModel here after placeId and queueID is received//
+        // extend mMessagesViewModel to pass place and queue's Keys value
+        if(!TextUtils.isEmpty(mPlaceId) && !TextUtils.isEmpty(mQueueId)){
+            mViewModel = new ViewModelProvider(this, new ViewModelProvider.Factory() {
+                @NonNull
+                @Override
+                public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+                    return (T)new CustomersViewModel (mPlaceId, mQueueId);
+                }
+            }).get(CustomersViewModel.class);
+        }
+
     }
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-
-        mBinding = FragmentQueuesBinding.inflate(inflater, container, false);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        mBinding = FragmentCustomersBinding.inflate(inflater, container, false);
         View view = mBinding.getRoot();
 
         navController = NavHostFragment.findNavController(this);
-
-        mBinding.searchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                navController.navigate(R.id.search);
-            }
-        });
 
         // It's best to observe on onActivityCreated so that we dona't have to update ViewModel manually.
         // This is because LiveData will not call the observer since it had already delivered the last result to that observer.
         // But recycler adapter is updated any way despite that LiveData delivers updates only when data changes, and only to active observers.
         // Use getViewLifecycleOwner() instead of this, to get only one observer for this view
-        mViewModel.getItemPagedList().observe(getViewLifecycleOwner(), new Observer<PagedList<UserQueue>>() {
+        mViewModel.getItemPagedList().observe(getViewLifecycleOwner(), new Observer<PagedList<Customer>>() {
             @Override
-            public void onChanged(@Nullable final PagedList<UserQueue> items) {
+            public void onChanged(@Nullable final PagedList<Customer> items) {
 
                 if (items != null ){
                     // your code here
@@ -138,15 +169,15 @@ public class QueuesFragment extends Fragment implements ItemClickListener {
 
                 }
             }
-        });
+        }); // End of get itemPagedList//
 
         // Initiate the RecyclerView
-        mBinding.queuesRecycler.setHasFixedSize(true);
+        mBinding.customersRecycler.setHasFixedSize(true);
         mLinearLayoutManager = new LinearLayoutManager(mContext);
-        mBinding.queuesRecycler.setLayoutManager(mLinearLayoutManager);
-        mBinding.queuesRecycler.setAdapter(mAdapter);
+        mBinding.customersRecycler.setLayoutManager(mLinearLayoutManager);
+        mBinding.customersRecycler.setAdapter(mAdapter);
 
-        mBinding.queuesRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        mBinding.customersRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
@@ -163,7 +194,8 @@ public class QueuesFragment extends Fragment implements ItemClickListener {
                 int lastVisibleItem = mLinearLayoutManager.findLastVisibleItemPosition(); // the position of last displayed item
                 int firstVisibleItem = mLinearLayoutManager.findFirstVisibleItemPosition(); // the position of first displayed item
                 int totalItemCount = mAdapter.getItemCount(); // total items count from the adapter
-                int visibleItemCount = mBinding.queuesRecycler.getChildCount(); // items are shown on screen right now
+                int visibleItemCount = mBinding.customersRecycler.getChildCount(); // items are shown on screen right now
+
                 Log.d(TAG, "visibleItemCount = "+visibleItemCount +" totalItemCount= "+totalItemCount+" lastVisibleItem "+lastVisibleItem +" firstVisibleItem "+firstVisibleItem);
 
                 //if(lastCompletelyVisibleItem >= (totalItemCount-1)){
@@ -173,7 +205,7 @@ public class QueuesFragment extends Fragment implements ItemClickListener {
                     Log.i(TAG, "List reached the bottom");
                     // Set scrolling direction and and last visible item which is needed to know
                     // the initial key position weather it's above or below
-                    mChatsViewModel.setScrollDirection(mScrollDirection, lastVisibleItem);
+                    mViewModel.setScrollDirection(mScrollDirection, lastVisibleItem);
 
                 }*/if(firstVisibleItem <= 4){
                     // The position of last displayed item is less than visibleItemCount, witch means we are at the top
@@ -202,8 +234,26 @@ public class QueuesFragment extends Fragment implements ItemClickListener {
             }
         });
 
-
         return view;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop");
+        // Update all broken avatars on fragment's stop
+        if (mAdapter != null) {
+            mViewModel.updateBrokenAvatars(mAdapter.getBrokenAvatarsList(), new FirebaseOnCompleteCallback() {
+                @Override
+                public void onCallback(@NonNull Task<Void> task) {
+                    if(task.isSuccessful()){
+                        // onSuccess clear the list to start all over
+                        Log.d(TAG, "brokenAvatarsList url . onSuccess ");
+                        mAdapter.clearBrokenAvatarsList();
+                    }
+                }
+            });
+        }
     }
 
     @Override
@@ -215,12 +265,18 @@ public class QueuesFragment extends Fragment implements ItemClickListener {
 
     @Override
     public void onClick(View view, int position, boolean isLongClick) {
-        //Log.d(TAG, "onClick: item id="+mAdapter.getItemId(position));
-        UserQueue userQueue = mAdapter.getItem(position);
-        if(userQueue != null){
-            Log.d(TAG, "onClick: userQueue name= "+userQueue.getName()+ " placeId= "+ userQueue.getPlaceId()+ " queueId= "+ userQueue.getKey());
-            NavDirections direction = QueuesFragmentDirections.actionQueuesToCustomers(userQueue.getPlaceId(), userQueue.getKey());
-            navController.navigate(direction);
+        Log.d(TAG, "onClick: item id="+mAdapter.getItemId(position));
+        Customer customer = mAdapter.getItem(position);
+        if(customer != null){
+            if (view.getId() == R.id.customer_image) {
+                // only avatar is clicked, go to profile
+                NavDirections direction = CustomersFragmentDirections.actionCustomersToProfile(customer.getUserId());
+                navController.navigate(direction);
+            } else {
+                // entire row is clicked, chat with user
+                NavDirections direction = CustomersFragmentDirections.actionCustomersToMessages(null, customer.getUserId(), false);
+                navController.navigate(direction);
+            }
         }
     }
 }

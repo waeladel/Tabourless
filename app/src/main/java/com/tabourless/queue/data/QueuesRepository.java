@@ -31,7 +31,7 @@ public class QueuesRepository {
     public ValueEventListener initialListener;
 
     private static List<FirebaseListeners> mListenersList;// = new ArrayList<>();
-    private static List<UserQueue> totalItemsList;// = new ArrayList<>();
+    private List<UserQueue> totalItemsList;// = new ArrayList<>();
 
     private DataSource.InvalidatedCallback invalidatedCallback;
     private ItemKeyedDataSource.LoadInitialCallback loadInitialCallback;
@@ -62,8 +62,8 @@ public class QueuesRepository {
             Log.d(TAG, "start onDataChange isAfterFirstLoaded = "+ isAfterFirstLoaded);
             if (!isAfterFirstLoaded){
                 // Remove post value event listener
+                Log.d(TAG, "getAfter Invalidated removeEventListener");
                 removeListeners();
-                Log.d(TAG, "mama getAfter Invalidated removeEventListener");
                 //isAfterFirstLoaded =  true;
                 Log.d(TAG, "getAfter onInvalidated(). isAfterFirstLoaded = "+ isAfterFirstLoaded);
                 invalidatedCallback.onInvalidated();
@@ -129,8 +129,8 @@ public class QueuesRepository {
             Log.d(TAG, "start onDataChange isBeforeFirstLoaded = "+ isBeforeFirstLoaded);
             if (!isBeforeFirstLoaded){
                 // Remove post value event listener
-                removeListeners();
                 Log.d(TAG, "mama getBefore Invalidated removeEventListener");
+                removeListeners();
                 //isBeforeFirstLoaded =  true;
                 Log.d(TAG, "getBefore onInvalidated(). isBeforeFirstLoaded = "+ isBeforeFirstLoaded);
                 invalidatedCallback.onInvalidated();
@@ -236,7 +236,7 @@ public class QueuesRepository {
                            @NonNull final ItemKeyedDataSource.LoadInitialCallback<UserQueue> callback){
 
         this.initialKey = initialKey;
-        Query query;
+        Query queuesQuery;
         isInitialFirstLoaded = true;
 
         initialListener = new ValueEventListener() {
@@ -247,8 +247,8 @@ public class QueuesRepository {
 
                     if (!isInitialFirstLoaded) {
                         // Remove post value event listener
+                        Log.d(TAG, "getInitial Invalidated removeEventListener");
                         removeListeners();
-                        Log.d(TAG, "mama chatsChanged Invalidated removeEventListener");
                         //isInitialFirstLoaded =  true;
                         Log.d(TAG, "onInvalidated(). isInitialFirstLoaded = " + isInitialFirstLoaded);
                         invalidatedCallback.onInvalidated();
@@ -314,7 +314,7 @@ public class QueuesRepository {
         if (initialKey == null) {// if it's loaded for the first time. Key is null
             Log.d(TAG, "mama getChats initialKey= " + initialKey);
             isInitialKey = false;
-            query = mCurrentUserQueuesRef
+            queuesQuery = mCurrentUserQueuesRef
                     .orderByChild("joined")//limitToLast to start from the last (page size) items
                     .limitToLast(size);
 
@@ -332,7 +332,7 @@ public class QueuesRepository {
                     break;*/
                 case REACHED_THE_TOP:
                     Log.d(TAG, "messages query = REACHED_THE_TOP. ScrollDirection= "+mScrollDirection+ " mVisibleItem= "+ mVisibleItem + " totalItemsList size= "+totalItemsList.size());
-                    query = mCurrentUserQueuesRef
+                    queuesQuery = mCurrentUserQueuesRef
                             .orderByChild("joined")//limitToLast to start from the last (page size) items
                             .limitToLast(size);
                     break;
@@ -347,7 +347,7 @@ public class QueuesRepository {
                     // InitialKey is in the top, must load data from top to bottom
                     // list is reversed, load data above InitialKey
                     Log.d(TAG, "messages query = Load data from top to bottom (above InitialKey cause list is reversed). ScrollDirection= "+mScrollDirection+ " InitialKey Position= "+getInitialKeyPosition() +" first VisibleItem= "+ mVisibleItem +" totalItemsList size= "+totalItemsList.size());
-                    query = mCurrentUserQueuesRef
+                    queuesQuery = mCurrentUserQueuesRef
                             .orderByChild("joined")
                             .endAt(getItem(mVisibleItem).getJoinedLong())//Using first visible item key instead of initial key
                             .limitToLast(size);
@@ -361,7 +361,7 @@ public class QueuesRepository {
                     // InitialKey is in the bottom, must load data from bottom to top
                     // list is reversed, load data below InitialKey
                     Log.d(TAG, "messages query = Load data from bottom to top (below InitialKey cause list is reversed). ScrollDirection= "+mScrollDirection+ " InitialKey Position= "+getInitialKeyPosition() +"  last VisibleItem= "+ mVisibleItem + " Item Message= "+" totalItemsList size= "+totalItemsList.size());
-                    query = mCurrentUserQueuesRef
+                    queuesQuery = mCurrentUserQueuesRef
                             .orderByChild("joined")
                             .startAt(getItem(mVisibleItem).getJoinedLong())//Using last visible item key instead of initial key
                             .limitToFirst(size);
@@ -389,7 +389,7 @@ public class QueuesRepository {
                     }
                     break;*/
                     Log.d(TAG, "messages query = default. ScrollDirection= "+mScrollDirection+ " mVisibleItem= "+ mVisibleItem + " totalItemsList size= "+totalItemsList.size());
-                    query = mCurrentUserQueuesRef
+                    queuesQuery = mCurrentUserQueuesRef
                             .orderByChild("joined")//limitToLast to start from the last (page size) items
                             .limitToLast(size);
             }
@@ -398,8 +398,8 @@ public class QueuesRepository {
         totalItemsList.clear();
         Log.d(TAG, "messages query = totalItemsList is cleared");
 
-        query.addValueEventListener(initialListener);
-        mListenersList.add(new FirebaseListeners(query, initialListener));
+        queuesQuery.addValueEventListener(initialListener);
+        mListenersList.add(new FirebaseListeners(queuesQuery, initialListener));
         //mUsersRef.addValueEventListener(usersListener);
 
     }

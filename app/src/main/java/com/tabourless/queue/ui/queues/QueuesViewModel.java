@@ -75,7 +75,7 @@ public class QueuesViewModel extends ViewModel {
 
     @Override
     protected void onCleared() {
-        Log.d(TAG, "mama ChatsViewModel onCleared:");
+        Log.d(TAG, "QueuesViewModel onCleared:");
         mQueuesDataFactory.removeListeners();
         super.onCleared();
     }

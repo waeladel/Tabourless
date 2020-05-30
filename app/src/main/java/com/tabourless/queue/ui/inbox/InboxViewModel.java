@@ -70,8 +70,8 @@ public class InboxViewModel extends ViewModel {
 
     @Override
     protected void onCleared() {
-        Log.d(TAG, "mama ChatsViewModel onCleared:");
-        InboxRepository.removeListeners();
+        Log.d(TAG, "InboxViewModel onCleared:");
+        mInboxDataFactory.removeListeners();
         super.onCleared();
     }
 

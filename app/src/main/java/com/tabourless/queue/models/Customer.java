@@ -176,7 +176,8 @@ public class Customer {
         return
                 disabled == customer.disabled &&
                 number == customer.number &&
-                TextUtils.equals(userId, customer.userId) &&
+                age == customer.age &&
+                //TextUtils.equals(userId, customer.userId) &&
                 TextUtils.equals(status, customer.status) &&
                 TextUtils.equals(counter, customer.counter) &&
                 TextUtils.equals(avatar, customer.avatar) &&
@@ -192,7 +193,8 @@ public class Customer {
         int result = 1;
         result = 31 * result + (disabled ? 1 : 0);
         result = 31 * result + (number == 0 ? 0 : 1);
-        result = 31 * result + (userId == null ? 0 : userId.hashCode());
+        result = 31 * result + (age == 0 ? 0 : 1);
+        //result = 31 * result + (userId == null ? 0 : userId.hashCode());
         result = 31 * result + (status == null ? 0 : status.hashCode());
         result = 31 * result + (counter == null ? 0 : counter.hashCode());
         result = 31 * result + (avatar == null ? 0 : avatar.hashCode());

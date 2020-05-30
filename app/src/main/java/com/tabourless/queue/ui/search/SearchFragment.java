@@ -109,9 +109,10 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
     private static final long EXPIRATION_DURATION = 30 * 60 * 1000L;
     private static final int DISPLACEMENT = 10;
 
-    private static final String CUSTOMER_STATUS_WAITING = "Waiting";
-    private static final String CUSTOMER_STATUS_NEXT = "Next";
-    private static final String CUSTOMER_STATUS_FRONT = "Front";
+    private static final String CUSTOMER_STATUS_WAITING = "waiting";
+    private static final String CUSTOMER_STATUS_NEXT = "next";
+    private static final String CUSTOMER_STATUS_FRONT = "front";
+    private static final String CUSTOMER_STATUS_AWAY = "away";
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -530,6 +531,8 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                             if(task.isSuccessful()){
                                 // Go to customers recycler
                                 Log.d(TAG, "FirebaseOnCompleteCallback onCallback: "+task.isSuccessful());
+                                NavDirections direction = SearchFragmentDirections.actionSearchToCustomers(userQueue.getPlaceId(), userQueue.getKey());
+                                navController.navigate(direction);
                             }else{
                                 Toast.makeText(mContext, R.string.book_queue_error, Toast.LENGTH_LONG).show();
                             }

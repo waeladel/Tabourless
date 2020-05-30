@@ -32,8 +32,7 @@ public class InboxRepository {
     public ValueEventListener initialChatsListener;
 
     private static List<FirebaseListeners> mListenersList;// = new ArrayList<>();
-    private MutableLiveData<Chat> mChat;
-    private static List<Chat> totalItemsList;// = new ArrayList<>();
+    private List<Chat> totalItemsList;// = new ArrayList<>();
 
     private DataSource.InvalidatedCallback invalidatedCallback;
     private ItemKeyedDataSource.LoadInitialCallback loadInitialCallback;
@@ -519,7 +518,7 @@ public class InboxRepository {
     }*/
 
     //removeListeners is static so it can be triggered when ViewModel is onCleared
-    public static void removeListeners(){
+    public void removeListeners(){
 
         if(null != mListenersList){
             for (int i = 0; i < mListenersList.size(); i++) {

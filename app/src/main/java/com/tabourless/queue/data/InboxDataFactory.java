@@ -35,6 +35,10 @@ public class InboxDataFactory extends DataSource.Factory<Long, Chat>{
         inboxDataSource.setScrollDirection(scrollDirection, lastVisibleItem);
     }
 
+    public void removeListeners(){
+        inboxDataSource.removeListeners();
+    }
+
 
     @Override
     public DataSource<Long, Chat> create() {

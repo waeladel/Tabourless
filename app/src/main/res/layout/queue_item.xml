@@ -7,14 +7,17 @@
     android:background="?android:attr/selectableItemBackground">
 
 
+
     <TextView
         android:id="@+id/current_number_value"
         android:layout_width="@dimen/medium_avatar"
         android:layout_height="@dimen/medium_avatar"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:background="@drawable/text_rounded_background"
+        android:background="@drawable/text_rounded_background_waiting"
         android:gravity="center"
+        android:singleLine="true"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="@tools:sample/us_zipcodes" />
@@ -25,8 +28,10 @@
         android:layout_height="@dimen/medium_avatar"
         android:layout_marginStart="8dp"
         android:layout_marginBottom="8dp"
-        android:background="@drawable/text_rounded_background"
+        android:background="@drawable/text_rounded_background_waiting"
         android:gravity="center"
+        android:singleLine="true"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:text="@tools:sample/us_zipcodes" />

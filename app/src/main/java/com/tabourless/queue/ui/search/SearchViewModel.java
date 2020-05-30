@@ -113,7 +113,7 @@ public class SearchViewModel extends ViewModel {
 
     @Override
     protected void onCleared() {
-        Log.d(TAG, "mama ChatsViewModel onCleared:");
+        Log.d(TAG, "SearchViewModel onCleared:");
         mSearchRepository.removeListeners();
         super.onCleared();
     }

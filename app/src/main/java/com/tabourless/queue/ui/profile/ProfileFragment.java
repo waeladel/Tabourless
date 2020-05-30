@@ -470,7 +470,7 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
                 mBinding.userDisabilityIcon.setVisibility(View.VISIBLE);
             } else if (!mUser.getDisabled()) {
                 mBinding.userDisabilityValue.setText(R.string.no);
-                mBinding.userDisabilityIcon.setImageResource(R.drawable.ic_toilet_man);
+                mBinding.userDisabilityIcon.setImageResource(R.drawable.ic_fit_person_stretching_exercises);
                 mBinding.userDisabilityIcon.setVisibility(View.VISIBLE);
             } else {
                 mBinding.userDisabilityValue.setText(R.string.not_specified);

@@ -747,7 +747,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // Go to Chats fragment
+    // Go to Queues fragment
     private void goToMain() {
         if (null != navController.getCurrentDestination() && R.id.queues != navController.getCurrentDestination().getId()) {
             navController.navigate(R.id.queues);

@@ -173,7 +173,7 @@ public class MessagesFragment extends Fragment {
         // Setup toolbar
         NavigationUI.setupWithNavController(mBinding.toolbar, navController, appBarConfiguration);
 
-        mBinding.toolbar.setTitle("Ahmed Adel");
+        mBinding.toolbar.setTitle("wael Adel");
         mBinding.toolbar.setLogoDescription("Online 5 m ago");
         //mBinding.toolbar.setNavigationIcon(R.drawable.ic_business_man);
         mBinding.toolbar.setSubtitle("Online 5 m ago");

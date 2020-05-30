@@ -80,7 +80,7 @@ public class CountersDialogFragment extends DialogFragment  {
                              Bundle savedInstanceState) {
 
         if(null != getDialog()){
-            getDialog().setTitle(R.string.add_place_add_counter_title);
+            getDialog().setTitle(R.string.title_add_place_add_counter);
         }
 
         // get queueItemPosition  from arguments
@@ -255,7 +255,7 @@ public class CountersDialogFragment extends DialogFragment  {
     public void onViewCreated(@NotNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if(null != getDialog()){
-            getDialog().setTitle(R.string.add_place_add_counter_title);
+            getDialog().setTitle(R.string.title_add_place_add_counter);
         }
     }
 

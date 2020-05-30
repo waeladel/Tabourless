@@ -11,6 +11,9 @@
     <string name="title_edit_profile">Edit Profile</string>
     <string name="edit_button_title">Edit</string>
 
+    <string name="title_add_place_add_counter">Add A Counter</string>
+    <string name="title_customers">Queue</string>
+
     <string name="title_messages">Direct messages</string>
     <string name="title_search">Search</string>
     <string name="title_add_place">Add A Place</string>
@@ -70,8 +73,13 @@
     <string name="add_place_counter_title">Service counter*</string>
     <string name="add_place_counter_hint">Main, Counter A, Elderly Counter</string>
     <string name="add_place_counter_helper">Only add multiple counters if this service can serve more than one customer simultaneously. If you see multiple queues in front of a single counter, add only one counter then use filters to separate the queues</string>
+    <string name="customer_number_title" translatable="false">#:</string>
 
-    <string name="add_place_add_counter_title">Add A Counter</string>
+    <string name="customer_age_value_old">Old</string>
+    <string name="customer_age_value_young">Young</string>
+    <string name="customer_disability_value_disabled">Disabled</string>
+    <string name="customer_disability_value_able">Able-bodied</string>
+
 
     <!--toast and error messages -->
     <string name="sign_in_cancelled">Sign in has been cancelled</string>

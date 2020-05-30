@@ -193,7 +193,7 @@ public class InboxAdapter extends PagedListAdapter<Chat, InboxAdapter.ViewHolder
                                     NavDirections ProfileDirection = MainFragmentDirections.actionMainToProfile(currentUserId, membersList.get(0).getKey(), membersList.get(0));
                                     Navigation.findNavController(view).navigate(ProfileDirection);*/
                                 Log.i(TAG, "chat avatar is clicked= " + view.getId());
-                                NavDirections MessageDirection = InboxFragmentDirections.actionInboxToMessages(chat.getKey(), membersList.get(0).getKey(), true);
+                                NavDirections MessageDirection = InboxFragmentDirections.actionInboxToProfile(membersList.get(0).getKey());
                                 Navigation.findNavController(view).navigate(MessageDirection);
                             } else {
                                 Log.i(TAG, "user row clicked= " + view.getId());

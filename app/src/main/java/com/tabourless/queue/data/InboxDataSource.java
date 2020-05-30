@@ -91,4 +91,8 @@ public class InboxDataSource extends ItemKeyedDataSource<Long, Chat> {
     public Long getKey(@NonNull Chat chat) {
         return  chat.getLastSentLong();
     }
+
+    public void removeListeners() {
+        inboxRepository.removeListeners();
+    }
 }
