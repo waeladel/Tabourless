@@ -49,7 +49,11 @@ public class CustomersRepository {
     private String beforeKey;
     private String mPlaceKey, mQueueKey;
 
-    private List<FirebaseListeners> mListenersList;// = not static to only remove listeners of this instance
+    // Not static to only remove listeners of this repository instance
+    // Start destination fragment is never destroyed , so when clicking on it's bottom navigation icon again it got destroyed to be recreated
+    // When that happens clearing listeners is triggered on viewmodel Cleared, which removes that new listeners for the just added query
+    // When new listener is removed we got 0 results and have no listeners for updates.
+    private List<FirebaseListeners> mListenersList;
     private List<Customer> totalItemsList;// = new ArrayList<>();
     //private static List<Message> seenItemsList;// = new ArrayList<>() for seen messages by current user;
 

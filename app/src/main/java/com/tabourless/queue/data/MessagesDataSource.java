@@ -37,6 +37,13 @@ public class MessagesDataSource extends ItemKeyedDataSource<String, Message> {
         //messagesRepository.MessagesChanged(onInvalidatedCallback);
         //invalidate();
     }
+    public void setScrollDirection(int scrollDirection, int lastVisibleItem) {
+        messagesRepository.setScrollDirection(scrollDirection, lastVisibleItem);
+    }
+
+    public void removeListeners() {
+        messagesRepository.removeListeners();
+    }
 
     @Override
     public void invalidate() {
@@ -94,4 +101,5 @@ public class MessagesDataSource extends ItemKeyedDataSource<String, Message> {
     public String getKey(@NonNull Message message) {
         return  message.getKey();
     }
+
 }

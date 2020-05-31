@@ -33,9 +33,11 @@ public class UserRepository {
     private MutableLiveData<Long> mChatsCount, mNotificationsCount;
 
     // HashMap to keep track of Firebase Listeners
-    //private HashMap< DatabaseReference , ValueEventListener> mListenersMap;
-    // Change mListenersList to static so that it's the same for all instance
-    private  List<FirebaseListeners> mListenersList;// = new ArrayList<>();
+    // Not static to only remove listeners of this repository instance
+    // Start destination fragment is never destroyed , so when clicking on it's bottom navigation icon again it got destroyed to be recreated
+    // When that happens clearing listeners is triggered on viewmodel Cleared, which removes that new listeners for the just added query
+    // When new listener is removed we got 0 results and have no listeners for updates.
+    private List<FirebaseListeners> mListenersList;
 
     // A listener for mCurrentUser changes
     private ValueEventListener currentUserListener = new ValueEventListener() {

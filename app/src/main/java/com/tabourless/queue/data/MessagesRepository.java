@@ -30,7 +30,13 @@ public class MessagesRepository {
     private DatabaseReference mDatabaseRef;
     private DatabaseReference mUsersRef , mMessagesRef, mChatRef;
     private Boolean isFirstLoaded = true;
-    private static List<FirebaseListeners> mListenersList;// = new ArrayList<>();
+
+    // Not static to only remove listeners of this repository instance
+    // Start destination fragment is never destroyed , so when clicking on it's bottom navigation icon again it got destroyed to be recreated
+    // When that happens clearing listeners is triggered on viewmodel Cleared, which removes that new listeners for the just added query
+    // When new listener is removed we got 0 results and have no listeners for updates.
+    private List<FirebaseListeners> mListenersList;
+
     private MutableLiveData<User> mUser, mCurrentUser;
     private MutableLiveData<String> mSenderId;
     private MutableLiveData<Chat> mChat;

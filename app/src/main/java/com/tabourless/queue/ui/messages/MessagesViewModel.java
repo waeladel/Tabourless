@@ -109,8 +109,7 @@ public class MessagesViewModel extends ViewModel {
 
     // Set scroll direction and last visible item which is used to get initial key's position
     public void setScrollDirection(int scrollDirection, int lastVisibleItem) {
-        //MessagesListRepository.setScrollDirection(scrollDirection);
-        MessagesListRepository.setScrollDirection(scrollDirection, lastVisibleItem);
+        messagesDataFactory.setScrollDirection(scrollDirection, lastVisibleItem);
     }
 
 
@@ -126,7 +125,7 @@ public class MessagesViewModel extends ViewModel {
         messagesRepository.removeListeners();
 
         // Remove all Listeners from MessagesListRepository
-        MessagesListRepository.removeListeners();
+        messagesDataFactory.removeListeners();
         /*// Update all seen messages by currentUser before onCleared
         updateSeenMessages(chatId);*/
         super.onCleared();

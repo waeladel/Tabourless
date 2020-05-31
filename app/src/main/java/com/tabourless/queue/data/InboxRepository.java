@@ -31,7 +31,12 @@ public class InboxRepository {
     //public ValueEventListener ChatsChangesListener;
     public ValueEventListener initialChatsListener;
 
-    private static List<FirebaseListeners> mListenersList;// = new ArrayList<>();
+    // Not static to only remove listeners of this repository instance
+    // Start destination fragment is never destroyed , so when clicking on it's bottom navigation icon again it got destroyed to be recreated
+    // When that happens clearing listeners is triggered on viewmodel Cleared, which removes that new listeners for the just added query
+    // When new listener is removed we got 0 results and have no listeners for updates.
+    private List<FirebaseListeners> mListenersList;
+    // Not static have a new list of each repository instance
     private List<Chat> totalItemsList;// = new ArrayList<>();
 
     private DataSource.InvalidatedCallback invalidatedCallback;

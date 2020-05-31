@@ -21,11 +21,16 @@ public class MessagesDataFactory extends DataSource.Factory<String, Message>{
         //messagesDataSource.loadInitial();
     }
 
+    public void setScrollDirection(int scrollDirection, int lastVisibleItem) {
+        messagesDataSource.setScrollDirection(scrollDirection, lastVisibleItem);
+    }
+
+    public void removeListeners() {
+        messagesDataSource.removeListeners();
+    }
+
     @Override
     public DataSource<String, Message> create() {
         return messagesDataSource;
     }
-
-
-
 }

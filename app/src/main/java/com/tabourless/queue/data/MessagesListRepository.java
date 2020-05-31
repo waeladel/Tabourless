@@ -51,7 +51,13 @@ public class MessagesListRepository {
     private String chatKey;
 
     private ValueEventListener MessagesChangesListener;
-    private static List<FirebaseListeners> mListenersList;// = new ArrayList<>();
+
+    // Not static to only remove listeners of this repository instance
+    // Start destination fragment is never destroyed , so when clicking on it's bottom navigation icon again it got destroyed to be recreated
+    // When that happens clearing listeners is triggered on viewmodel Cleared, which removes that new listeners for the just added query
+    // When new listener is removed we got 0 results and have no listeners for updates.
+    private List<FirebaseListeners> mListenersList;
+
     private static List<Message> totalItemsList;// = new ArrayList<>();
     //private static List<Message> seenItemsList;// = new ArrayList<>() for seen messages by current user;
 
@@ -269,7 +275,7 @@ public class MessagesListRepository {
     }
 
     // Set the scrolling direction and get the last visible item
-    public static void setScrollDirection(int scrollDirection, int lastVisibleItem) {
+    public void setScrollDirection(int scrollDirection, int lastVisibleItem) {
         Log.d(TAG, "mScrollDirection = " + scrollDirection+ " lastVisibleItem= "+ lastVisibleItem);
         mScrollDirection = scrollDirection;
         mLastVisibleItem = lastVisibleItem;
@@ -600,7 +606,7 @@ public class MessagesListRepository {
     }*/
 
    //removeListeners is static so it can be triggered when ViewModel is onCleared
-    public static void removeListeners(){
+    public void removeListeners(){
 
         if(null != mListenersList){
             for (int i = 0; i < mListenersList.size(); i++) {
