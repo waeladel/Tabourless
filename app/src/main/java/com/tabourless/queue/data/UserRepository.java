@@ -1,5 +1,6 @@
 package com.tabourless.queue.data;
 
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -322,7 +323,16 @@ public class UserRepository {
         return mNotificationsCount;
     }
 
-
+    public void updateBrokenImage(String userId, Uri uri, boolean isAvatar) {
+        DatabaseReference UserRef = mUsersRef.child(userId);
+        if(isAvatar){
+            // Lets update avatar
+            UserRef.child("avatar").setValue(String.valueOf(uri));
+        }else{
+            // Lets update Cover
+            UserRef.child("coverImage").setValue(String.valueOf(uri));
+        }
+    }
 
     public void removeListeners(){
         if(null != mListenersList){
@@ -343,5 +353,5 @@ public class UserRepository {
             mListenersList.clear();
         }
     }
- }
+}
 

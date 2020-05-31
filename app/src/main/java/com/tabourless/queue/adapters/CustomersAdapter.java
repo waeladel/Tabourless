@@ -21,7 +21,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.squareup.picasso.Picasso;
+import com.tabourless.queue.GlideApp;
 import com.tabourless.queue.R;
 import com.tabourless.queue.databinding.CustomerItemBinding;
 import com.tabourless.queue.interfaces.ItemClickListener;
@@ -98,29 +98,18 @@ public class CustomersAdapter extends PagedListAdapter<Customer, CustomersAdapte
                 holder.mBinding.customerName.setText(null);
             }
 
-            // Avatar
-            if (!TextUtils.isEmpty(customer.getAvatar())) {
-                holder.mBinding.customerImage.setImageResource(R.drawable.ic_round_account_filled_72);
-                Picasso.get()
-                        .load(customer.getAvatar())
-                        .placeholder(R.mipmap.account_circle_72dp)
+            // Lets get avatar
+            if(!TextUtils.isEmpty(customer.getAvatar())){
+                StorageReference userAvatarStorageRef = mStorageRef.child("images/"+ customer.getUserId() +"/"+ AVATAR_THUMBNAIL_NAME);
+                // Download directly from StorageReference using Glide
+                GlideApp.with(mContext)
+                        .load(userAvatarStorageRef)
+                        //.placeholder(R.mipmap.account_circle_72dp)
+                        .placeholder(R.drawable.ic_round_account_filled_72)
                         .error(R.drawable.ic_round_broken_image_72px)
-                        .into(holder.mBinding.customerImage , new com.squareup.picasso.Callback() {
-                            @Override
-                            public void onSuccess() {
-                                // loading avatar succeeded, do nothing
-                            }
-                            @Override
-                            public void onError(Exception e) {
-                                // loading avatar failed, lets try to get the avatar from storage instead of database link
-                                loadStorageImage(customer, holder.mBinding.customerImage);
-                            }
-                        });
+                        .into(holder.mBinding.customerImage);
             }else{
-                // Avatar url is empty or null. lets put the default avatar first then try to get image from storage
                 holder.mBinding.customerImage.setImageResource(R.drawable.ic_round_account_filled_72);
-                // lets try to get the avatar from storage instead of database link
-                loadStorageImage(customer, holder.mBinding.customerImage);
             }// end of user avatar
 
             // Ticket number
@@ -213,8 +202,7 @@ public class CustomersAdapter extends PagedListAdapter<Customer, CustomersAdapte
 
     }
 
-    private void loadStorageImage(final Customer customer, final CircleImageView avatar) {
-        mStorageRef = FirebaseStorage.getInstance().getReference();
+    /*private void loadStorageImage(final Customer customer, final CircleImageView avatar) {
         mStorageRef.child("images/"+customer.getUserId() +"/"+ AVATAR_THUMBNAIL_NAME ).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
@@ -238,17 +226,17 @@ public class CustomersAdapter extends PagedListAdapter<Customer, CustomersAdapte
             }
         });
 
-    }
+    }*/
 
 
-    public List<Customer> getBrokenAvatarsList(){
+    /*public List<Customer> getBrokenAvatarsList(){
         return brokenAvatarsList;
     }
 
     // clear sent messages list after updating the database
     public void clearBrokenAvatarsList(){
         brokenAvatarsList.clear();
-    }
+    }*/
 
     // CALLBACK to calculate the difference between the old item and the new item
     private static final DiffUtil.ItemCallback<Customer> DIFF_CALLBACK =

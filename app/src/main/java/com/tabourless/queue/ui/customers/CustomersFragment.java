@@ -242,7 +242,7 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
         super.onStop();
         Log.d(TAG, "onStop");
         // Update all broken avatars on fragment's stop
-        if (mAdapter != null) {
+        /*if (mAdapter != null) {
             mViewModel.updateBrokenAvatars(mAdapter.getBrokenAvatarsList(), new FirebaseOnCompleteCallback() {
                 @Override
                 public void onCallback(@NonNull Task<Void> task) {
@@ -253,7 +253,7 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
                     }
                 }
             });
-        }
+        }*/
     }
 
     @Override

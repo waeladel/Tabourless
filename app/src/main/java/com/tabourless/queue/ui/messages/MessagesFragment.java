@@ -35,7 +35,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.squareup.picasso.Picasso;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.tabourless.queue.GlideApp;
 import com.tabourless.queue.R;
 import com.tabourless.queue.adapters.MessagesAdapter;
 import com.tabourless.queue.databinding.FragmentMessagesBinding;
@@ -105,6 +107,12 @@ public class MessagesFragment extends Fragment {
     private long mTimeLiftInMillis;
     private Long mLastOnlineEndTime;
 
+    private static final String AVATAR_THUMBNAIL_NAME = "avatar.jpg";
+    private static final String COVER_THUMBNAIL_NAME = "cover.jpg";
+    private static final String AVATAR_ORIGINAL_NAME = "original_avatar.jpg";
+    private static final String COVER_ORIGINAL_NAME = "original_cover.jpg";
+    private StorageReference mStorageRef;
+
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -119,6 +127,9 @@ public class MessagesFragment extends Fragment {
         //Get current logged in user
         mFirebaseCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
         mCurrentUserId = mFirebaseCurrentUser != null ? mFirebaseCurrentUser.getUid() : null;
+
+        // [START create_storage_reference]
+        mStorageRef = FirebaseStorage.getInstance().getReference();
 
         if(null != getArguments() && getArguments().containsKey("chatUserId") && getArguments().containsKey("isGroup")) {
             //mCurrentUserId = MessagesFragmentArgs.fromBundle(getArguments()).getCurrentUserId();//logged in user
@@ -136,7 +147,7 @@ public class MessagesFragment extends Fragment {
 
         // prepare the Adapter
         mMessagesArrayList = new ArrayList<>();
-        mMessagesAdapter = new MessagesAdapter(); // Pass chat id because it's needed to update message revelation
+        mMessagesAdapter = new MessagesAdapter(mContext); // Pass chat id because it's needed to update message revelation
 
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
         mChatsRef = mDatabaseRef.child("chats");
@@ -586,14 +597,14 @@ public class MessagesFragment extends Fragment {
                 updateMap.put(statusList.get(i).getKey()+"/status", statusList.get(i).getStatus());
             }
 
-            // Get broken avatars list from the adapter
+            /*// Get broken avatars list from the adapter
             List<Message> brokenAvatarsList = mMessagesAdapter.getBrokenAvatarsList();
             //mMessagesAdapter.getCurrentList();
 
             for (int i = 0; i < brokenAvatarsList.size(); i++) {
                 Log.d(TAG, "brokenAvatarsList message= "+brokenAvatarsList.get(i).getMessage() + " key= "+brokenAvatarsList.get(i).getKey() + " avatar= "+brokenAvatarsList.get(i).getSenderAvatar());
                 updateMap.put(brokenAvatarsList.get(i).getKey()+"/senderAvatar", brokenAvatarsList.get(i).getSenderAvatar());
-            }
+            }*/
 
         }// End of if mMessagesAdapter is not null
 
@@ -602,7 +613,7 @@ public class MessagesFragment extends Fragment {
             public void onSuccess(Void aVoid) {
                 // onSuccess clear the list to start all over
                 mMessagesAdapter.clearStatusList();
-                mMessagesAdapter.clearBrokenAvatarsList();
+                //mMessagesAdapter.clearBrokenAvatarsList();
             }
         });
 
@@ -677,10 +688,14 @@ public class MessagesFragment extends Fragment {
     private void showAvatar() {
         Log.d(TAG, "showAvatar starts");
         if(mChatUser != null){
-            if (null != mChatUser.getAvatar()) {
-                Picasso.get()
-                        .load(mChatUser.getAvatar())
-                        .placeholder(R.mipmap.account_circle_72dp)
+            if (!TextUtils.isEmpty(mChatUser.getAvatar())) {
+                // Lets get avatar
+                StorageReference userAvatarStorageRef = mStorageRef.child("images/"+ mChatUser.getKey() +"/"+ AVATAR_THUMBNAIL_NAME);
+                // Download directly from StorageReference using Glide
+                GlideApp.with(mContext)
+                        .load(userAvatarStorageRef)
+                        //.placeholder(R.mipmap.account_circle_72dp)
+                        .placeholder(R.drawable.ic_round_account_filled_72)
                         .error(R.drawable.ic_round_broken_image_72px)
                         .into(mBinding.userImage);
             }else{

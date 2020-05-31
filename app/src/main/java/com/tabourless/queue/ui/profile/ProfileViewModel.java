@@ -1,5 +1,6 @@
 package com.tabourless.queue.ui.profile;
 
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -69,6 +70,5 @@ public class ProfileViewModel extends ViewModel {
         relationRepository.removeListeners();
         mUserRepository.removeListeners();
     }
-
 
 }

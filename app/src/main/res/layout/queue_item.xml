@@ -14,7 +14,7 @@
         android:layout_height="@dimen/medium_avatar"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:background="@drawable/text_rounded_background_waiting"
+        android:background="@drawable/text_rounded_background_front"
         android:gravity="center"
         android:singleLine="true"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"

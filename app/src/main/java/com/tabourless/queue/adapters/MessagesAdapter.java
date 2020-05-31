@@ -1,5 +1,6 @@
 package com.tabourless.queue.adapters;
 
+import android.content.Context;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
@@ -24,7 +25,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.squareup.picasso.Picasso;
+import com.tabourless.queue.GlideApp;
 import com.tabourless.queue.R;
 import com.tabourless.queue.databinding.MessageReceivedItemBinding;
 import com.tabourless.queue.databinding.MessageSentItemBinding;
@@ -79,11 +80,13 @@ public class MessagesAdapter extends PagedListAdapter<Message, RecyclerView.View
     private MessageSentItemBinding mSentBinding;
     private MessageReceivedItemBinding mReceivedBinding;
 
-    public MessagesAdapter() {
+    private Context mContext;
+    public MessagesAdapter(Context context) {
         super(DIFF_CALLBACK);
         // [START create_storage_reference]
-        mStorageRef = FirebaseStorage.getInstance().getReference();
+        this.mContext = context;
 
+        mStorageRef = FirebaseStorage.getInstance().getReference();
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
         // use received chatKey to create a database ref
         mMessagesRef = mDatabaseRef.child("messages");
@@ -230,45 +233,31 @@ public class MessagesAdapter extends PagedListAdapter<Message, RecyclerView.View
                 //Log.d(TAG, "mama  onBindViewHolder. users key"  +  user.getCreatedLong()+ "name: "+user.getName());
                 // click listener using interface
                 // user name text value
-                if (null != message.getMessage()) {
+                if (!TextUtils.isEmpty(message.getMessage())) {
                     // Message can't be empty because scratch view width will crash the app if it's width is < 0
-                    if(!message.getMessage().isEmpty()){
-                        // Only display message text if it's not empty
-                        ReceivedHolder.mReceivedBinding.messageText.setText(message.getMessage());
-                    }else{
-                        // if message is empty we must display empty space to have a width for scratch view
-                        ReceivedHolder.mReceivedBinding.messageText.setText(" ");
-                    }
-                    //ReceivedHolder.mScratch.setText(message.getMessage()+ message.getKey());
+                    // Only display message text if it's not empty
+                    ReceivedHolder.mReceivedBinding.messageText.setText(message.getMessage());
                 }else{
-                    // if message is null (not set) we must display empty space to have a width for scratch view
+                    // if message is empty or null (not set) we must display empty space to have a width for scratch view
                     ReceivedHolder.mReceivedBinding.messageText.setText(" ");
                     //ReceivedHolder.mScratch.setText(null);
                 }
 
-                if (null != message.getSenderId()) {
-                    // [START create_storage_reference]
-                    //ReceivedHolder.mAvatar.setImageResource(R.drawable.ic_user_account_grey_white);
-                    //mStorageRef.child("images/"+message.getSenderId()+"/"+ AVATAR_THUMBNAIL_NAME).getFile()
-                    Picasso.get()
-                            .load(message.getSenderAvatar())
-                            .placeholder(R.mipmap.account_circle_72dp)
+                // Lets get avatar
+                if(!TextUtils.isEmpty(message.getSenderAvatar())){
+                    StorageReference userAvatarStorageRef = mStorageRef.child("images/"+ message.getSenderId() +"/"+ AVATAR_THUMBNAIL_NAME);
+                    // Download directly from StorageReference using Glide
+                    GlideApp.with(mContext)
+                            .load(userAvatarStorageRef)
+                            //.placeholder(R.mipmap.account_circle_72dp)
+                            .placeholder(R.drawable.ic_round_account_filled_72)
                             .error(R.drawable.ic_round_broken_image_72px)
-                            .into(ReceivedHolder.mReceivedBinding.userImage , new com.squareup.picasso.Callback() {
-                                @Override
-                                public void onSuccess() {
-                                    // loading avatar succeeded, do nothing
-                                }
-                                @Override
-                                public void onError(Exception e) {
-                                    // loading avatar failed, lets try to get the avatar from storage instead of database link
-                                    loadStorageImage(message, ReceivedHolder.mReceivedBinding.userImage);
-                                }
-                            });
+                            .into(ReceivedHolder.mReceivedBinding.userImage);
                 }else{
-                    // Handle if getSenderId() is null
                     ReceivedHolder.mReceivedBinding.userImage.setImageResource(R.drawable.ic_round_account_filled_72);
                 }
+
+
 
                 if (null != message.getCreated()) {
                     Calendar c = Calendar.getInstance();
@@ -332,8 +321,7 @@ public class MessagesAdapter extends PagedListAdapter<Message, RecyclerView.View
 
     }
 
-    private void loadStorageImage(final Message message, final CircleImageView avatar) {
-
+    /*private void loadStorageImage(final Message message, final CircleImageView avatar) {
         mStorageRef.child("images/"+message.getSenderId() +"/"+ AVATAR_THUMBNAIL_NAME ).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
@@ -355,16 +343,16 @@ public class MessagesAdapter extends PagedListAdapter<Message, RecyclerView.View
                 avatar.setImageResource(R.drawable.ic_round_account_filled_72);
             }
         });
-    }
+    }*/
 
-    public List<Message> getBrokenAvatarsList(){
+    /*public List<Message> getBrokenAvatarsList(){
         return brokenAvatarsList;
     }
 
     // clear sent messages list after updating the database
     public void clearBrokenAvatarsList(){
         brokenAvatarsList.clear();
-    }
+    }*/
 
 
     // CALLBACK to calculate the difference between the old item and the new item

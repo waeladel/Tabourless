@@ -207,7 +207,7 @@ public class InboxFragment extends Fragment {
         super.onStop();
         Log.d(TAG, "onStop");
 
-        // Create a map for all messages need to be updated
+        /*// Create a map for all messages need to be updated
         Map<String, Object> updateMap = new HashMap<>();
 
         // Update all broken avatars on fragment's stop
@@ -238,7 +238,7 @@ public class InboxFragment extends Fragment {
                     }
                 });
             }
-        }
+        }*/
     }
 
     @Override

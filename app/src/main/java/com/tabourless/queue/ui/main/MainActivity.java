@@ -29,7 +29,9 @@ import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
-import com.squareup.picasso.Picasso;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.tabourless.queue.GlideApp;
 import com.tabourless.queue.R;
 import com.tabourless.queue.databinding.ActivityMainBinding;
 import com.tabourless.queue.databinding.ToolbarBinding;
@@ -89,20 +91,23 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseReference mDatabaseRef;
     private DatabaseReference mUserRef;
     //private FirebaseDatabase database ;
-
     private DatabaseReference myConnectionsRef;
     private DatabaseReference connection;
-
     // Stores the timestamp of my last disconnect (the last time I was seen online)
     private DatabaseReference lastOnlineRef;
-
     private DatabaseReference connectedRef;//  = database.getReference(".info/connected");
     //private DatabaseReference connection;
+    private StorageReference mStorageRef; // Storage ref for user's image
 
     private MainViewModel mViewModel;// ViewMode for getting the latest current user id
     private Intent intent;
 
     private FragmentManager fragmentManager;
+
+    private static final String AVATAR_THUMBNAIL_NAME = "avatar.jpg";
+    private static final String COVER_THUMBNAIL_NAME = "cover.jpg";
+    private static final String AVATAR_ORIGINAL_NAME = "original_avatar.jpg";
+    private static final String COVER_ORIGINAL_NAME = "original_cover.jpg";
 
     // To navigate when item clicked
     /*private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -175,6 +180,9 @@ public class MainActivity extends AppCompatActivity {
         mToolbarBinding = mBinding.toolbar;
         mHeaderAvatar = mBinding.drawerNavView.getHeaderView(0).findViewById(R.id.header_avatar_image);
         mHeaderName = mBinding.drawerNavView.getHeaderView(0).findViewById(R.id.header_user_name);
+
+        // [START create_storage_reference]
+        mStorageRef = FirebaseStorage.getInstance().getReference();
 
         View view = mBinding.getRoot();
         setContentView(view);
@@ -657,20 +665,28 @@ public class MainActivity extends AppCompatActivity {
                     String currentUserId = dataSnapshot.getKey();*/
 
                     // If name or avatar is empty go to goToCompleteProfile
-                    if (null == mUser.getName() || null == mUser.getAvatar()) {
+                    if (TextUtils.isEmpty(mUser.getName()) || TextUtils.isEmpty(mUser.getAvatar())) {
                         Log.d(TAG, "user exist: Name=" + mUser.getName());
                         goToCompleteProfile();
                         //return;
                     }
 
                     //Display header avatar
-                    if (null != mUser.getAvatar()) {
-                        mHeaderAvatar.setImageResource(R.drawable.ic_round_account_filled_72);
+                    if (!TextUtils.isEmpty(mUser.getAvatar())) {
+                        // Lets get avatar
+                        StorageReference userAvatarStorageRef = mStorageRef.child("images/"+ mUserId +"/"+ AVATAR_THUMBNAIL_NAME);
+                        GlideApp.with(MainActivity.this)
+                                .load(userAvatarStorageRef)
+                                //.placeholder(R.mipmap.account_circle_72dp)
+                                .placeholder(R.drawable.ic_round_account_filled_72)
+                                .error(R.drawable.ic_round_broken_image_72px)
+                                .into(mHeaderAvatar);
+                        /*mHeaderAvatar.setImageResource(R.drawable.ic_round_account_filled_72);
                         Picasso.get()
                                 .load(mUser.getAvatar())
                                 .placeholder(R.mipmap.account_circle_72dp)
                                 .error(R.drawable.ic_round_broken_image_72px)
-                                .into(mHeaderAvatar);
+                                .into(mHeaderAvatar);*/
                     }else{
                         // end of user avatar
                         mHeaderAvatar.setImageResource(R.drawable.ic_round_account_filled_72);

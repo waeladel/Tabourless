@@ -2,6 +2,7 @@ package com.tabourless.queue.ui.profile;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -20,12 +21,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.squareup.picasso.Picasso;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.tabourless.queue.GlideApp;
 import com.tabourless.queue.R;
 import com.tabourless.queue.databinding.FragmentProfileBinding;
 import com.tabourless.queue.interfaces.FirebaseUserCallback;
@@ -34,7 +38,6 @@ import com.tabourless.queue.models.Relation;
 import com.tabourless.queue.models.User;
 import com.tabourless.queue.ui.BlockAlertFragment;
 import com.tabourless.queue.ui.BlockDeleteAlertFragment;
-
 import java.util.Calendar;
 
 public class ProfileFragment extends Fragment implements ItemClickListener {
@@ -44,6 +47,8 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
     private ProfileViewModel mViewModel;
     private FragmentProfileBinding mBinding;
 
+    private static final String AVATAR_THUMBNAIL_NAME = "avatar.jpg";
+    private static final String COVER_THUMBNAIL_NAME = "cover.jpg";
     private static final String AVATAR_ORIGINAL_NAME = "original_avatar.jpg";
     private static final String COVER_ORIGINAL_NAME = "original_cover.jpg";
 
@@ -71,6 +76,7 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
     // [START declare_database_ref]
     private DatabaseReference mDatabaseRef;
     private DatabaseReference mUserRef;
+    private StorageReference mStorageRef;
 
     private Context mContext;
 
@@ -100,7 +106,10 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
             mUserId = ProfileFragmentArgs.fromBundle(getArguments()).getUserId(); // any user
             Log.d(TAG, "mCurrentUserId= " + mCurrentUserId + " mUserId= " + mUserId );
         }
+
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
+        // [START create_storage_reference]
+        mStorageRef = FirebaseStorage.getInstance().getReference();
 
         mViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
 
@@ -123,8 +132,9 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
                 @Override
                 public void onChanged(User user) {
                     if(user != null){
-                        Log.d(TAG,  "onChanged user name= " + user.getName() + " hashcode= "+ hashCode());
                         mUser = user;
+                        mUser.setKey(mUserId);
+                        Log.d(TAG,  "onChanged user name= " + user.getName() + " hashcode= "+ hashCode()+ " userId= "+mUser.getKey());
                         showCurrentUser();
                     }
                 }
@@ -135,8 +145,9 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
                 @Override
                 public void onChanged(User user) {
                     if(user != null){
-                        Log.d(TAG,  "onChanged user name= " + user.getName() + " hashcode= "+ hashCode());
                         mUser = user;
+                        mUser.setKey(mCurrentUserId);
+                        Log.d(TAG,  "onChanged user name= " + user.getName() + " hashcode= "+ hashCode()+ " userId= "+mUser.getKey());
                         showCurrentUser();
                     }else{
                         // if user is not exist. if new user managed to open profile fragment without having a profile yet
@@ -404,34 +415,41 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
     }
 
     private void showCurrentUser() {
-
+        // Get user values
         if (mUser != null) {
-            // Get user values
-            if (null != mUser.getCoverImage()) {
-                mBinding.coverImage.setImageResource(R.drawable.ic_picture_gallery);
-                Picasso.get()
-                        .load(mUser.getCoverImage())
-                        .placeholder(R.mipmap.ic_picture_gallery_white_512px)
+            // Lets get cover
+            if(!TextUtils.isEmpty(mUser.getCoverImage())){
+                StorageReference userCoverStorageRef = mStorageRef.child("images/"+ mUser.getKey() +"/"+ COVER_THUMBNAIL_NAME);
+                // Download directly from StorageReference using Glide
+                GlideApp.with(mContext)
+                        .load(userCoverStorageRef)
+                        //.placeholder(R.mipmap.ic_picture_gallery_white_512px)
+                        .placeholder(R.drawable.ic_picture_gallery)
                         .error(R.drawable.ic_broken_image_512px)
                         .into(mBinding.coverImage);
             }else{
                 mBinding.coverImage.setImageResource(R.drawable.ic_picture_gallery);
             }
 
-            if (null != mUser.getAvatar()) {
-                mBinding.userImage.setImageResource(R.drawable.ic_round_account_filled_72);
-                Picasso.get()
-                        .load(mUser.getAvatar())
-                        .placeholder(R.mipmap.account_circle_72dp)
+            // Lets get avatar
+            if(!TextUtils.isEmpty(mUser.getAvatar())){
+                StorageReference userAvatarStorageRef = mStorageRef.child("images/"+ mUser.getKey() +"/"+ AVATAR_THUMBNAIL_NAME);
+                // Download directly from StorageReference using Glide
+                GlideApp.with(mContext)
+                        .load(userAvatarStorageRef)
+                        //.placeholder(R.mipmap.account_circle_72dp)
+                        .placeholder(R.drawable.ic_round_account_filled_72)
                         .error(R.drawable.ic_round_broken_image_72px)
                         .into(mBinding.userImage);
             }else{
-                // end of user avatar
                 mBinding.userImage.setImageResource(R.drawable.ic_round_account_filled_72);
             }
 
+            // Show user name
             if (null != mUser.getName()) {
                 mBinding.userNameText.setText(mUser.getName());
+            }else{
+                mBinding.userNameText.setText(null);
             }
 
             //mLovedByValue.setText(getString(R.string.user_loved_by, mUser.getLoveCounter()));
@@ -480,6 +498,65 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
             // End of display parcelable data]
         }
     }
+
+   /* // Get image from storage if the link in database is broken
+    private void loadStorageImage(final String userId, final boolean isAvatar) {
+        Log.d(TAG, "loadStorageImage: userId= "+ userId);
+        if(isAvatar){
+            // Lets get avatar
+            *//*mStorageRef.child("images/"+userId +"/"+ AVATAR_THUMBNAIL_NAME).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    Log.d(TAG, "onSuccess: uri= "+ uri);
+                    if(null != mBinding.userImage){
+                        Picasso.get()
+                                .load(uri)
+                                .placeholder(R.mipmap.account_circle_72dp)
+                                .error(R.drawable.ic_round_broken_image_72px)
+                                .into(mBinding.userImage);
+                    }
+
+                    // Update broken images in the database (Only if it's current user, due to security rules)
+                    if(TextUtils.equals(userId, mCurrentUserId)){
+                        mViewModel.updateBrokenImage(userId, uri, isAvatar);
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle any errors
+                    mBinding.userImage.setImageResource(R.drawable.ic_round_account_filled_72);
+                }
+            });*//*
+
+        }else{
+            // Lets get Cover
+            mStorageRef.child("images/"+userId +"/"+ COVER_THUMBNAIL_NAME).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    Picasso.get()
+                            .load(uri)
+                            .placeholder(R.mipmap.ic_picture_gallery_white_512px)
+                            .error(R.drawable.ic_broken_image_512px)
+                            .into(mBinding.coverImage);
+
+                    // Update broken images in the database (Only if it's current user, due to security rules)
+                    if(TextUtils.equals(userId, mCurrentUserId)){
+                        mViewModel.updateBrokenImage(userId, uri, isAvatar);
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle any errors
+                    mBinding.coverImage.setImageResource(R.drawable.ic_picture_gallery);
+                }
+            });
+
+        }
+
+    }*/
+
     //Show a dialog to confirm blocking user
     private void showBlockDialog() {
         BlockAlertFragment blockFragment = BlockAlertFragment.newInstance(mContext, this);

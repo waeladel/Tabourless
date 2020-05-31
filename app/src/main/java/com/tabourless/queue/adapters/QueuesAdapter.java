@@ -15,30 +15,13 @@ import androidx.navigation.Navigation;
 import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.squareup.picasso.Picasso;
-import com.tabourless.queue.R;
-import com.tabourless.queue.databinding.InboxItemBinding;
 import com.tabourless.queue.databinding.QueueItemBinding;
 import com.tabourless.queue.interfaces.ItemClickListener;
-import com.tabourless.queue.models.Chat;
-import com.tabourless.queue.models.ChatMember;
 import com.tabourless.queue.models.UserQueue;
-import com.tabourless.queue.ui.inbox.InboxFragmentDirections;
-
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
-
-import de.hdodenhof.circleimageview.CircleImageView;
 
 public class QueuesAdapter extends PagedListAdapter<UserQueue, QueuesAdapter.ViewHolder> {
 

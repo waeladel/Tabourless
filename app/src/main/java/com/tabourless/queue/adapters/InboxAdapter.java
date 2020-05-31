@@ -2,6 +2,7 @@ package com.tabourless.queue.adapters;
 
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +23,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.squareup.picasso.Picasso;
+import com.tabourless.queue.GlideApp;
 import com.tabourless.queue.R;
 import com.tabourless.queue.databinding.InboxItemBinding;
 import com.tabourless.queue.interfaces.ItemClickListener;
@@ -217,49 +218,19 @@ public class InboxAdapter extends PagedListAdapter<Chat, InboxAdapter.ViewHolder
                             holder.mBinding.userName.setText(null);
                         }
 
-                        // Avatar
-                        if (null != membersList.get(0).getAvatar()) {
-                            holder.mBinding.userImage.setImageResource(R.drawable.ic_round_account_filled_72);
-                            Picasso.get()
-                                    .load(membersList.get(0).getAvatar())
-                                    .placeholder(R.mipmap.account_circle_72dp)
+                        // Lets get avatar
+                        if(!TextUtils.isEmpty(membersList.get(0).getAvatar())){
+                            StorageReference userAvatarStorageRef = mStorageRef.child("images/"+ membersList.get(0).getKey() +"/"+ AVATAR_THUMBNAIL_NAME);
+                            // Download directly from StorageReference using Glide
+                            GlideApp.with(fragment)
+                                    .load(userAvatarStorageRef)
+                                    //.placeholder(R.mipmap.account_circle_72dp)
+                                    .placeholder(R.drawable.ic_round_account_filled_72)
                                     .error(R.drawable.ic_round_broken_image_72px)
-                                    .into(holder.mBinding.userImage , new com.squareup.picasso.Callback() {
-                                @Override
-                                public void onSuccess() {
-                                    // loading avatar succeeded, do nothing
-                                }
-                                @Override
-                                public void onError(Exception e) {
-                                    // loading avatar failed, lets try to get the avatar from storage instead of database link
-                                    loadStorageImage(chat.getKey(), membersList.get(0), holder.mBinding.userImage);
-                                }
-                            });
+                                    .into(holder.mBinding.userImage);
                         }else{
-                            // end of user avatar
                             holder.mBinding.userImage.setImageResource(R.drawable.ic_round_account_filled_72);
                         }
-
-                        /*// [START create_storage_reference]
-                        //ReceivedHolder.mAvatar.setImageResource(R.drawable.ic_user_account_grey_white);
-                        mStorageRef.child("images/"+membersList.get(0).getKey()+"/"+ AVATAR_THUMBNAIL_NAME).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                            @Override
-                            public void onSuccess(Uri uri) {
-                                // Got the download URL for 'users/me/profile.png'
-                                Picasso.get()
-                                        .load(uri)
-                                        .placeholder(R.drawable.ic_user_account_grey_white)
-                                        .error(R.drawable.ic_broken_image)
-                                        .into(holder.mAvatar);
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception exception) {
-                                // Handle any errors
-                                holder.mAvatar.setImageResource(R.drawable.ic_user_account_grey_white);
-                            }
-                        });*/
-
                         break;
                     case 2:// there is 2 member other than current user
                         Log.d(TAG, "mama getItems getMember= "+membersList.get(0));
@@ -277,8 +248,7 @@ public class InboxAdapter extends PagedListAdapter<Chat, InboxAdapter.ViewHolder
 
     }
 
-    private void loadStorageImage(final String key, final ChatMember chatMember, final CircleImageView avatar) {
-        mStorageRef = FirebaseStorage.getInstance().getReference();
+   /* private void loadStorageImage(final String key, final ChatMember chatMember, final CircleImageView avatar) {
         Log.d(TAG, "chatMember id= "+chatMember.getKey());
         mStorageRef.child("images/"+chatMember.getKey() +"/"+ AVATAR_THUMBNAIL_NAME ).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
@@ -303,17 +273,17 @@ public class InboxAdapter extends PagedListAdapter<Chat, InboxAdapter.ViewHolder
             }
         });
 
-    }
+    }*/
 
 
-    public List<ChatMember> getBrokenAvatarsList(){
+    /*public List<ChatMember> getBrokenAvatarsList(){
         return brokenAvatarsList;
     }
 
     // clear sent messages list after updating the database
     public void clearBrokenAvatarsList(){
         brokenAvatarsList.clear();
-    }
+    }*/
 
     // CALLBACK to calculate the difference between the old item and the new item
     private static final DiffUtil.ItemCallback<Chat> DIFF_CALLBACK =

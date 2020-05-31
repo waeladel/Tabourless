@@ -40,7 +40,7 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.squareup.picasso.Picasso;
+import com.tabourless.queue.GlideApp;
 import com.tabourless.queue.R;
 import com.tabourless.queue.databinding.FragmentCompleteProfileBinding;
 import com.tabourless.queue.interfaces.FirebaseUserCallback;
@@ -148,6 +148,7 @@ public class CompleteProfileFragment extends Fragment {
                     if(user != null){
                         Log.d(TAG,  "FirebaseUserCallback onCallback. name= " + user.getName()+ " key= "+user.getKey());
                         mViewModel.setUser(user);
+                        mViewModel.getUser().setKey(user.getKey());
                         //currentUser = mEditProfileViewModel.getUser();
                         showCurrentUser(mViewModel.getUser());
                     }else{
@@ -280,31 +281,34 @@ public class CompleteProfileFragment extends Fragment {
 
     private void showCurrentUser(User user) {
         mBinding.nameValue.setText(user.getName());
-
         //Display avatar
-        if (null != user.getAvatar()) {
-            mBinding.avatarImage.setImageResource(R.drawable.ic_round_account_filled_72);
-            Picasso.get()
-                    .load(user.getAvatar())
-                    .placeholder(R.mipmap.account_circle_72dp)
+        if(!TextUtils.isEmpty(user.getAvatar())){
+            StorageReference userAvatarStorageRef = mStorageRef.child("images/"+ user.getKey() +"/"+ AVATAR_THUMBNAIL_NAME);
+            // Download directly from StorageReference using Glide
+            GlideApp.with(mContext)
+                    .load(userAvatarStorageRef)
+                    //.placeholder(R.mipmap.account_circle_72dp)
+                    .placeholder(R.drawable.ic_round_account_filled_72)
                     .error(R.drawable.ic_round_broken_image_72px)
                     .into(mBinding.avatarImage);
         }else{
-            // end of user avatar
             mBinding.avatarImage.setImageResource(R.drawable.ic_round_account_filled_72);
         }
 
         // Display cover
-        if (null != user.getCoverImage()) {
-            mBinding.coverImage.setImageResource(R.drawable.ic_picture_gallery);
-            Picasso.get()
-                    .load(user.getCoverImage())
-                    .placeholder(R.mipmap.ic_picture_gallery_white_512px)
+        if(!TextUtils.isEmpty(user.getCoverImage())){
+            StorageReference userCoverStorageRef = mStorageRef.child("images/"+ user.getKey() +"/"+ COVER_THUMBNAIL_NAME);
+            // Download directly from StorageReference using Glide
+            GlideApp.with(mContext)
+                    .load(userCoverStorageRef)
+                    //.placeholder(R.mipmap.ic_picture_gallery_white_512px)
+                    .placeholder(R.drawable.ic_picture_gallery)
                     .error(R.drawable.ic_broken_image_512px)
                     .into(mBinding.coverImage);
         }else{
             mBinding.coverImage.setImageResource(R.drawable.ic_picture_gallery);
         }
+
 
         //Set gender value
         if(TextUtils.equals(user.getGender(), "male") ){
@@ -510,22 +514,36 @@ public class CompleteProfileFragment extends Fragment {
                             case "avatar":
                                 mViewModel.getUser().setAvatar(String.valueOf(downloadUri));
                                 //Display avatar
-                                mBinding.avatarImage.setImageResource(R.drawable.ic_round_account_filled_72);
+                                GlideApp.with(mContext)
+                                        .load(mViewModel.getUser().getAvatar())
+                                        //.placeholder(R.mipmap.account_circle_72dp)
+                                        .placeholder(R.drawable.ic_round_account_filled_72)
+                                        .error(R.drawable.ic_round_broken_image_72px)
+                                        .into(mBinding.avatarImage);
+
+                                /*mBinding.avatarImage.setImageResource(R.drawable.ic_round_account_filled_72);
                                 Picasso.get()
                                         .load(mViewModel.getUser().getAvatar())
                                         .placeholder(R.mipmap.account_circle_72dp)
                                         .error(R.drawable.ic_round_broken_image_72px)
-                                        .into(mBinding.avatarImage);
+                                        .into(mBinding.avatarImage);*/
                                 break;
                             case "coverImage":
                                 mViewModel.getUser().setCoverImage(String.valueOf(downloadUri));
                                 // Display cover
-                                mBinding.coverImage.setImageResource(R.drawable.ic_picture_gallery);
+                                GlideApp.with(mContext)
+                                        .load(mViewModel.getUser().getCoverImage())
+                                        //.placeholder(R.mipmap.ic_picture_gallery_white_512px)
+                                        .placeholder(R.drawable.ic_picture_gallery)
+                                        .error(R.drawable.ic_broken_image_512px)
+                                        .into(mBinding.coverImage);
+
+                                /*mBinding.coverImage.setImageResource(R.drawable.ic_picture_gallery);
                                 Picasso.get()
                                         .load(mViewModel.getUser().getCoverImage())
                                         .placeholder(R.mipmap.ic_picture_gallery_white_512px)
                                         .error(R.drawable.ic_broken_image_512px)
-                                        .into(mBinding.coverImage);
+                                        .into(mBinding.coverImage);*/
                                 break;
                         }
 
