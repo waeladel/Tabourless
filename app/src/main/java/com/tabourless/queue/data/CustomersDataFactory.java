@@ -24,8 +24,8 @@ public class CustomersDataFactory extends DataSource.Factory<String, Customer>{
         mCustomersDataSource.setScrollDirection(scrollDirection, lastVisibleItem);
     }
 
-    public void updateBrokenAvatars(List<Customer> brokenAvatarsList, FirebaseOnCompleteCallback callback) {
-        mCustomersDataSource.updateBrokenAvatars(brokenAvatarsList, callback);
+    public void removeCustomer(Customer customer) {
+        mCustomersDataSource.removeCustomer(customer);
     }
 
     public void removeListeners() {
@@ -36,4 +36,5 @@ public class CustomersDataFactory extends DataSource.Factory<String, Customer>{
     public DataSource<String, Customer> create() {
         return mCustomersDataSource;
     }
+
 }

@@ -9,6 +9,7 @@ import androidx.paging.ItemKeyedDataSource;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -25,7 +26,9 @@ import com.tabourless.queue.models.Message;
 import com.tabourless.queue.models.Queue;
 import com.tabourless.queue.models.User;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 
 public class CustomersViewModel extends ViewModel {
@@ -87,8 +90,9 @@ public class CustomersViewModel extends ViewModel {
         //MessagesListRepository.setScrollDirection(scrollDirection);
         mCustomersDataFactory.setScrollDirection(scrollDirection, lastVisibleItem);
     }
-    public void updateBrokenAvatars(List<Customer> brokenAvatarsList, FirebaseOnCompleteCallback callback) {
-        mCustomersDataFactory.updateBrokenAvatars(brokenAvatarsList, callback);
+
+    public void removeCustomer(Customer customer) {
+        mCustomersDataFactory.removeCustomer(customer);
     }
 
     @Override

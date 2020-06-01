@@ -122,10 +122,6 @@ public class CustomersAdapter extends PagedListAdapter<Customer, CustomersAdapte
             // Status
             if(!TextUtils.isEmpty(customer.getStatus())){
                 switch (customer.getStatus()){
-                    case CUSTOMER_STATUS_WAITING:
-                        holder.mBinding.numberValue.setBackgroundResource(R.drawable.text_rounded_background_waiting);
-                        holder.mBinding.numberValue.setTextColor(ContextCompat.getColor(mContext, R.color.material_on_primary_emphasis_high_type));
-                        break;
                     case CUSTOMER_STATUS_NEXT:
                         holder.mBinding.numberValue.setBackgroundResource(R.drawable.text_rounded_background_next);
                         holder.mBinding.numberValue.setTextColor(ContextCompat.getColor(mContext, R.color.color_on_surface_emphasis_medium));
@@ -138,6 +134,11 @@ public class CustomersAdapter extends PagedListAdapter<Customer, CustomersAdapte
                         holder.mBinding.numberValue.setBackgroundResource(R.drawable.text_rounded_background_away);
                         holder.mBinding.numberValue.setTextColor(ContextCompat.getColor(mContext, R.color.material_on_surface_disabled));
                         break;
+                    default:
+                        // default is waiting
+                        holder.mBinding.numberValue.setBackgroundResource(R.drawable.text_rounded_background_waiting);
+                        holder.mBinding.numberValue.setTextColor(ContextCompat.getColor(mContext, R.color.material_on_primary_emphasis_high_type));
+                        break;
                 }
             }else{
                 // Status is not set, lets display away background
@@ -146,11 +147,17 @@ public class CustomersAdapter extends PagedListAdapter<Customer, CustomersAdapte
 
 
             // Joined Time text value
+            Log.d(TAG, "onBindViewHolder: ");
             if (null != customer.getJoined()) {
-                Calendar c = Calendar.getInstance();
-                c.setTimeInMillis(customer.getJoinedLong());
-                String joinedTime = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(c.getTime());
-                holder.mBinding.joinedTimeValue.setText(joinedTime);
+                if(customer.getJoinedLong() != 0) {
+                    Calendar c = Calendar.getInstance();
+                    c.setTimeInMillis(customer.getJoinedLong());
+                    String joinedTime = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(c.getTime());
+                    holder.mBinding.joinedTimeValue.setText(joinedTime);
+                }else{
+                    // booking ended
+                    holder.mBinding.joinedTimeValue.setText(R.string.joined_time_ended);
+                }
             }else{
                 holder.mBinding.joinedTimeValue.setText(null);
             }
@@ -287,6 +294,12 @@ public class CustomersAdapter extends PagedListAdapter<Customer, CustomersAdapte
     public void onCurrentListChanged(@Nullable PagedList<Message> currentList) {
         super.onCurrentListChanged(currentList);
     }*/
+
+    @Override
+    public int getItemCount() {
+        Log.d(TAG, "getItemCount: ");
+        return super.getItemCount();
+    }
 
     @Nullable
     @Override

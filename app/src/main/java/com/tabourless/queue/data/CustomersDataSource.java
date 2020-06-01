@@ -103,10 +103,9 @@ public class CustomersDataSource extends ItemKeyedDataSource<String, Customer> {
         mCustomersRepository.setScrollDirection(scrollDirection, lastVisibleItem);
     }
 
-    public void updateBrokenAvatars(List<Customer> brokenAvatarsList, FirebaseOnCompleteCallback callback) {
-        mCustomersRepository.updateBrokenAvatars(brokenAvatarsList, callback);
+    public void removeCustomer(Customer customer) {
+        mCustomersRepository.removeCustomer(customer);
     }
-
     public void removeListeners() {
         mCustomersRepository.removeListeners();
     }

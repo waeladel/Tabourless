@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.tabourless.queue.R;
 import com.tabourless.queue.databinding.QueueItemBinding;
 import com.tabourless.queue.interfaces.ItemClickListener;
 import com.tabourless.queue.models.UserQueue;
@@ -75,17 +76,21 @@ public class QueuesAdapter extends PagedListAdapter<UserQueue, QueuesAdapter.Vie
             }
 
             // Joined Time text value
+            Log.d(TAG, "onBindViewHolder: ");
             if (null != userQueue.getJoined()) {
-                Calendar c = Calendar.getInstance();
-                c.setTimeInMillis(userQueue.getJoinedLong());
-                String joinedTime = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(c.getTime());
-                holder.mBinding.joinedTimeValue.setText(joinedTime);
+                if(userQueue.getJoinedLong() != 0) {
+                    Calendar c = Calendar.getInstance();
+                    c.setTimeInMillis(userQueue.getJoinedLong());
+                    String joinedTime = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(c.getTime());
+                    holder.mBinding.joinedTimeValue.setText(joinedTime);
+                }else{
+                    // booking ended
+                    holder.mBinding.joinedTimeValue.setText(R.string.joined_time_ended);
+                }
             }else{
                 holder.mBinding.joinedTimeValue.setText(null);
             }
-
         }
-
     }
 
     // CALLBACK to calculate the difference between the old item and the new item

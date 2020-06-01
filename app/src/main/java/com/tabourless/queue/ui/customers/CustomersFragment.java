@@ -1,10 +1,12 @@
 package com.tabourless.queue.ui.customers;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
@@ -13,6 +15,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.paging.PagedList;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,22 +24,22 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
-import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.tabourless.queue.R;
 import com.tabourless.queue.adapters.CustomersAdapter;
 import com.tabourless.queue.databinding.FragmentCustomersBinding;
-import com.tabourless.queue.interfaces.FirebaseOnCompleteCallback;
 import com.tabourless.queue.interfaces.ItemClickListener;
 import com.tabourless.queue.models.Customer;
-import com.tabourless.queue.models.UserQueue;
-import com.tabourless.queue.ui.messages.MessagesFragment;
-import com.tabourless.queue.ui.messages.MessagesViewModel;
-import com.tabourless.queue.ui.queues.QueuesFragmentDirections;
 
 import java.util.ArrayList;
+
+import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
+
+import static com.tabourless.queue.Utils.StringUtils.getFirstWord;
 
 
 /**
@@ -64,6 +67,11 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
     private static final int REACHED_THE_BOTTOM = -2;
     private static int mScrollDirection;
     private static int mLastVisibleItem;
+
+    private static final String CUSTOMER_STATUS_WAITING = "waiting";
+    private static final String CUSTOMER_STATUS_NEXT = "next";
+    private static final String CUSTOMER_STATUS_FRONT = "front";
+    private static final String CUSTOMER_STATUS_AWAY = "away";
 
     public CustomersFragment() {
         // Required empty public constructor
@@ -233,6 +241,128 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
                 }
             }
         });
+
+        // Swipe to delete
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.START | ItemTouchHelper.END) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            // To only enable swipe for front customers
+            /*@Override
+            public int getSwipeDirs(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                int position = viewHolder.getAdapterPosition(); // Get Position of to be deleted item
+                Customer deletedCustomer = mAdapter.getItem(position); // Get customer to be deleted, it is also useful if user undo
+                if(deletedCustomer != null && !TextUtils.equals(deletedCustomer.getStatus(), CUSTOMER_STATUS_FRONT)){
+                    Toast.makeText(mContext, R.string.swipe_item_disabled_toast, Toast.LENGTH_SHORT).show();
+                    return 0;
+                }else{
+                    return super.getSwipeDirs(recyclerView, viewHolder);
+                }
+            }*/
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                Log.d(TAG, "onSwiped: AdapterPosition="+viewHolder.getAdapterPosition());
+                //PagedList<Customer> items = mAdapter.getCurrentList(); // Get current list to remove deleted customer from it
+                /*switch (direction){
+                    case ItemTouchHelper.START:
+                        Log.d(TAG, "onSwiped: lift");
+                        break;
+                    case ItemTouchHelper.END:
+                        Log.d(TAG, "onSwiped: right");
+                        break;
+                }*/
+                // Lets remove item for items list
+                //mAdapter.notifyItemRemoved(position); // don't call remove because user might want to undo, in this case we can return item by notify changed
+                if(viewHolder.getAdapterPosition() != RecyclerView.NO_POSITION){
+                    final int position = viewHolder.getAdapterPosition(); // Get Position of to be deleted item
+                    final Customer deletedCustomer = mAdapter.getItem(position); // Get customer to be deleted, it is also useful if user undo
+                    String shortenName; // To use user's first name instead of Customer word
+                    if(deletedCustomer != null) {
+                        // Check if we suppose to remove this user or he is not served yet
+                        if(!TextUtils.equals(deletedCustomer.getStatus(), CUSTOMER_STATUS_FRONT)){
+                            mAdapter.notifyItemChanged(position);
+                            Toast.makeText(mContext, R.string.swipe_item_disabled_toast, Toast.LENGTH_SHORT).show();
+                        }else{
+                            // proceed with removing the customer
+                            if(!TextUtils.isEmpty(deletedCustomer.getName())){
+                                shortenName = getFirstWord(deletedCustomer.getName());
+                            }else{
+                                shortenName = getString(R.string.customer_name_constant);
+                            }
+                            Snackbar.make(mBinding.customersRecycler, getString(R.string.confirm_removing_customer_alert, shortenName), Snackbar.LENGTH_LONG)
+                                    .setAction(R.string.confirm_undo_button, new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            Log.d(TAG, "onClick: ");
+                                        }
+                                    })
+                                    .addCallback(new Snackbar.Callback() {
+                                        @Override
+                                        public void onDismissed(Snackbar snackbar, int event) {
+                                            Log.d(TAG, "onDismissed: event= "+event);
+                                            if(event == DISMISS_EVENT_ACTION){
+                                                mAdapter.notifyItemChanged(position);
+                                            }else{
+                                                // it's dismissed due to time out DISMISS_EVENT_TIMEOUT. Lets remove customer from database
+                                                Log.d(TAG, "onDismissed: event is not click undo deletedCustomer= "+deletedCustomer.getKey());
+                                                mViewModel.removeCustomer(deletedCustomer);
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onShown(Snackbar snackbar) {
+                                            Log.d(TAG, "onShown: ");
+                                        }
+                                    })
+                                    .show();
+                        }
+
+                    }
+                }
+            }
+
+            public void onChildDraw(Canvas c, @NonNull RecyclerView recyclerView,
+                                    @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                Log.d(TAG, "onChildDraw: isCurrentlyActive= "+isCurrentlyActive + " Position= "+viewHolder.getAdapterPosition()+" old postion= " +viewHolder.getOldPosition());
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE && viewHolder.getAdapterPosition() != RecyclerView.NO_POSITION) {
+                    int position = viewHolder.getAdapterPosition(); // Get Position of to be deleted item
+                    Customer deletedCustomer = mAdapter.getItem(position); // Get customer to be deleted, it is also useful if user undo
+                    float translationX = 0;
+                    // Check if we suppose to remove this user or he is not served yet
+                    if(deletedCustomer != null && !TextUtils.equals(deletedCustomer.getStatus(), CUSTOMER_STATUS_FRONT)){
+                        // Don't allow removing the customer he is not served yet
+                        if(dX < 0){
+                            translationX = Math.min(-dX, viewHolder.itemView.getWidth() >> 2); // Math.min(-dX, viewHolder.itemView.getWidth() /4);
+                        }else {
+                            translationX = Math.max(-dX, (-1) * viewHolder.itemView.getWidth() >> 2); // Math.max(-dX, (-1) * viewHolder.itemView.getWidth() /4);
+                        }
+                        // Decorate swipe background
+                        new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, -translationX, dY, actionState, isCurrentlyActive)
+                                .addBackgroundColor(ContextCompat.getColor(mContext, R.color.disabled_button))
+                                .addActionIcon(R.drawable.ic_delete_sweep_24dp)
+                                .setActionIconTint(R.color.color_on_error)
+                                .create()
+                                .decorate();
+                        viewHolder.itemView.setTranslationX(-translationX);
+                    }else{
+                        // proceed with removing the customer
+                        // Decorate swipe background
+                        new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                                .addBackgroundColor(ContextCompat.getColor(mContext, R.color.colorError))
+                                .addActionIcon(R.drawable.ic_delete_sweep_24dp)
+                                .setActionIconTint(R.color.color_on_error)
+                                .create()
+                                .decorate();
+                        super.onChildDraw(c, recyclerView, viewHolder, (dX -translationX), dY, actionState, isCurrentlyActive);
+                    }
+                }
+            }
+        });
+
+        itemTouchHelper.attachToRecyclerView(mBinding.customersRecycler);
 
         return view;
     }

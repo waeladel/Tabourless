@@ -9,6 +9,7 @@ import androidx.paging.DataSource;
 import androidx.paging.ItemKeyedDataSource;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -527,6 +528,17 @@ public class CustomersRepository {
         }
     }*/
 
+    public void removeCustomer(Customer customer) {
+        Map<String, Object> childUpdates = new HashMap<>();
+
+        // Update relations to null. To start fresh
+        childUpdates.put("/customers/" + mPlaceKey + "/" + mQueueKey + "/" + customer.getKey(), null);
+        childUpdates.put("/userQueues/" + customer.getUserId() + "/" + mQueueKey+ "/joined" , 0);
+
+        // update Data base
+        mDatabaseRef.updateChildren(childUpdates);
+    }
+
    //removeListeners is static so it can be triggered when ViewModel is onCleared
     public void removeListeners(){
 
@@ -655,24 +667,4 @@ public class CustomersRepository {
         invalidatedCallback.onInvalidated();
     }
 
-    public void updateBrokenAvatars(List<Customer> brokenAvatarsList, final FirebaseOnCompleteCallback callback) {
-        // Create a map for all messages need to be updated
-        Map<String, Object> updateMap = new HashMap<>();
-
-        // We use userId to store the placeId value, not good for logic but it's a quick work around
-        for (int i = 0; i < brokenAvatarsList.size(); i++) {
-            Log.d(TAG, "brokenAvatarsList url= " + brokenAvatarsList.get(i).getAvatar() + " key= " + brokenAvatarsList.get(i).getKey() + "name= " + brokenAvatarsList.get(i).getName());
-            updateMap.put(brokenAvatarsList.get(i).getKey() +"/avatar", brokenAvatarsList.get(i).getAvatar());
-        }
-
-        if (updateMap.size() > 0 ) {
-            // update customer's Avatars to the new urls
-            mCustomersRef.updateChildren(updateMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    callback.onCallback(task); // A call back to clear the broken avatar's list when it's updated successfully
-                }
-            });
-        }
-    }
 }

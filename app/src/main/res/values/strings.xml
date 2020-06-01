@@ -99,6 +99,7 @@
     <string name="user_confirm_blocking_dialog">Block</string>
     <string name="user_confirm_dialog_negative">Cancel</string>
     <string name="confirm_dialog_positive_button">OK</string>
+    <string name="confirm_undo_button">Undo</string>
     <string name="chat_blocked_alert_dialog_title">Conversation Disabled</string>
     <string name="chat_blocked_dialog_message">Communication with this person is currently not allowed.</string>
 
@@ -119,7 +120,10 @@
     <string name="book_queue_error">Failed to join the queue, try again later.</string>
     <string name="fetch_profile_error">Failed to fetch your profile data, try again later.</string>
     <string name="save_place_error">Failed to save your place, try again later.</string>
-
+    <string name="confirm_removing_customer_alert">%1$s has been removed.</string>
+    <string name="customer_name_constant">Customer</string>
+    <string name="swipe_item_disabled_toast">Can\'t remove unsevered customers.</string>
+    <string name="joined_time_ended">Ended</string>
 
     <!--Images content Description-->
     <string name="cover_image_description">Your cover image</string>
