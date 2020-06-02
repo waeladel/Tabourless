@@ -282,17 +282,22 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
                     String shortenName; // To use user's first name instead of Customer word
                     if(deletedCustomer != null) {
                         // Check if we suppose to remove this user or he is not served yet
-                        if(!TextUtils.equals(deletedCustomer.getStatus(), CUSTOMER_STATUS_FRONT)){
-                            mAdapter.notifyItemChanged(position);
-                            Toast.makeText(mContext, R.string.swipe_item_disabled_toast, Toast.LENGTH_SHORT).show();
-                        }else{
+                        if(TextUtils.equals(deletedCustomer.getStatus(), CUSTOMER_STATUS_FRONT)
+                                || TextUtils.equals(deletedCustomer.getUserId(), mCurrentUserId)){
                             // proceed with removing the customer
                             if(!TextUtils.isEmpty(deletedCustomer.getName())){
                                 shortenName = getFirstWord(deletedCustomer.getName());
                             }else{
                                 shortenName = getString(R.string.customer_name_constant);
                             }
-                            Snackbar.make(mBinding.customersRecycler, getString(R.string.alert_confirm_removing_customer, shortenName), Snackbar.LENGTH_LONG)
+                            // If current user deleting himself we must change Snackbar message
+                            String SnackMessage;
+                            if(TextUtils.equals(deletedCustomer.getUserId(), mCurrentUserId)){
+                                SnackMessage = getString(R.string.alert_confirm_removing_your_booking);
+                            }else{
+                                SnackMessage = getString(R.string.alert_confirm_removing_customer, shortenName);
+                            }
+                            Snackbar.make(mBinding.customersRecycler, SnackMessage, Snackbar.LENGTH_LONG)
                                     .setAction(R.string.confirm_undo_button, new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
@@ -318,6 +323,10 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
                                         }
                                     })
                                     .show();
+                        }else{
+                            // Don't delete this customer
+                            mAdapter.notifyItemChanged(position);
+                            Toast.makeText(mContext, R.string.swipe_item_disabled_toast, Toast.LENGTH_SHORT).show();
                         }
 
                     }
@@ -332,11 +341,22 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
                     Customer deletedCustomer = mAdapter.getItem(position); // Get customer to be deleted, it is also useful if user undo
                     float translationX = 0;
                     // Check if we suppose to remove this user or he is not served yet
-                    if(deletedCustomer != null && !TextUtils.equals(deletedCustomer.getStatus(), CUSTOMER_STATUS_FRONT)){
+                    if(deletedCustomer != null && TextUtils.equals(deletedCustomer.getStatus(), CUSTOMER_STATUS_FRONT)
+                        || deletedCustomer != null &&  TextUtils.equals(deletedCustomer.getUserId(), mCurrentUserId)) {
+                        // proceed with removing the customer
+                        // Decorate swipe background
+                        new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                                .addBackgroundColor(ContextCompat.getColor(mContext, R.color.colorError))
+                                .addActionIcon(R.drawable.ic_delete_sweep_24dp)
+                                .setActionIconTint(R.color.color_on_error)
+                                .create()
+                                .decorate();
+                        super.onChildDraw(c, recyclerView, viewHolder, (dX -translationX), dY, actionState, isCurrentlyActive);
+                    }else{
                         // Don't allow removing the customer he is not served yet
-                        if(dX < 0){
+                        if (dX < 0) {
                             translationX = Math.min(-dX, viewHolder.itemView.getWidth() >> 2); // Math.min(-dX, viewHolder.itemView.getWidth() /4);
-                        }else {
+                        } else {
                             translationX = Math.max(-dX, (-1) * viewHolder.itemView.getWidth() >> 2); // Math.max(-dX, (-1) * viewHolder.itemView.getWidth() /4);
                         }
                         // Decorate swipe background
@@ -347,16 +367,6 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
                                 .create()
                                 .decorate();
                         viewHolder.itemView.setTranslationX(-translationX);
-                    }else{
-                        // proceed with removing the customer
-                        // Decorate swipe background
-                        new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-                                .addBackgroundColor(ContextCompat.getColor(mContext, R.color.colorError))
-                                .addActionIcon(R.drawable.ic_delete_sweep_24dp)
-                                .setActionIconTint(R.color.color_on_error)
-                                .create()
-                                .decorate();
-                        super.onChildDraw(c, recyclerView, viewHolder, (dX -translationX), dY, actionState, isCurrentlyActive);
                     }
                 }
             }
