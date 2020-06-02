@@ -531,8 +531,9 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                             if(task.isSuccessful()){
                                 // Go to customers recycler
                                 Log.d(TAG, "FirebaseOnCompleteCallback onCallback: "+task.isSuccessful());
-                                NavDirections direction = SearchFragmentDirections.actionSearchToCustomers(userQueue.getPlaceId(), userQueue.getKey());
-                                navController.navigate(direction);
+                                /*NavDirections direction = SearchFragmentDirections.actionSearchToCustomers(userQueue.getPlaceId(), userQueue.getKey());
+                                navController.navigate(direction);*/
+                                navController.navigate(R.id.queues);
                             }else{
                                 Toast.makeText(mContext, R.string.book_queue_error, Toast.LENGTH_LONG).show();
                             }
