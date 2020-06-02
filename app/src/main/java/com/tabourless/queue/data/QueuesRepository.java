@@ -533,20 +533,26 @@ public class QueuesRepository {
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Map<String, Object> childUpdates = new HashMap<>();
                 if(dataSnapshot.exists()){
                     // loop throw all found results. We should only allow one booking per user anyway
-                    String customerKey = " ";
+                    String customerKey = "";
                     for (DataSnapshot snapshot: dataSnapshot.getChildren()){
                         customerKey = snapshot.getKey();
                     }
 
                     if(!TextUtils.isEmpty(customerKey)){
-                        Map<String, Object> childUpdates = new HashMap<>();
                         childUpdates.put("/customers/" + deletedQueue.getPlaceId() + "/" + deletedQueue.getKey() + "/" + customerKey, null);
                         childUpdates.put("/userQueues/" + userId + "/" + deletedQueue.getKey(), null);
                         // update Data base
                         mDatabaseRef.updateChildren(childUpdates);
                     }
+                }else{
+                    // can't find the customer in this queue, probably it's an inactive queue and the booking was canceled already
+                    childUpdates.put("/userQueues/" + userId + "/" + deletedQueue.getKey(), null);
+                    // update Data base
+                    mDatabaseRef.updateChildren(childUpdates);
+
                 }
             }
 

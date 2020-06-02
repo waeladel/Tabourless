@@ -3,6 +3,7 @@ package com.tabourless.queue.ui.queues;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -245,7 +246,17 @@ public class QueuesFragment extends Fragment implements ItemClickListener {
                     final UserQueue deletedQueue = mAdapter.getItem(position); // Get customer to be deleted, it is also useful if user undo
                     String shortenName; // To use user's first name instead of Customer word
                     if(deletedQueue != null) {
-                        Snackbar.make(mBinding.queuesRecycler, getString(R.string.alert_confirm_removing_queue), Snackbar.LENGTH_LONG)
+                        // If current user deleting himself we must change Snackbar message
+                        String SnackMessage;
+                        if(deletedQueue.getJoinedLong() == 0){
+                            // the queue's booking is ended
+                            SnackMessage = getString(R.string.alert_confirm_removing_queue);
+                        }else{
+                            // it's an active reservation
+                            SnackMessage = getString(R.string.alert_confirm_removing_booking);
+                        }
+
+                        Snackbar.make(mBinding.queuesRecycler, SnackMessage, Snackbar.LENGTH_LONG)
                                 .setAction(R.string.confirm_undo_button, new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {

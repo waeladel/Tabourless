@@ -293,7 +293,7 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
                             // If current user deleting himself we must change Snackbar message
                             String SnackMessage;
                             if(TextUtils.equals(deletedCustomer.getUserId(), mCurrentUserId)){
-                                SnackMessage = getString(R.string.alert_confirm_removing_your_booking);
+                                SnackMessage = getString(R.string.alert_confirm_removing_booking);
                             }else{
                                 SnackMessage = getString(R.string.alert_confirm_removing_customer, shortenName);
                             }

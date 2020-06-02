@@ -121,8 +121,8 @@
     <string name="fetch_profile_error">Failed to fetch your profile data, try again later.</string>
     <string name="save_place_error">Failed to save your place, try again later.</string>
     <string name="alert_confirm_removing_customer">%1$s has been removed.</string>
-    <string name="alert_confirm_removing_your_booking">Your booking has been canceled.</string>
-    <string name="alert_confirm_removing_queue">Booking has been canceled.</string>
+    <string name="alert_confirm_removing_booking">Your booking has been canceled.</string>
+    <string name="alert_confirm_removing_queue">Queue has been deleted.</string>
     <string name="customer_name_constant">Customer</string>
     <string name="swipe_item_disabled_toast">Can\'t remove unsevered customers.</string>
     <string name="joined_time_ended">Ended</string>
