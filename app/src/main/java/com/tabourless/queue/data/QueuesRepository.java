@@ -1,5 +1,6 @@
 package com.tabourless.queue.data;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -17,7 +18,9 @@ import com.tabourless.queue.models.UserQueue;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class QueuesRepository {
 
@@ -521,6 +524,37 @@ public class QueuesRepository {
             User.getArrayValue(User.class);
         }
     }*/
+
+    public void removeQueue(final String userId, final UserQueue deletedQueue) {
+
+        // Query to get customer key to delete his/her booking
+        final DatabaseReference currentCustomerRef = mDatabaseRef.child("customers").child(deletedQueue.getPlaceId()).child(deletedQueue.getKey());
+        Query query = currentCustomerRef.orderByChild("userId").equalTo(userId).limitToFirst(1);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    // loop throw all found results. We should only allow one booking per user anyway
+                    String customerKey = " ";
+                    for (DataSnapshot snapshot: dataSnapshot.getChildren()){
+                        customerKey = snapshot.getKey();
+                    }
+
+                    if(!TextUtils.isEmpty(customerKey)){
+                        Map<String, Object> childUpdates = new HashMap<>();
+                        childUpdates.put("/customers/" + deletedQueue.getPlaceId() + "/" + deletedQueue.getKey() + "/" + customerKey, null);
+                        childUpdates.put("/userQueues/" + userId + "/" + deletedQueue.getKey(), null);
+                        // update Data base
+                        mDatabaseRef.updateChildren(childUpdates);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
+    }
 
     //removeListeners is static so it can be triggered when ViewModel is onCleared
     public void removeListeners(){

@@ -37,6 +37,9 @@ public class QueuesDataFactory extends DataSource.Factory<Long, UserQueue>{
         mQueuesDataSource.setScrollDirection(scrollDirection, lastVisibleItem);
     }
 
+    public void removeQueue(String userId, UserQueue deletedQueue) {
+        mQueuesDataSource.removeQueue(userId, deletedQueue);
+    }
     public void removeListeners() {
         mQueuesDataSource.removeListeners();
     }

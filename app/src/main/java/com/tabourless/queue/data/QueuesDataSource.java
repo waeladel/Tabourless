@@ -29,6 +29,10 @@ public class QueuesDataSource extends ItemKeyedDataSource<Long, UserQueue> {
         mQueuesRepository.setScrollDirection(scrollDirection, lastVisibleItem);
     }
 
+    public void removeQueue(String userId, UserQueue deletedQueue) {
+        mQueuesRepository.removeQueue(userId, deletedQueue);
+    }
+
     // a callback to invalidate the data whenever a change happen
     @Override
     public void addInvalidatedCallback(@NonNull InvalidatedCallback onInvalidatedCallback) {
@@ -98,4 +102,5 @@ public class QueuesDataSource extends ItemKeyedDataSource<Long, UserQueue> {
             mQueuesRepository.removeListeners();
         }
     }
+
 }

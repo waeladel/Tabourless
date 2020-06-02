@@ -149,15 +149,10 @@ public class CustomersAdapter extends PagedListAdapter<Customer, CustomersAdapte
             // Joined Time text value
             Log.d(TAG, "onBindViewHolder: ");
             if (null != customer.getJoined()) {
-                if(customer.getJoinedLong() != 0) {
-                    Calendar c = Calendar.getInstance();
-                    c.setTimeInMillis(customer.getJoinedLong());
-                    String joinedTime = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(c.getTime());
-                    holder.mBinding.joinedTimeValue.setText(joinedTime);
-                }else{
-                    // booking ended
-                    holder.mBinding.joinedTimeValue.setText(R.string.joined_time_ended);
-                }
+                Calendar c = Calendar.getInstance();
+                c.setTimeInMillis(customer.getJoinedLong());
+                String joinedTime = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(c.getTime());
+                holder.mBinding.joinedTimeValue.setText(joinedTime);
             }else{
                 holder.mBinding.joinedTimeValue.setText(null);
             }

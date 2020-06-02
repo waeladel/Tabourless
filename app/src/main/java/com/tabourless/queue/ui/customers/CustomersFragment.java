@@ -292,7 +292,7 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
                             }else{
                                 shortenName = getString(R.string.customer_name_constant);
                             }
-                            Snackbar.make(mBinding.customersRecycler, getString(R.string.confirm_removing_customer_alert, shortenName), Snackbar.LENGTH_LONG)
+                            Snackbar.make(mBinding.customersRecycler, getString(R.string.alert_confirm_removing_customer, shortenName), Snackbar.LENGTH_LONG)
                                     .setAction(R.string.confirm_undo_button, new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
@@ -326,7 +326,7 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
 
             public void onChildDraw(Canvas c, @NonNull RecyclerView recyclerView,
                                     @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-                Log.d(TAG, "onChildDraw: isCurrentlyActive= "+isCurrentlyActive + " Position= "+viewHolder.getAdapterPosition()+" old postion= " +viewHolder.getOldPosition());
+                Log.d(TAG, "onChildDraw: isCurrentlyActive= "+isCurrentlyActive);
                 if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE && viewHolder.getAdapterPosition() != RecyclerView.NO_POSITION) {
                     int position = viewHolder.getAdapterPosition(); // Get Position of to be deleted item
                     Customer deletedCustomer = mAdapter.getItem(position); // Get customer to be deleted, it is also useful if user undo

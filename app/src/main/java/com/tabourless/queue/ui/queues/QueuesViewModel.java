@@ -73,6 +73,10 @@ public class QueuesViewModel extends ViewModel {
         mQueuesDataFactory.setScrollDirection(scrollDirection, lastVisibleItem);
     }
 
+    public void removeQueue(String userId, UserQueue deletedQueue) {
+        mQueuesDataFactory.removeQueue(userId, deletedQueue);
+    }
+
     @Override
     protected void onCleared() {
         Log.d(TAG, "QueuesViewModel onCleared:");
