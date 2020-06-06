@@ -43,6 +43,11 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static com.tabourless.queue.App.DATABASE_REF_CUSTOMERS;
+import static com.tabourless.queue.App.DATABASE_REF_PLACES;
+import static com.tabourless.queue.App.DIRECTION_ARGUMENTS_KEY_PLACE_KEY;
+import static com.tabourless.queue.App.DIRECTION_ARGUMENTS_KEY_POINT;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -85,13 +90,13 @@ public class AddPlaceFragment extends Fragment implements ItemClickListener {
         mFirebaseCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
         currentUserId = mFirebaseCurrentUser!= null ? mFirebaseCurrentUser.getUid() : null;
 
-        if(getArguments() != null && getArguments().containsKey("point")) {
+        if(getArguments() != null && getArguments().containsKey(DIRECTION_ARGUMENTS_KEY_POINT)) {
             // get latLng of this place
             point = AddPlaceFragmentArgs.fromBundle(getArguments()).getPoint();
             Log.d(TAG, "getArguments point: "+point);
         }
 
-        if(getArguments() != null && getArguments().containsKey("placeKey")) {
+        if(getArguments() != null && getArguments().containsKey(DIRECTION_ARGUMENTS_KEY_PLACE_KEY)) {
             // get latLng of this place
             if(null != AddPlaceFragmentArgs.fromBundle(getArguments()).getPlaceKey()){
                 PlaceKey = AddPlaceFragmentArgs.fromBundle(getArguments()).getPlaceKey();
@@ -102,8 +107,8 @@ public class AddPlaceFragment extends Fragment implements ItemClickListener {
         mViewModel = new ViewModelProvider(this).get(AddPlaceViewModel.class);
 
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
-        mPlacesRef = mDatabaseRef.child("places");
-        mCustomersRef = mDatabaseRef.child("customers");
+        mPlacesRef = mDatabaseRef.child(DATABASE_REF_PLACES);
+        mCustomersRef = mDatabaseRef.child(DATABASE_REF_CUSTOMERS);
 
         // Create the adapter first then set it's data
         mAddPlaceAdapter = new AddPlaceAdapter(this,this);

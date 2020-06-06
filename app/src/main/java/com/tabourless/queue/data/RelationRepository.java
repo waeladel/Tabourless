@@ -18,6 +18,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.tabourless.queue.App.DATABASE_REF_CHATS;
+import static com.tabourless.queue.App.DATABASE_REF_CHAT_ACTIVE;
+import static com.tabourless.queue.App.DATABASE_REF_RELATIONS;
+import static com.tabourless.queue.App.DATABASE_REF_RELATION_STATUS;
+import static com.tabourless.queue.App.DATABASE_REF_USER_CHATS;
+import static com.tabourless.queue.App.RELATION_STATUS_BLOCKED;
+import static com.tabourless.queue.App.RELATION_STATUS_BLOCKING;
 import static com.tabourless.queue.Utils.DatabaseKeys.getJoinedKeys;
 
 public class RelationRepository {
@@ -29,10 +36,6 @@ public class RelationRepository {
     private DatabaseReference mRelationRef;
     private MutableLiveData<Relation> mRelation;
 
-
-    // requests and relations status
-    private static final String RELATION_STATUS_BLOCKING = "blocking"; // the selected user is blocking me (current user)
-    private static final String RELATION_STATUS_BLOCKED= "blocked"; // the selected user is blocked by me (current user)
 
     // HashMap to keep track of Firebase Listeners
     //private HashMap< DatabaseReference , ValueEventListener> mListenersMap;
@@ -65,7 +68,7 @@ public class RelationRepository {
 
     public RelationRepository(){
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
-        mRelationRef = mDatabaseRef.child("relations");
+        mRelationRef = mDatabaseRef.child(DATABASE_REF_RELATIONS);
         mRelation = new MutableLiveData<>();
 
         if(mListenersList == null){
@@ -128,19 +131,15 @@ public class RelationRepository {
     // Block user without deleting conversation
     public void blockUser(String currentUserId, String userId) {
         Map<String, Object> childUpdates = new HashMap<>();
-        //Cancel likes i (current user) sent to this (target user). Keep like he sent to me (current user)
-        childUpdates.put("/favorites/" + currentUserId + "/" + userId, null);
-        //likes is to display who send likes to this particular user
-        childUpdates.put("/likes/" + userId + "/" + currentUserId, null);
 
         // Update relations to blocking (current user) and blocked (target user)
-        childUpdates.put("/relations/" + currentUserId + "/" + userId+ "/status", RELATION_STATUS_BLOCKED);
-        childUpdates.put("/relations/" + userId + "/" + currentUserId+ "/status", RELATION_STATUS_BLOCKING);
+        childUpdates.put(DATABASE_REF_RELATIONS +"/"+ currentUserId + "/" + userId +"/"+ DATABASE_REF_RELATION_STATUS, RELATION_STATUS_BLOCKED);
+        childUpdates.put(DATABASE_REF_RELATIONS +"/"+ userId +"/"+ currentUserId +"/"+ DATABASE_REF_RELATION_STATUS, RELATION_STATUS_BLOCKING);
 
         // Chat ID is not passed from MainFragment, we need to create
         String chatId = getJoinedKeys(currentUserId , userId);
         // update chat active to -1, which means it's blocked chat room
-        childUpdates.put("/chats/" + chatId +"/active",-1);
+        childUpdates.put(DATABASE_REF_CHATS  +"/"+ chatId +"/"+ DATABASE_REF_CHAT_ACTIVE,-1);
 
         // Delete chats with this person from chats recycler view
         /*childUpdates.put("/userChats/" + currentUserId + "/" + chatId, null);
@@ -162,23 +161,19 @@ public class RelationRepository {
     // Block user and delete the conversation (userChat table)
     public void blockDelete(String currentUserId, String userId) {
         Map<String, Object> childUpdates = new HashMap<>();
-        //Cancel likes i (current user) sent to this (target user). Keep like he sent to me (current user)
-        childUpdates.put("/favorites/" + currentUserId + "/" + userId, null);
-        //likes is to display who send likes to this particular user
-        childUpdates.put("/likes/" + userId + "/" + currentUserId, null);
 
         // Update relations to blocking (current user) and blocked (target user)
-        childUpdates.put("/relations/" + currentUserId + "/" + userId+ "/status", RELATION_STATUS_BLOCKED);
-        childUpdates.put("/relations/" + userId + "/" + currentUserId+ "/status", RELATION_STATUS_BLOCKING);
+        childUpdates.put(DATABASE_REF_RELATIONS +"/"+  currentUserId + "/" + userId +"/"+ DATABASE_REF_RELATION_STATUS, RELATION_STATUS_BLOCKED);
+        childUpdates.put(DATABASE_REF_RELATIONS +"/"+ userId + "/" + currentUserId+"/"+ DATABASE_REF_RELATION_STATUS, RELATION_STATUS_BLOCKING);
 
         // Chat ID is not passed from MainFragment, we need to create
         String chatId = getJoinedKeys(currentUserId , userId);
         // update chat active to -1, which means it's blocked chat room
-        childUpdates.put("/chats/" + chatId +"/active",-1);
+        childUpdates.put(DATABASE_REF_CHATS  +"/"+  chatId +"/"+ DATABASE_REF_CHAT_ACTIVE,-1);
 
         // Delete chats with this person from chats recycler view
-        childUpdates.put("/userChats/" + currentUserId + "/" + chatId, null);
-        childUpdates.put("/userChats/" + userId + "/" + chatId, null);
+        childUpdates.put(DATABASE_REF_USER_CHATS +"/"+ currentUserId + "/" + chatId, null);
+        childUpdates.put(DATABASE_REF_USER_CHATS +"/"+ userId + "/" + chatId, null);
 
         // Delete notifications
 
@@ -198,13 +193,13 @@ public class RelationRepository {
         Map<String, Object> childUpdates = new HashMap<>();
 
         // Update relations to null. To start fresh
-        childUpdates.put("/relations/" + currentUserId + "/" + userId, null);
-        childUpdates.put("/relations/" + userId + "/" + currentUserId, null);
+        childUpdates.put(DATABASE_REF_RELATIONS +"/"+ currentUserId +"/"+ userId, null);
+        childUpdates.put(DATABASE_REF_RELATIONS +"/"+ userId + "/" + currentUserId, null);
 
         // Chat ID is not passed from MainFragment, we need to create
         String chatId = getJoinedKeys(currentUserId , userId);
         // update chat to null, to delete the chat room and start fresh
-        childUpdates.put("/chats/" + chatId ,null);
+        childUpdates.put(DATABASE_REF_CHATS +"/"+ chatId ,null);
 
         mDatabaseRef.updateChildren(childUpdates).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override

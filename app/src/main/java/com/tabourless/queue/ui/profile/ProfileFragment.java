@@ -40,22 +40,24 @@ import com.tabourless.queue.ui.BlockAlertFragment;
 import com.tabourless.queue.ui.BlockDeleteAlertFragment;
 import java.util.Calendar;
 
+import static com.tabourless.queue.App.AVATAR_ORIGINAL_NAME;
+import static com.tabourless.queue.App.AVATAR_THUMBNAIL_NAME;
+import static com.tabourless.queue.App.COVER_ORIGINAL_NAME;
+import static com.tabourless.queue.App.COVER_THUMBNAIL_NAME;
+import static com.tabourless.queue.App.DIRECTION_ARGUMENTS_KEY_USER_ID;
+import static com.tabourless.queue.App.RELATION_STATUS_BLOCKED;
+import static com.tabourless.queue.App.RELATION_STATUS_BLOCKING;
+import static com.tabourless.queue.App.RELATION_STATUS_NOT_FRIEND;
+import static com.tabourless.queue.App.STORAGE_REF_IMAGES;
+import static com.tabourless.queue.App.USER_SPINNER_GENDER_FEMALE;
+import static com.tabourless.queue.App.USER_SPINNER_GENDER_MALE;
+
 public class ProfileFragment extends Fragment implements ItemClickListener {
 
     private final static String TAG = ProfileFragment.class.getSimpleName();
 
     private ProfileViewModel mViewModel;
     private FragmentProfileBinding mBinding;
-
-    private static final String AVATAR_THUMBNAIL_NAME = "avatar.jpg";
-    private static final String COVER_THUMBNAIL_NAME = "cover.jpg";
-    private static final String AVATAR_ORIGINAL_NAME = "original_avatar.jpg";
-    private static final String COVER_ORIGINAL_NAME = "original_cover.jpg";
-
-    // requests and relations status
-    private static final String RELATION_STATUS_NOT_FRIEND = "notFriend";
-    private static final String RELATION_STATUS_BLOCKING = "blocking"; // the selected user is blocking me (current user)
-    private static final String RELATION_STATUS_BLOCKED= "blocked"; // the selected user is blocked by me (current user)
 
     //Fragments tags
     private  static final String REQUEST_FRAGMENT = "RequestFragment";
@@ -80,9 +82,6 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
 
     private Context mContext;
 
-    // DatabaseNotification's types
-    private static final String NOTIFICATION_TYPE_MESSAGE = "Message";
-
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -101,7 +100,7 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
 
         Log.d(TAG, "getArguments: "+ getArguments());
 
-        if(getArguments() != null && getArguments().containsKey("userId")) {
+        if(getArguments() != null && getArguments().containsKey(DIRECTION_ARGUMENTS_KEY_USER_ID)) {
             // Check if current logged in user is the selected user
             mUserId = ProfileFragmentArgs.fromBundle(getArguments()).getUserId(); // any user
             Log.d(TAG, "mCurrentUserId= " + mCurrentUserId + " mUserId= " + mUserId );
@@ -419,7 +418,7 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
         if (mUser != null) {
             // Lets get cover
             if(!TextUtils.isEmpty(mUser.getCoverImage())){
-                StorageReference userCoverStorageRef = mStorageRef.child("images/"+ mUser.getKey() +"/"+ COVER_THUMBNAIL_NAME);
+                StorageReference userCoverStorageRef = mStorageRef.child(STORAGE_REF_IMAGES +"/"+ mUser.getKey() +"/"+ COVER_THUMBNAIL_NAME);
                 // Download directly from StorageReference using Glide
                 GlideApp.with(mContext)
                         .load(userCoverStorageRef)
@@ -433,7 +432,7 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
 
             // Lets get avatar
             if(!TextUtils.isEmpty(mUser.getAvatar())){
-                StorageReference userAvatarStorageRef = mStorageRef.child("images/"+ mUser.getKey() +"/"+ AVATAR_THUMBNAIL_NAME);
+                StorageReference userAvatarStorageRef = mStorageRef.child(STORAGE_REF_IMAGES +"/"+ mUser.getKey() +"/"+ AVATAR_THUMBNAIL_NAME);
                 // Download directly from StorageReference using Glide
                 GlideApp.with(mContext)
                         .load(userAvatarStorageRef)
@@ -459,12 +458,12 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
 
             if (null != mUser.getGender()) {
                 switch (mUser.getGender()) {
-                    case "male":
+                    case USER_SPINNER_GENDER_MALE:
                         mBinding.userGenderValue.setText(R.string.male);
                         mBinding.userGenderIcon.setImageResource(R.drawable.ic_business_man);
                         mBinding.userGenderIcon.setVisibility(View.VISIBLE);
                         break;
-                    case "female":
+                    case USER_SPINNER_GENDER_FEMALE:
                         mBinding.userGenderValue.setText(R.string.female);
                         mBinding.userGenderIcon.setImageResource(R.drawable.ic_business_woman);
                         mBinding.userGenderIcon.setVisibility(View.VISIBLE);

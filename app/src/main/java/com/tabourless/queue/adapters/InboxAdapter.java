@@ -39,6 +39,9 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static com.tabourless.queue.App.AVATAR_THUMBNAIL_NAME;
+import static com.tabourless.queue.App.STORAGE_REF_IMAGES;
+
 public class InboxAdapter extends PagedListAdapter<Chat, InboxAdapter.ViewHolder> {
 
     private final static String TAG = InboxAdapter.class.getSimpleName();
@@ -46,8 +49,6 @@ public class InboxAdapter extends PagedListAdapter<Chat, InboxAdapter.ViewHolder
     private FirebaseUser currentFirebaseUser ;
     private String currentUserId ;
 
-    private static final String AVATAR_THUMBNAIL_NAME = "avatar.jpg";
-    private static final String COVER_THUMBNAIL_NAME = "cover.jpg";
     private static final int VIEW_TYPE_MESSAGE_SENT = 1;
     private static final int VIEW_TYPE_MESSAGE_RECEIVED = 2;
 
@@ -124,7 +125,7 @@ public class InboxAdapter extends PagedListAdapter<Chat, InboxAdapter.ViewHolder
                 final List<ChatMember> membersList = new ArrayList<>();
                 for (Object o : chat.getMembers().entrySet()) {
                     Map.Entry pair = (Map.Entry) o;
-                    Log.d(TAG, "mama Chats getMember = " + pair.getKey() + " = " + pair.getValue() + currentFirebaseUser.getUid());
+                    Log.d(TAG, "Chats getMember = " + pair.getKey() + " = " + pair.getValue() + currentFirebaseUser.getUid());
 
                     if (!currentFirebaseUser.getUid().equals(pair.getKey())) {
                         ChatMember user = chat.getMembers().get(String.valueOf(pair.getKey()));
@@ -208,9 +209,6 @@ public class InboxAdapter extends PagedListAdapter<Chat, InboxAdapter.ViewHolder
 
                 switch (membersList.size()){
                     case 1:// there is only one member other than current user
-                        Log.d(TAG, "mama getItems membersList name= "+membersList.get(0).getName());
-                        Log.d(TAG, "mama getItems membersList key= "+membersList.get(0).getKey());
-                        Log.d(TAG, "mama getItems membersList avatar= "+membersList.get(0).getAvatar());
                         // names text value
                         if (null != membersList.get(0).getName()) {
                             holder.mBinding.userName.setText(membersList.get(0).getName());
@@ -220,7 +218,7 @@ public class InboxAdapter extends PagedListAdapter<Chat, InboxAdapter.ViewHolder
 
                         // Lets get avatar
                         if(!TextUtils.isEmpty(membersList.get(0).getAvatar())){
-                            StorageReference userAvatarStorageRef = mStorageRef.child("images/"+ membersList.get(0).getKey() +"/"+ AVATAR_THUMBNAIL_NAME);
+                            StorageReference userAvatarStorageRef = mStorageRef.child(STORAGE_REF_IMAGES +"/"+ membersList.get(0).getKey() +"/"+ AVATAR_THUMBNAIL_NAME);
                             // Download directly from StorageReference using Glide
                             GlideApp.with(fragment)
                                     .load(userAvatarStorageRef)
@@ -233,14 +231,14 @@ public class InboxAdapter extends PagedListAdapter<Chat, InboxAdapter.ViewHolder
                         }
                         break;
                     case 2:// there is 2 member other than current user
-                        Log.d(TAG, "mama getItems getMember= "+membersList.get(0));
-                        Log.d(TAG, "mama getItems getMember= "+membersList.get(1));
+                        Log.d(TAG, " getItems getMember= "+membersList.get(0));
+                        Log.d(TAG, " getItems getMember= "+membersList.get(1));
                         break;
                 }
 
 
             }else{
-                Log.d(TAG, "mama Chats= null");
+                Log.d(TAG, "Chats= null");
                 holder.mBinding.userImage.setImageResource(R.drawable.ic_round_account_filled_72);
             }
 

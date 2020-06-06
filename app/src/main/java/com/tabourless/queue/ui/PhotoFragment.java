@@ -30,6 +30,10 @@ import com.tabourless.queue.R;
 import com.tabourless.queue.databinding.FragmentPhotoBinding;
 import com.yanzhenjie.album.widget.photoview.PhotoViewAttacher;
 
+import static com.tabourless.queue.App.DIRECTION_ARGUMENTS_KEY_IMAGE_NAME;
+import static com.tabourless.queue.App.DIRECTION_ARGUMENTS_KEY_USER_ID;
+import static com.tabourless.queue.App.STORAGE_REF_IMAGES;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -88,13 +92,13 @@ public class PhotoFragment extends Fragment {
         mBinding = FragmentPhotoBinding.inflate(inflater, container, false);
         View view = mBinding.getRoot();
 
-        if(null  != getArguments() && getArguments().containsKey("userId") && getArguments().containsKey("imageName")) {
+        if(null  != getArguments() && getArguments().containsKey(DIRECTION_ARGUMENTS_KEY_USER_ID) && getArguments().containsKey(DIRECTION_ARGUMENTS_KEY_IMAGE_NAME)) {
             mUserId = PhotoFragmentArgs.fromBundle(getArguments()).getUserId(); // any user
             mImageName = PhotoFragmentArgs.fromBundle(getArguments()).getImageName();
             Log.d(TAG, "mCurrentUserId= " + mUserId + " mImageName= "+ mImageName);
 
             // Lets get avatar
-            StorageReference userStorageRef = mStorageRef.child("images/"+ mUserId +"/"+ mImageName);
+            StorageReference userStorageRef = mStorageRef.child(STORAGE_REF_IMAGES +"/"+ mUserId +"/"+ mImageName);
             // Download directly from StorageReference using Glide
             GlideApp.with(mContext)
                     .load(userStorageRef)

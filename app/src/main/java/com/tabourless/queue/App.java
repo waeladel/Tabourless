@@ -43,6 +43,78 @@ public class App extends MultiDexApplication { // had to enable MultiDex after a
     private static final String NIGHT_VALUE_BATTERY = "battery";
     private static final String NIGHT_VALUE_SYSTEM = "system";
 
+    public static final String COUNTER_SPINNER_ANY = "any";
+    public static final String COUNTER_SPINNER_BOTH = "both";
+    public static final String COUNTER_SPINNER_GENDER_MALE = "male";
+    public static final String COUNTER_SPINNER_GENDER_FEMALE = "female";
+    public static final String COUNTER_SPINNER_GENDER_YOUNG = "young";
+    public static final String COUNTER_SPINNER_GENDER_OLD = "old";
+    public static final String COUNTER_SPINNER_GENDER_DISABLED = "disabled";
+    public static final String COUNTER_SPINNER_GENDER_ABLED = "abled";
+
+    public static final String USER_SPINNER_GENDER_MALE = "male";
+    public static final String USER_SPINNER_GENDER_FEMALE = "female";
+
+    public static final String DATABASE_REF_USERS = "users";
+    public static final String DATABASE_REF_USER_LAST_ONLINE = "lastOnline";
+    public static final String DATABASE_REF_USER_QUEUES = "userQueues";
+    public static final String DATABASE_REF_USER_CHATS = "userChats";
+    public static final String DATABASE_REF_CHAT_LAST_SENT = "lastSent";
+    public static final String DATABASE_REF_PLACES = "places";
+    public static final String DATABASE_REF_NOTIFICATIONS = "notifications";
+    public static final String DATABASE_REF_MESSAGES = "messages";
+    public static final String DATABASE_REF_MESSAGE_STATUS = "status";
+    public static final String DATABASE_REF_CUSTOMERS = "customers";
+    public static final String DATABASE_REF_CUSTOMER_USER_ID = "userId";
+    public static final String DATABASE_REF_QUEUE_JOINED = "joined";
+    public static final String DATABASE_REF_CHATS = "chats";
+    public static final String DATABASE_REF_CHAT_ACTIVE = "active";
+    public static final String DATABASE_REF_CHATS_MEMBERS = "members";
+    public static final String DATABASE_REF_CHATS_MEMBER_READ = "read";
+    public static final String DATABASE_REF_COUNTERS = "counters";
+    public static final String DATABASE_REF_QUEUES = "queues";
+    public static final String DATABASE_REF_NOTIFICATIONS_ALERTS = "alerts";
+    public static final String DATABASE_REF_NOTIFICATIONS_MESSAGES = "messages";
+    public static final String DATABASE_REF_NOTIFICATIONS_SEEN = "seen";
+    public static final String DATABASE_REF_USER_TOKENS = "tokens";
+    public static final String DATABASE_REF_RELATIONS= "relations";
+    public static final String DATABASE_REF_RELATION_STATUS= "status";
+
+
+    public static final String STORAGE_REF_IMAGES = "images";
+    public static final String STORAGE_REF_AVATAR = "avatar";
+    public static final String STORAGE_REF_COVER = "coverImage";
+    public static final String AVATAR_THUMBNAIL_NAME = "avatar.jpg";
+    public static final String COVER_THUMBNAIL_NAME = "cover.jpg";
+    public static final String AVATAR_ORIGINAL_NAME = "original_avatar.jpg";
+    public static final String COVER_ORIGINAL_NAME = "original_cover.jpg";
+
+    public static final String DIRECTION_ARGUMENTS_KEY_POINT = "point";
+    public static final String DIRECTION_ARGUMENTS_KEY_PLACE_KEY = "placeKey";
+    public static final String DIRECTION_ARGUMENTS_KEY_IS_EDIT = "isEdit";
+    public static final String DIRECTION_ARGUMENTS_KEY_PLACE_ID = "placeId";
+    public static final String DIRECTION_ARGUMENTS_KEY_QUEUE_ID = "queueId";
+    public static final String DIRECTION_ARGUMENTS_KEY_CHAT_USER_ID = "chatUserId";
+    public static final String DIRECTION_ARGUMENTS_KEY_IS_GROUP = "isGroup";
+    public static final String DIRECTION_ARGUMENTS_KEY_USER_ID = "userId";
+    public static final String DIRECTION_ARGUMENTS_KEY_IMAGE_NAME = "imageName";
+
+
+    public static final String CUSTOMER_STATUS_WAITING = "waiting";
+    public static final String CUSTOMER_STATUS_NEXT = "next";
+    public static final String CUSTOMER_STATUS_FRONT = "front";
+    public static final String CUSTOMER_STATUS_AWAY = "away";
+
+    public static final String NOTIFICATION_TYPE_MESSAGE = "message";
+    public static final String Message_STATUS_SENDING = "sending";
+    public static final String Message_STATUS_SENT = "sent";
+    public static final String Message_STATUS_DELIVERED = "delivered";
+
+    public static final String RELATION_STATUS_NOT_FRIEND = "notFriend";
+    public static final String RELATION_STATUS_BLOCKING = "blocking"; // the selected user is blocking me (current user)
+    public static final String RELATION_STATUS_BLOCKED= "blocked"; // the selected user is blocked by me (current user)
+
+
     private SharedPreferences sharedPreferences;
 
     public boolean isInForeground = false; // to check if app is open or not from alarm broadcast receiver

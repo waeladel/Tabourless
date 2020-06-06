@@ -39,6 +39,9 @@ import java.util.ArrayList;
 
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
+import static com.tabourless.queue.App.CUSTOMER_STATUS_FRONT;
+import static com.tabourless.queue.App.DIRECTION_ARGUMENTS_KEY_PLACE_ID;
+import static com.tabourless.queue.App.DIRECTION_ARGUMENTS_KEY_QUEUE_ID;
 import static com.tabourless.queue.Utils.StringUtils.getFirstWord;
 
 
@@ -68,11 +71,6 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
     private static int mScrollDirection;
     private static int mLastVisibleItem;
 
-    private static final String CUSTOMER_STATUS_WAITING = "waiting";
-    private static final String CUSTOMER_STATUS_NEXT = "next";
-    private static final String CUSTOMER_STATUS_FRONT = "front";
-    private static final String CUSTOMER_STATUS_AWAY = "away";
-
     public CustomersFragment() {
         // Required empty public constructor
     }
@@ -93,12 +91,12 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
         mCurrentUserId = mFirebaseCurrentUser != null ? mFirebaseCurrentUser.getUid() : null;
 
         // Get placeId and queueId from Arguments
-        if(null != getArguments() && getArguments().containsKey("placeId")) {
+        if(null != getArguments() && getArguments().containsKey(DIRECTION_ARGUMENTS_KEY_PLACE_ID)) {
             // Get PlaceID
             mPlaceId = CustomersFragmentArgs.fromBundle(getArguments()).getPlaceId();
         }
 
-        if(null != getArguments() && getArguments().containsKey("queueId")){
+        if(null != getArguments() && getArguments().containsKey(DIRECTION_ARGUMENTS_KEY_QUEUE_ID)){
             // Get Queue
             mQueueId = CustomersFragmentArgs.fromBundle(getArguments()).getQueueId();
         }
@@ -158,13 +156,13 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
                                     //handler.post(this);
                                 }
                                 //Now items size is greater than 0, let's submit the List
-                                Log.d(TAG, "ChatsFragment onChanged. after  sleep finished. size= "+items.size());
+                                Log.d(TAG, "onChanged. after  sleep finished. size= "+items.size());
                                 if(items.size() == 0 && sleepCounter == 1000){
                                     // If we submit List after loop is finish with 0 results
                                     // we may erase another results submitted via newer thread
-                                    Log.d(TAG, "ChatsFragment onChanged. Loop finished with 0 items. Don't submitList");
+                                    Log.d(TAG, "onChanged. Loop finished with 0 items. Don't submitList");
                                 }else{
-                                    Log.d(TAG, "ChatsFragment onChanged. submitList= "+items.size());
+                                    Log.d(TAG, "onChanged. submitList= "+items.size());
                                     mAdapter.submitList(items);
                                 }
 

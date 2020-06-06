@@ -15,6 +15,8 @@ import com.tabourless.queue.data.InboxDataFactory;
 import com.tabourless.queue.data.InboxRepository;
 import com.tabourless.queue.models.Chat;
 
+import static com.tabourless.queue.App.DATABASE_REF_USER_CHATS;
+
 public class InboxViewModel extends ViewModel {
 
     private final static String TAG = InboxViewModel.class.getSimpleName();
@@ -43,7 +45,7 @@ public class InboxViewModel extends ViewModel {
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
         // keepSync UserChatsRef to work offline
         if(mCurrentUserId != null){
-            mUserChatsRef = mDatabaseRef.child("userChats").child(mCurrentUserId);
+            mUserChatsRef = mDatabaseRef.child(DATABASE_REF_USER_CHATS).child(mCurrentUserId);
             mUserChatsRef.keepSynced(true);
         }
 

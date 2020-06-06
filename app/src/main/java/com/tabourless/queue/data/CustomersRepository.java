@@ -31,6 +31,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.tabourless.queue.App.DATABASE_REF_CUSTOMERS;
+import static com.tabourless.queue.App.DATABASE_REF_QUEUE_JOINED;
+import static com.tabourless.queue.App.DATABASE_REF_USER_QUEUES;
+
 public class CustomersRepository {
 
     private final static String TAG = CustomersRepository.class.getSimpleName();
@@ -76,11 +80,6 @@ public class CustomersRepository {
     private static int mScrollDirection;
     private static int mLastVisibleItem;
 
-    private static final String CUSTOMER_STATUS_WAITING = "waiting";
-    private static final String CUSTOMER_STATUS_NEXT = "next";
-    private static final String CUSTOMER_STATUS_FRONT = "front";
-    private static final String CUSTOMER_STATUS_AWAY = "away";
-
     private ValueEventListener afterListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -89,9 +88,9 @@ public class CustomersRepository {
             if (!isAfterFirstLoaded){
                 // Remove post value event listener
                 removeListeners();
-                Log.d(TAG, "mama getMessagesAfter Invalidated removeEventListener");
+                Log.d(TAG, "getAfter Invalidated removeEventListener");
                 //isAfterFirstLoaded =  true;
-                Log.d(TAG, "getMessagesAfter onInvalidated(). isAfterFirstLoaded = "+ isAfterFirstLoaded);
+                Log.d(TAG, "getAfter onInvalidated(). isAfterFirstLoaded = "+ isAfterFirstLoaded);
                 invalidatedCallback.onInvalidated();
                 //UsersDataSource.InvalidatedCallback.class.getMethod("loadInitial", "LoadInitialParams");
                 //UsersDataSource.invalidate();
@@ -122,11 +121,11 @@ public class CustomersRepository {
                 if(resultList.size() != 0){
                     //callback.onResult(messagesList);
                     getLoadAfterCallback().onResult(resultList);
-                    Log.d(TAG, "mama getMessagesAfter  List.size= " +  resultList.size()+ " last key= "+resultList.get(resultList.size()-1).getKey());
+                    Log.d(TAG, "getMessagesAfter  List.size= " +  resultList.size()+ " last key= "+resultList.get(resultList.size()-1).getKey());
                 }
             } else {
                 // no data
-                Log.w(TAG, "mama getMessagesAfter no users exist");
+                Log.w(TAG, "getAfter no users exist");
             }
             printListeners();
             isAfterFirstLoaded =  false;
@@ -136,7 +135,7 @@ public class CustomersRepository {
         @Override
         public void onCancelled(DatabaseError databaseError) {
             // Getting Post failed, log a message
-            Log.w(TAG, "mama getMessagesAfter loadPost:onCancelled", databaseError.toException());
+            Log.w(TAG, "getAfter loadPost:onCancelled", databaseError.toException());
         }
     };
 
@@ -148,9 +147,9 @@ public class CustomersRepository {
             if (!isBeforeFirstLoaded){
                 // Remove post value event listener
                 removeListeners();
-                Log.d(TAG, "mama getMessagesBefore Invalidated removeEventListener");
+                Log.d(TAG, "getMBefore Invalidated removeEventListener");
                 //isBeforeFirstLoaded =  true;
-                Log.d(TAG, "getMessagesBefore onInvalidated(). isBeforeFirstLoaded = "+ isBeforeFirstLoaded);
+                Log.d(TAG, "getBefore onInvalidated(). isBeforeFirstLoaded = "+ isBeforeFirstLoaded);
                 invalidatedCallback.onInvalidated();
                 //UsersDataSource.InvalidatedCallback.class.getMethod("loadInitial", "LoadInitialParams");
                 //UsersDataSource.invalidate();
@@ -175,7 +174,7 @@ public class CustomersRepository {
                 if(resultList.size() != 0){
                     //callback.onResult(messagesList);
                     getLoadBeforeCallback().onResult(resultList);
-                    Log.d(TAG, "mama getMessagesBefore  List.size= " +  resultList.size()+ " last key= "+resultList.get(resultList.size()-1).getKey());
+                    Log.d(TAG, "getBefore  List.size= " +  resultList.size()+ " last key= "+resultList.get(resultList.size()-1).getKey());
 
                     // Create a reversed list to add messages to the beginning of totalItemsList
                     List<Customer> reversedList = new ArrayList<>(resultList);
@@ -190,7 +189,7 @@ public class CustomersRepository {
                 }
             } else {
                 // no data
-                Log.w(TAG, "mama getBefore no users exist");
+                Log.w(TAG, "getBefore no users exist");
             }
             printListeners();
             isBeforeFirstLoaded =  false;
@@ -200,7 +199,7 @@ public class CustomersRepository {
         @Override
         public void onCancelled(DatabaseError databaseError) {
             // Getting Post failed, log a message
-            Log.w(TAG, "mama getMessagesBefore:onCancelled", databaseError.toException());
+            Log.w(TAG, "getBefore: onCancelled", databaseError.toException());
         }
     };
 
@@ -210,7 +209,7 @@ public class CustomersRepository {
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
         // use received placeKey and queueKey to create a database ref
         Log.d(TAG, "CustomersRepository: placeId= "+ placeKey+ " queueId= "+ queueKey);
-        mCustomersRef = mDatabaseRef.child("customers").child(placeKey).child(queueKey);
+        mCustomersRef = mDatabaseRef.child(DATABASE_REF_CUSTOMERS).child(placeKey).child(queueKey);
 
         //Get current logged in user
         mFirebaseCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -225,7 +224,7 @@ public class CustomersRepository {
         isAfterFirstLoaded = true;
         isBeforeFirstLoaded = true;
 
-        Log.d(TAG, "mama MessagesListRepository init. isInitialFirstLoaded= " + isInitialFirstLoaded+ " after= "+isAfterFirstLoaded + " before= "+isBeforeFirstLoaded);
+        Log.d(TAG, "Repository init. isInitialFirstLoaded= " + isInitialFirstLoaded+ " after= "+isAfterFirstLoaded + " before= "+isBeforeFirstLoaded);
 
         if(mListenersList == null){
             mListenersList = new ArrayList<>();
@@ -368,7 +367,7 @@ public class CustomersRepository {
                     .limitToFirst(size);
 
         } else {// not the first load. Key is the last seen key
-            Log.d(TAG, "mama getMessages initialKey= " + initialKey);
+            Log.d(TAG, "initialKey= " + initialKey);
             switch (mScrollDirection){
                 case REACHED_THE_BOTTOM:
                     Log.d(TAG, "query = REACHED_THE_BOTTOM");
@@ -427,7 +426,7 @@ public class CustomersRepository {
         //this.afterKey = key;
         Query afterQuery;
 
-        Log.d(TAG, "mama getAfter. AfterKey= " + key);
+        Log.d(TAG, "getAfter. AfterKey= " + key);
         afterQuery = mCustomersRef.orderByKey()
                             .startAt(key)
                             .limitToFirst(size);
@@ -532,8 +531,8 @@ public class CustomersRepository {
         Map<String, Object> childUpdates = new HashMap<>();
 
         // Update relations to null. To start fresh
-        childUpdates.put("/customers/" + mPlaceKey + "/" + mQueueKey + "/" + customer.getKey(), null);
-        childUpdates.put("/userQueues/" + customer.getUserId() + "/" + mQueueKey+ "/joined" , 0);
+        childUpdates.put(DATABASE_REF_CUSTOMERS +"/" + mPlaceKey + "/" + mQueueKey + "/" + customer.getKey(), null);
+        childUpdates.put(DATABASE_REF_USER_QUEUES +"/" + customer.getUserId() + "/" + mQueueKey+ "/"+ DATABASE_REF_QUEUE_JOINED , 0);
 
         // update Data base
         mDatabaseRef.updateChildren(childUpdates);

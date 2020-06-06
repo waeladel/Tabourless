@@ -21,6 +21,15 @@ import com.tabourless.queue.models.Counter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static com.tabourless.queue.App.COUNTER_SPINNER_ANY;
+import static com.tabourless.queue.App.COUNTER_SPINNER_BOTH;
+import static com.tabourless.queue.App.COUNTER_SPINNER_GENDER_ABLED;
+import static com.tabourless.queue.App.COUNTER_SPINNER_GENDER_DISABLED;
+import static com.tabourless.queue.App.COUNTER_SPINNER_GENDER_FEMALE;
+import static com.tabourless.queue.App.COUNTER_SPINNER_GENDER_MALE;
+import static com.tabourless.queue.App.COUNTER_SPINNER_GENDER_OLD;
+import static com.tabourless.queue.App.COUNTER_SPINNER_GENDER_YOUNG;
+
 public class CountersDialogFragment extends DialogFragment  {
     private final static String TAG = CountersDialogFragment.class.getSimpleName();
 
@@ -102,19 +111,19 @@ public class CountersDialogFragment extends DialogFragment  {
             // set selected value in gender spinner
             if(null != sCounter.getGender()) {
                 switch (sCounter.getGender()) { // display sorting option selected from shared preference
-                    case "Any":
+                    case COUNTER_SPINNER_ANY:
                         mBinding.spinnerGenderValue.setSelection(0);
                         Log.d(TAG, "display 0 option on sorting spinner");
                         break;
-                    case "Females":
+                    case COUNTER_SPINNER_GENDER_FEMALE:
                         mBinding.spinnerGenderValue.setSelection(1);
                         Log.d(TAG, "display 1 option on sorting spinner");
                         break;
-                    case "Males":
+                    case COUNTER_SPINNER_GENDER_MALE:
                         mBinding.spinnerGenderValue.setSelection(2);
                         Log.d(TAG, "display 2 option on sorting spinner");
                         break;
-                    case "Both":
+                    case COUNTER_SPINNER_BOTH:
                         mBinding.spinnerGenderValue.setSelection(3);
                         Log.d(TAG, "display 3 option on sorting spinner");
                         break;
@@ -124,19 +133,19 @@ public class CountersDialogFragment extends DialogFragment  {
             // set selected value in age spinner
             if(null != sCounter.getAge()) {
                 switch (sCounter.getAge()) { // display sorting option selected from shared preference
-                    case "Any":
+                    case COUNTER_SPINNER_ANY:
                         mBinding.spinnerAgeValue.setSelection(0);
                         Log.d(TAG, "display 0 option on sorting spinner");
                         break;
-                    case "Old":
+                    case COUNTER_SPINNER_GENDER_OLD:
                         mBinding.spinnerAgeValue.setSelection(1);
                         Log.d(TAG, "display 1 option on sorting spinner");
                         break;
-                    case "Young":
+                    case COUNTER_SPINNER_GENDER_YOUNG:
                         mBinding.spinnerAgeValue.setSelection(2);
                         Log.d(TAG, "display 2 option on sorting spinner");
                         break;
-                    case "Both":
+                    case COUNTER_SPINNER_BOTH:
                         mBinding.spinnerAgeValue.setSelection(3);
                         Log.d(TAG, "display 3 option on sorting spinner");
                         break;
@@ -146,19 +155,19 @@ public class CountersDialogFragment extends DialogFragment  {
             // set selected value in Disability spinner
             if(null != sCounter.getDisability()) {
                 switch (sCounter.getDisability()) { // display sorting option selected from shared preference
-                    case "Any":
+                    case COUNTER_SPINNER_ANY:
                         mBinding.spinnerDisabilityValue.setSelection(0);
                         Log.d(TAG, "display 0 option on sorting spinner");
                         break;
-                    case "Disabled":
+                    case COUNTER_SPINNER_GENDER_DISABLED:
                         mBinding.spinnerDisabilityValue.setSelection(1);
                         Log.d(TAG, "display 1 option on sorting spinner");
                         break;
-                    case "Abled":
+                    case COUNTER_SPINNER_GENDER_ABLED:
                         mBinding.spinnerDisabilityValue.setSelection(2);
                         Log.d(TAG, "display 2 option on sorting spinner");
                         break;
-                    case "Both":
+                    case COUNTER_SPINNER_BOTH:
                         mBinding.spinnerDisabilityValue.setSelection(3);
                         Log.d(TAG, "display 3 option on sorting spinner");
                         break;
@@ -184,16 +193,16 @@ public class CountersDialogFragment extends DialogFragment  {
                     // set gender value
                     switch (mBinding.spinnerGenderValue.getSelectedItemPosition()){
                         case 0:
-                            sCounter.setGender("Any"); // Update current counter gender value
+                            sCounter.setGender(COUNTER_SPINNER_ANY); // Update current counter gender value
                             break;
                         case 1:
-                            sCounter.setGender("Females"); // Update current counter gender value
+                            sCounter.setGender(COUNTER_SPINNER_GENDER_FEMALE); // Update current counter gender value
                             break;
                         case 2:
-                            sCounter.setGender("Males"); // Update current counter gender value
+                            sCounter.setGender(COUNTER_SPINNER_GENDER_MALE); // Update current counter gender value
                             break;
                         case 3:
-                            sCounter.setGender("Both"); // Update current counter gender value
+                            sCounter.setGender(COUNTER_SPINNER_BOTH); // Update current counter gender value
                             break;
                     }
                     Log.d(TAG, "onClick: selected gender= "+ mBinding.spinnerGenderValue.getSelectedItemPosition());
@@ -201,16 +210,16 @@ public class CountersDialogFragment extends DialogFragment  {
                     // set age value
                     switch (mBinding.spinnerAgeValue.getSelectedItemPosition()){
                         case 0:
-                            sCounter.setAge("Any"); // Update current counter gender value
+                            sCounter.setAge(COUNTER_SPINNER_ANY); // Update current counter gender value
                             break;
                         case 1:
-                            sCounter.setAge("Old"); // Update current counter gender value
+                            sCounter.setAge(COUNTER_SPINNER_GENDER_OLD); // Update current counter gender value
                             break;
                         case 2:
-                            sCounter.setAge("Young"); // Update current counter gender value
+                            sCounter.setAge(COUNTER_SPINNER_GENDER_YOUNG); // Update current counter gender value
                             break;
                         case 3:
-                            sCounter.setAge("Both"); // Update current counter gender value
+                            sCounter.setAge(COUNTER_SPINNER_BOTH); // Update current counter gender value
                             break;
                     }
 
@@ -219,16 +228,16 @@ public class CountersDialogFragment extends DialogFragment  {
                     // set disability value
                     switch (mBinding.spinnerDisabilityValue.getSelectedItemPosition()){
                         case 0:
-                            sCounter.setDisability("Any"); // Update current counter gender value
+                            sCounter.setDisability(COUNTER_SPINNER_ANY); // Update current counter gender value
                             break;
                         case 1:
-                            sCounter.setDisability("Disabled"); // Update current counter gender value
+                            sCounter.setDisability(COUNTER_SPINNER_GENDER_DISABLED); // Update current counter gender value
                             break;
                         case 2:
-                            sCounter.setDisability("Abled"); // Update current counter gender value
+                            sCounter.setDisability(COUNTER_SPINNER_GENDER_ABLED); // Update current counter gender value
                             break;
                         case 3:
-                            sCounter.setDisability("Both"); // Update current counter gender value
+                            sCounter.setDisability(COUNTER_SPINNER_BOTH); // Update current counter gender value
                             break;
                     }
                     Log.d(TAG, "onClick: selected Disability= "+ mBinding.spinnerDisabilityValue.getSelectedItemPosition());

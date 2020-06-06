@@ -31,6 +31,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static com.tabourless.queue.App.DATABASE_REF_COUNTERS;
+import static com.tabourless.queue.App.DATABASE_REF_PLACES;
+import static com.tabourless.queue.App.DATABASE_REF_QUEUES;
+
 public class AddPlaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements CounterSaveListener {
 
     private final static String TAG = AddPlaceAdapter.class.getSimpleName();
@@ -71,7 +75,7 @@ public class AddPlaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         //mPlaceQueuesMap = mViewModel.getPlace().getQueues();
 
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
-        mPlacesRef = mDatabaseRef.child("places");
+        mPlacesRef = mDatabaseRef.child(DATABASE_REF_PLACES);
     }
 
     public ArrayList<PlaceItem> getPlaceItemsList() {
@@ -335,7 +339,7 @@ public class AddPlaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         PlaceItem placeItem = placeItemsList.get(queueItemPosition);
         Queue queue = placeItem.getQueue();
         // Create keys for counters inside counter child (places/placeId/queues/counters/counterKey1,2,3)
-        String counterKey = mPlacesRef.child(mViewModel.getPlace().getKey()).child("queues").child(queue.getKey()).child("counters").push().getKey();
+        String counterKey = mPlacesRef.child(mViewModel.getPlace().getKey()).child(DATABASE_REF_QUEUES).child(queue.getKey()).child(DATABASE_REF_COUNTERS).push().getKey();
 
         counter.setKey(counterKey); // set key for the empty new counter
 

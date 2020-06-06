@@ -58,6 +58,16 @@ import top.zibin.luban.Luban;
 import top.zibin.luban.OnCompressListener;
 
 import static android.app.Activity.RESULT_OK;
+import static com.tabourless.queue.App.AVATAR_ORIGINAL_NAME;
+import static com.tabourless.queue.App.AVATAR_THUMBNAIL_NAME;
+import static com.tabourless.queue.App.COVER_ORIGINAL_NAME;
+import static com.tabourless.queue.App.COVER_THUMBNAIL_NAME;
+import static com.tabourless.queue.App.DATABASE_REF_USERS;
+import static com.tabourless.queue.App.DATABASE_REF_USER_TOKENS;
+import static com.tabourless.queue.App.DIRECTION_ARGUMENTS_KEY_IS_EDIT;
+import static com.tabourless.queue.App.STORAGE_REF_IMAGES;
+import static com.tabourless.queue.App.USER_SPINNER_GENDER_FEMALE;
+import static com.tabourless.queue.App.USER_SPINNER_GENDER_MALE;
 
 public class CompleteProfileFragment extends Fragment {
 
@@ -84,12 +94,6 @@ public class CompleteProfileFragment extends Fragment {
     private Uri mThumbnailCoverUri;
 
     // names of uploaded images
-    private static final String AVATAR_THUMBNAIL_NAME = "avatar.jpg";
-    private static final String COVER_THUMBNAIL_NAME = "cover.jpg";
-    private static final String AVATAR_ORIGINAL_NAME = "original_avatar.jpg";
-    private static final String COVER_ORIGINAL_NAME = "original_cover.jpg";
-
-
     private static final int SELECT_IMAGE_REQUEST_CODE = 200;
     private static final int CROP_IMAGE_AVATAR_REQUEST_CODE = 103;
     private static final int CROP_IMAGE_COVER_REQUEST_CODE = 104;
@@ -112,18 +116,18 @@ public class CompleteProfileFragment extends Fragment {
         mFirebaseCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
         currentUserId = mFirebaseCurrentUser!= null ? mFirebaseCurrentUser.getUid() : null;
 
-        if(getArguments() != null && getArguments().containsKey("isEdit")) {
+        if(getArguments() != null && getArguments().containsKey(DIRECTION_ARGUMENTS_KEY_IS_EDIT)) {
             // Check if should display Edit profile
             isEdit = CompleteProfileFragmentArgs.fromBundle(getArguments()).getIsEdit();
         }
 
         // [START database reference]
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
-        mUserRef = mDatabaseRef.child("users").child(currentUserId);
+        mUserRef = mDatabaseRef.child(DATABASE_REF_USERS).child(currentUserId);
 
         // [START create_storage_reference]
         mStorageRef = FirebaseStorage.getInstance().getReference();
-        mImagesRef = mStorageRef.child("images");
+        mImagesRef = mStorageRef.child(STORAGE_REF_IMAGES);
 
     }
 
@@ -283,7 +287,7 @@ public class CompleteProfileFragment extends Fragment {
         mBinding.nameValue.setText(user.getName());
         //Display avatar
         if(!TextUtils.isEmpty(user.getAvatar())){
-            StorageReference userAvatarStorageRef = mStorageRef.child("images/"+ user.getKey() +"/"+ AVATAR_THUMBNAIL_NAME);
+            StorageReference userAvatarStorageRef = mStorageRef.child(STORAGE_REF_IMAGES +"/"+ user.getKey() +"/"+ AVATAR_THUMBNAIL_NAME);
             // Download directly from StorageReference using Glide
             GlideApp.with(mContext)
                     .load(userAvatarStorageRef)
@@ -297,7 +301,7 @@ public class CompleteProfileFragment extends Fragment {
 
         // Display cover
         if(!TextUtils.isEmpty(user.getCoverImage())){
-            StorageReference userCoverStorageRef = mStorageRef.child("images/"+ user.getKey() +"/"+ COVER_THUMBNAIL_NAME);
+            StorageReference userCoverStorageRef = mStorageRef.child(STORAGE_REF_IMAGES +"/"+ user.getKey() +"/"+ COVER_THUMBNAIL_NAME);
             // Download directly from StorageReference using Glide
             GlideApp.with(mContext)
                     .load(userCoverStorageRef)
@@ -311,7 +315,7 @@ public class CompleteProfileFragment extends Fragment {
 
 
         //Set gender value
-        if(TextUtils.equals(user.getGender(), "male") ){
+        if(TextUtils.equals(user.getGender(), USER_SPINNER_GENDER_MALE) ){
             mBinding.spinnerGenderValue.setSelection(0);
         }else{
             mBinding.spinnerGenderValue.setSelection(1);
@@ -439,19 +443,19 @@ public class CompleteProfileFragment extends Fragment {
 
         switch (type){
             case "avatar":
-                userRef = mStorageRef.child("images/"+currentUserId +"/"+ AVATAR_THUMBNAIL_NAME);
+                userRef = mStorageRef.child(STORAGE_REF_IMAGES +"/"+currentUserId +"/"+ AVATAR_THUMBNAIL_NAME);
                 break;
             case "coverImage":
-                userRef = mStorageRef.child("images/"+currentUserId +"/"+ COVER_THUMBNAIL_NAME );
+                userRef = mStorageRef.child(STORAGE_REF_IMAGES +"/"+currentUserId +"/"+ COVER_THUMBNAIL_NAME );
                 break;
             case "original avatar":
-                userRef = mStorageRef.child("images/"+currentUserId +"/"+ AVATAR_ORIGINAL_NAME);
+                userRef = mStorageRef.child(STORAGE_REF_IMAGES +"/"+currentUserId +"/"+ AVATAR_ORIGINAL_NAME);
                 break;
             case "original cover":
-                userRef = mStorageRef.child("images/"+currentUserId +"/"+ COVER_ORIGINAL_NAME);
+                userRef = mStorageRef.child(STORAGE_REF_IMAGES +"/"+currentUserId +"/"+ COVER_ORIGINAL_NAME);
                 break;
             default:
-                userRef = mStorageRef.child("images/"+currentUserId+AVATAR_THUMBNAIL_NAME);
+                userRef = mStorageRef.child(STORAGE_REF_IMAGES +"/"+currentUserId+AVATAR_THUMBNAIL_NAME);
                 break;
         }
 
@@ -471,7 +475,7 @@ public class CompleteProfileFragment extends Fragment {
                 public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
 
                     double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
-                    System.out.println("Upload is " + progress + "% done");
+                    //System.out.println("Upload is " + progress + "% done");
                     // Show progress loading animation
                     switch (type) {
                         case "avatar":
@@ -591,9 +595,9 @@ public class CompleteProfileFragment extends Fragment {
         mViewModel.getUser().setName(mBinding.nameValue.getText().toString().trim());
         mViewModel.getUser().setBirthYear(Integer.parseInt(mBinding.spinnerBirthValue.getSelectedItem().toString()));
         if (mBinding.spinnerGenderValue.getSelectedItemPosition() == 0) {
-            mViewModel.getUser().setGender("male");
+            mViewModel.getUser().setGender(USER_SPINNER_GENDER_MALE);
         } else {
-            mViewModel.getUser().setGender("female");
+            mViewModel.getUser().setGender(USER_SPINNER_GENDER_FEMALE);
         }
 
         if (mBinding.spinnerDisabilityValue.getSelectedItemPosition() == 0) {
@@ -624,7 +628,7 @@ public class CompleteProfileFragment extends Fragment {
                                         // Get new Instance ID token
                                         String token = task.getResult().getToken();
                                         //mTokensRef.child(mUserId).child(token).setValue(true);
-                                        mUserRef.child("tokens").child(token).setValue(true);
+                                        mUserRef.child(DATABASE_REF_USER_TOKENS).child(token).setValue(true);
                                     }
                                 }
                             });

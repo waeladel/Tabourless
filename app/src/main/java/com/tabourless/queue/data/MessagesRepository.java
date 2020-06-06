@@ -22,6 +22,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.tabourless.queue.App.DATABASE_REF_CHATS;
+import static com.tabourless.queue.App.DATABASE_REF_MESSAGES;
+import static com.tabourless.queue.App.DATABASE_REF_USERS;
+
 public class MessagesRepository {
 
     private final static String TAG = MessagesRepository.class.getSimpleName();
@@ -121,11 +125,11 @@ public class MessagesRepository {
 
     public MessagesRepository(){
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
-        mUsersRef = mDatabaseRef.child("users");
-        mMessagesRef = mDatabaseRef.child("messages");
-        mChatRef = mDatabaseRef.child("chats");
+        mUsersRef = mDatabaseRef.child(DATABASE_REF_USERS);
+        mMessagesRef = mDatabaseRef.child(DATABASE_REF_MESSAGES);
+        mChatRef = mDatabaseRef.child(DATABASE_REF_CHATS);
         isFirstLoaded = true;
-        Log.d(TAG, "mama MessagesRepository init. isFirstLoaded is true");
+        Log.d(TAG, "MessagesRepository init. isFirstLoaded is true");
         mUser = new MutableLiveData<>();
         mCurrentUser = new MutableLiveData<>();
         mSenderId = new MutableLiveData<>();
@@ -324,36 +328,6 @@ public class MessagesRepository {
         }*/
 
         return mChat;
-    }
-
-    // To reveal all messages after forever is selected
-    public void revealMessages(String chatId) {
-        final DatabaseReference messagesRef = mMessagesRef.child(chatId);
-        //final MutableLiveData<User> mCurrentUser = new MutableLiveData<>();
-        Log.d(TAG, "revealMessages initiated: " + chatId);
-        messagesRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                if (dataSnapshot.exists()) {
-                    //Map <String, Boolean> updateMap = new HashMap<>();
-                    Map<String, Object> updateMap = new HashMap<>();
-
-                    // loop throw all messages to update revealed
-                    for (DataSnapshot snapshot: dataSnapshot.getChildren()){
-                        updateMap.put(snapshot.getKey()+"/revealed", true);
-                    }
-
-                    messagesRef.updateChildren(updateMap);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
     }
 
     // get the last message

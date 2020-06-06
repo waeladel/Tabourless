@@ -27,6 +27,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.tabourless.queue.App.DATABASE_REF_CHATS;
+import static com.tabourless.queue.App.DATABASE_REF_CHATS_MEMBERS;
+import static com.tabourless.queue.App.DATABASE_REF_CHATS_MEMBER_READ;
+import static com.tabourless.queue.App.DATABASE_REF_MESSAGES;
+import static com.tabourless.queue.App.DATABASE_REF_USERS;
+import static com.tabourless.queue.App.DATABASE_REF_USER_CHATS;
+
 public class MessagesListRepository {
 
     private final static String TAG = MessagesListRepository.class.getSimpleName();
@@ -79,9 +86,6 @@ public class MessagesListRepository {
     private static int mScrollDirection;
     private static int mLastVisibleItem;
 
-    private static final String Message_STATUS_SENDING = "Sending";
-    private static final String Message_STATUS_SENT = "Sent";
-    private static final String Message_STATUS_DELIVERED = "Delivered";
     private boolean isChatRead;
 
     private ValueEventListener afterMessagesListener = new ValueEventListener() {
@@ -92,7 +96,7 @@ public class MessagesListRepository {
             if (!isAfterFirstLoaded){
                 // Remove post value event listener
                 removeListeners();
-                Log.d(TAG, "mama getMessagesAfter Invalidated removeEventListener");
+                Log.d(TAG, "getMessagesAfter Invalidated removeEventListener");
                 //isAfterFirstLoaded =  true;
                 Log.d(TAG, "getMessagesAfter onInvalidated(). isAfterFirstLoaded = "+ isAfterFirstLoaded);
                 invalidatedCallback.onInvalidated();
@@ -125,11 +129,11 @@ public class MessagesListRepository {
                 if(messagesList.size() != 0){
                     //callback.onResult(messagesList);
                     getLoadAfterCallback().onResult(messagesList);
-                    Log.d(TAG, "mama getMessagesAfter  List.size= " +  messagesList.size()+ " last key= "+messagesList.get(messagesList.size()-1).getKey());
+                    Log.d(TAG, "getMessagesAfter  List.size= " +  messagesList.size()+ " last key= "+messagesList.get(messagesList.size()-1).getKey());
                 }
             } else {
                 // no data
-                Log.w(TAG, "mama getMessagesAfter no users exist");
+                Log.w(TAG, "getMessagesAfter no users exist");
             }
             printListeners();
             isAfterFirstLoaded =  false;
@@ -139,7 +143,7 @@ public class MessagesListRepository {
         @Override
         public void onCancelled(DatabaseError databaseError) {
             // Getting Post failed, log a message
-            Log.w(TAG, "mama getMessagesAfter loadPost:onCancelled", databaseError.toException());
+            Log.w(TAG, "getMessagesAfter loadPost:onCancelled", databaseError.toException());
         }
     };
 
@@ -151,7 +155,7 @@ public class MessagesListRepository {
             if (!isBeforeFirstLoaded){
                 // Remove post value event listener
                 removeListeners();
-                Log.d(TAG, "mama getMessagesBefore Invalidated removeEventListener");
+                Log.d(TAG, "getMessagesBefore Invalidated removeEventListener");
                 //isBeforeFirstLoaded =  true;
                 Log.d(TAG, "getMessagesBefore onInvalidated(). isBeforeFirstLoaded = "+ isBeforeFirstLoaded);
                 invalidatedCallback.onInvalidated();
@@ -178,7 +182,7 @@ public class MessagesListRepository {
                 if(messagesList.size() != 0){
                     //callback.onResult(messagesList);
                     getLoadBeforeCallback().onResult(messagesList);
-                    Log.d(TAG, "mama getMessagesBefore  List.size= " +  messagesList.size()+ " last key= "+messagesList.get(messagesList.size()-1).getKey());
+                    Log.d(TAG, "getMessagesBefore  List.size= " +  messagesList.size()+ " last key= "+messagesList.get(messagesList.size()-1).getKey());
 
                     // Create a reversed list to add messages to the beginning of totalItemsList
                     List<Message> reversedList = new ArrayList<>(messagesList);
@@ -199,7 +203,7 @@ public class MessagesListRepository {
                 }
             } else {
                 // no data
-                Log.w(TAG, "mama getMessagesBefore no users exist");
+                Log.w(TAG, "getMessagesBefore no users exist");
             }
             printListeners();
             isBeforeFirstLoaded =  false;
@@ -209,7 +213,7 @@ public class MessagesListRepository {
         @Override
         public void onCancelled(DatabaseError databaseError) {
             // Getting Post failed, log a message
-            Log.w(TAG, "mama getMessagesBefore:onCancelled", databaseError.toException());
+            Log.w(TAG, "getMessagesBefore:onCancelled", databaseError.toException());
         }
     };
 
@@ -218,8 +222,8 @@ public class MessagesListRepository {
     public MessagesListRepository(String chatKey, @NonNull DataSource.InvalidatedCallback onInvalidatedCallback){
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
         // use received chatKey to create a database ref
-        mMessagesRef = mDatabaseRef.child("messages").child(chatKey);
-        mUsersRef = mDatabaseRef.child("users");
+        mMessagesRef = mDatabaseRef.child(DATABASE_REF_MESSAGES).child(chatKey);
+        mUsersRef = mDatabaseRef.child(DATABASE_REF_USERS);
 
         //Get current logged in user
         mFirebaseCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -233,7 +237,7 @@ public class MessagesListRepository {
         isAfterFirstLoaded = true;
         isBeforeFirstLoaded = true;
 
-        Log.d(TAG, "mama MessagesListRepository init. isInitialFirstLoaded= " + isInitialFirstLoaded+ " after= "+isAfterFirstLoaded + " before= "+isBeforeFirstLoaded);
+        Log.d(TAG, "MessagesListRepository init. isInitialFirstLoaded= " + isInitialFirstLoaded+ " after= "+isAfterFirstLoaded + " before= "+isBeforeFirstLoaded);
 
         if(mListenersList == null){
             mListenersList = new ArrayList<>();
@@ -324,7 +328,7 @@ public class MessagesListRepository {
                 if (!isInitialFirstLoaded){
                     // Remove post value event listener
                     removeListeners();
-                    Log.d(TAG, "mama usersChanged Invalidated removeEventListener");
+                    Log.d(TAG, "usersChanged Invalidated removeEventListener");
                     //isInitialFirstLoaded =  true;
                     Log.d(TAG, "onInvalidated(). isInitialFirstLoaded = "+ isInitialFirstLoaded);
                     invalidatedCallback.onInvalidated();
@@ -367,8 +371,8 @@ public class MessagesListRepository {
                     // Update seen messages
                     if(isChatRead){
                         // Update chats member read
-                        updateMap.put("/userChats/" + currentUserId + "/" + chatKey + "/members/" +currentUserId+ "/read/" , true);
-                        updateMap.put("/chats/" + chatKey + "/members/" +currentUserId+ "/read/" , true);
+                        updateMap.put(DATABASE_REF_USER_CHATS +"/"+  currentUserId +"/"+ chatKey +"/"+  DATABASE_REF_CHATS_MEMBERS +"/"+ currentUserId +"/"+ DATABASE_REF_CHATS_MEMBER_READ+"/" , true);
+                        updateMap.put(DATABASE_REF_CHATS +"/"+  chatKey +"/"+ DATABASE_REF_CHATS_MEMBERS +"/"+  currentUserId +"/"+ DATABASE_REF_CHATS_MEMBER_READ+"/" , true);
 
                        /* // Update seen chats count
                         updateMap.put("/counts/" + currentUserId + "/chats/" + chatKey, null);*/
@@ -421,11 +425,11 @@ public class MessagesListRepository {
                         }*/
 
                         callback.onResult(messagesList);
-                        Log.d(TAG, "mama getMessages  List.size= " +  messagesList.size()+ " last key= "+messagesList.get(messagesList.size()-1).getKey() + " getInitialKey= "+ getInitialKey() );
+                        Log.d(TAG, "getMessages  List.size= " +  messagesList.size()+ " last key= "+messagesList.get(messagesList.size()-1).getKey() + " getInitialKey= "+ getInitialKey() );
                     }
                 } else {
                     // no data
-                    Log.w(TAG, "mama getMessages no users exist");
+                    Log.w(TAG, "getMessages no users exist");
                 }
                 printListeners();
                 isInitialFirstLoaded =  false;
@@ -435,17 +439,17 @@ public class MessagesListRepository {
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 // Getting Post failed, log a message
-                Log.w(TAG, "mama loadPost:onCancelled", databaseError.toException());
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
             }
         };
 
         if (initialKey == null) {// if it's loaded for the first time. Key is null
-            Log.d(TAG, "mama getMessages initialKey is null");
+            Log.d(TAG, "getMessages initialKey is null");
             messagesQuery = mMessagesRef.orderByKey()//limitToLast to start from the last (page size) items
                     .limitToLast(size);
 
         } else {// not the first load. Key is the last seen key
-            Log.d(TAG, "mama getMessages initialKey= " + initialKey);
+            Log.d(TAG, "getMessages initialKey= " + initialKey);
             switch (mScrollDirection){
                 case REACHED_THE_BOTTOM:
                     Log.d(TAG, "messages query = REACHED_THE_BOTTOM");
@@ -504,7 +508,7 @@ public class MessagesListRepository {
         //this.afterKey = key;
         Query afterMessagesQuery;
 
-        Log.d(TAG, "mama getMessagesAfter. AfterKey= " + key);
+        Log.d(TAG, "getMessagesAfter. AfterKey= " + key);
         afterMessagesQuery = mMessagesRef.orderByKey()
                             .startAt(key)
                             .limitToFirst(size);

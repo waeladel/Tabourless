@@ -17,7 +17,7 @@ public class MessagesDataSource extends ItemKeyedDataSource<String, Message> {
     public MessagesDataSource(String messageKey){
         //messagesRepository = new MessagesListRepository(chatKey);
         this.mMessageKey = messageKey;
-        Log.d(TAG, "mama MessagesDataSource initiated ");
+        Log.d(TAG, " MessagesDataSource initiated ");
        /* usersRepository.getUsersChangeSubject().observeOn(Schedulers.io()).subscribeOn(Schedulers.computation()).subscribe();{
             invalidate();
             Log.d(TAG, "mama invalidate ");
@@ -28,7 +28,7 @@ public class MessagesDataSource extends ItemKeyedDataSource<String, Message> {
     @Override
     public void addInvalidatedCallback(@NonNull InvalidatedCallback onInvalidatedCallback) {
         //super.addInvalidatedCallback(onInvalidatedCallback);
-        Log.d(TAG, "mama Callback MessagesDataSource addInvalidatedCallback ");
+        Log.d(TAG, " Callback MessagesDataSource addInvalidatedCallback ");
 
         // initiate messagesRepository here to pass  onInvalidatedCallback
         //messagesRepository = MessagesListRepository.getInstance();
@@ -47,13 +47,13 @@ public class MessagesDataSource extends ItemKeyedDataSource<String, Message> {
 
     @Override
     public void invalidate() {
-        Log.d(TAG, "mama MessagesListRepository Invalidated ");
+        Log.d(TAG, " MessagesListRepository Invalidated ");
         super.invalidate();
     }
 
     // When last database message is not loaded, Invalidate messagesDataSource to scroll down
     public void invalidateData() {
-        Log.d(TAG, "mama MessagesListRepository invalidateData ");
+        Log.d(TAG, " MessagesListRepository invalidateData ");
         //messagesRepository.setInitialKey(null);
         messagesRepository.invalidateData();
     }
@@ -70,7 +70,7 @@ public class MessagesDataSource extends ItemKeyedDataSource<String, Message> {
         /*List<User> items = usersRepository.getMessages(params.requestedInitialKey, params.requestedLoadSize);
         callback.onResult(items);*/
         //messagesRepository.setLoadInitialCallback(callback);
-        Log.d(TAG, "mama loadInitial params key" +params.requestedInitialKey+" LoadSize " + params.requestedLoadSize+ " callback= "+callback);
+        Log.d(TAG, " loadInitial params key" +params.requestedInitialKey+" LoadSize " + params.requestedLoadSize+ " callback= "+callback);
         messagesRepository.getMessages(params.requestedInitialKey, params.requestedLoadSize, callback);
         //usersRepository.getMessages( 0L, params.requestedLoadSize, callback);
 
@@ -82,7 +82,7 @@ public class MessagesDataSource extends ItemKeyedDataSource<String, Message> {
         /*List<User> items = usersRepository.getMessages(params.key, params.requestedLoadSize);
         callback.onResult(items);*/
         messagesRepository.setLoadAfterCallback(params.key, callback);
-        Log.d(TAG, "mama loadAfter params key " + params.key+" LoadSize " + params.requestedLoadSize+ " callback= "+callback);
+        Log.d(TAG, " loadAfter params key " + params.key+" LoadSize " + params.requestedLoadSize+ " callback= "+callback);
         messagesRepository.getMessagesAfter(params.key, params.requestedLoadSize, callback);
     }
 
@@ -92,7 +92,7 @@ public class MessagesDataSource extends ItemKeyedDataSource<String, Message> {
         /*List<User> items = fetchItemsBefore(params.key, params.requestedLoadSize);
         callback.onResult(items);*/
         messagesRepository.setLoadBeforeCallback(params.key, callback);
-        Log.d(TAG, "mama loadBefore params " + params.key+" LoadSize " + params.requestedLoadSize+ " callback= "+callback);
+        Log.d(TAG, " loadBefore params " + params.key+" LoadSize " + params.requestedLoadSize+ " callback= "+callback);
         messagesRepository.getMessagesBefore(params.key, params.requestedLoadSize, callback);
     }
 

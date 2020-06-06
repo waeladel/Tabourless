@@ -34,6 +34,14 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static com.tabourless.queue.App.AVATAR_THUMBNAIL_NAME;
+import static com.tabourless.queue.App.COUNTER_SPINNER_GENDER_FEMALE;
+import static com.tabourless.queue.App.COUNTER_SPINNER_GENDER_MALE;
+import static com.tabourless.queue.App.CUSTOMER_STATUS_AWAY;
+import static com.tabourless.queue.App.CUSTOMER_STATUS_FRONT;
+import static com.tabourless.queue.App.CUSTOMER_STATUS_NEXT;
+import static com.tabourless.queue.App.STORAGE_REF_IMAGES;
+
 public class CustomersAdapter extends PagedListAdapter<Customer, CustomersAdapter.ViewHolder> {
 
     private final static String TAG = CustomersAdapter.class.getSimpleName();
@@ -47,14 +55,6 @@ public class CustomersAdapter extends PagedListAdapter<Customer, CustomersAdapte
     // A not static array list for all avatars to update the broken avatars when fragment stops
     private List<Customer> brokenAvatarsList;// = new ArrayList<>();
     private StorageReference mStorageRef;
-
-    private static final String AVATAR_THUMBNAIL_NAME = "avatar.jpg";
-    private static final String COVER_THUMBNAIL_NAME = "cover.jpg";
-
-    private static final String CUSTOMER_STATUS_WAITING = "waiting";
-    private static final String CUSTOMER_STATUS_NEXT = "next";
-    private static final String CUSTOMER_STATUS_FRONT = "front";
-    private static final String CUSTOMER_STATUS_AWAY = "away";
 
     public CustomersAdapter(Context context, ItemClickListener itemClickListener) {
         super(DIFF_CALLBACK);
@@ -100,7 +100,7 @@ public class CustomersAdapter extends PagedListAdapter<Customer, CustomersAdapte
 
             // Lets get avatar
             if(!TextUtils.isEmpty(customer.getAvatar())){
-                StorageReference userAvatarStorageRef = mStorageRef.child("images/"+ customer.getUserId() +"/"+ AVATAR_THUMBNAIL_NAME);
+                StorageReference userAvatarStorageRef = mStorageRef.child(STORAGE_REF_IMAGES+ "/"+ customer.getUserId() +"/"+ AVATAR_THUMBNAIL_NAME);
                 // Download directly from StorageReference using Glide
                 GlideApp.with(mContext)
                         .load(userAvatarStorageRef)
@@ -160,11 +160,11 @@ public class CustomersAdapter extends PagedListAdapter<Customer, CustomersAdapte
             // Gender icon
             if (null != customer.getGender()) {
                 switch (customer.getGender()) {
-                    case "male":
+                    case COUNTER_SPINNER_GENDER_MALE:
                         holder.mBinding.genderIcon.setImageResource(R.drawable.ic_business_man);
                         holder.mBinding.genderIcon.setVisibility(View.VISIBLE);
                         break;
-                    case "female":
+                    case COUNTER_SPINNER_GENDER_FEMALE:
                         holder.mBinding.genderIcon.setImageResource(R.drawable.ic_business_woman);
                         holder.mBinding.genderIcon.setVisibility(View.VISIBLE);
                         break;

@@ -54,6 +54,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.tabourless.queue.App.AVATAR_THUMBNAIL_NAME;
+import static com.tabourless.queue.App.DATABASE_REF_CHATS;
+import static com.tabourless.queue.App.DATABASE_REF_MESSAGES;
+import static com.tabourless.queue.App.DATABASE_REF_MESSAGE_STATUS;
+import static com.tabourless.queue.App.DATABASE_REF_NOTIFICATIONS;
+import static com.tabourless.queue.App.DATABASE_REF_NOTIFICATIONS_ALERTS;
+import static com.tabourless.queue.App.DATABASE_REF_NOTIFICATIONS_MESSAGES;
+import static com.tabourless.queue.App.DATABASE_REF_USER_CHATS;
+import static com.tabourless.queue.App.DIRECTION_ARGUMENTS_KEY_CHAT_USER_ID;
+import static com.tabourless.queue.App.DIRECTION_ARGUMENTS_KEY_IS_GROUP;
+import static com.tabourless.queue.App.Message_STATUS_SENDING;
+import static com.tabourless.queue.App.Message_STATUS_SENT;
+import static com.tabourless.queue.App.NOTIFICATION_TYPE_MESSAGE;
+import static com.tabourless.queue.App.STORAGE_REF_IMAGES;
 import static com.tabourless.queue.Utils.DatabaseKeys.getJoinedKeys;
 import static com.tabourless.queue.Utils.StringUtils.getFirstWord;
 
@@ -91,13 +105,6 @@ public class MessagesFragment extends Fragment {
     private int mScrollDirection;
     private int bottomVisibleItemCount;
 
-    // DatabaseNotification's types
-    private static final String NOTIFICATION_TYPE_MESSAGE = "Message";
-
-    private static final String Message_STATUS_SENDING = "Sending";
-    private static final String Message_STATUS_SENT = "Sent";
-    private static final String Message_STATUS_DELIVERED = "Delivered";
-
     private  static final String BLOCKED_CHAT_FRAGMENT = "BlockedChatFragment";
 
     private static final String IS_HII_BOTTOM = "Hit_Bottom";
@@ -107,10 +114,6 @@ public class MessagesFragment extends Fragment {
     private long mTimeLiftInMillis;
     private Long mLastOnlineEndTime;
 
-    private static final String AVATAR_THUMBNAIL_NAME = "avatar.jpg";
-    private static final String COVER_THUMBNAIL_NAME = "cover.jpg";
-    private static final String AVATAR_ORIGINAL_NAME = "original_avatar.jpg";
-    private static final String COVER_ORIGINAL_NAME = "original_cover.jpg";
     private StorageReference mStorageRef;
 
     @Override
@@ -131,7 +134,7 @@ public class MessagesFragment extends Fragment {
         // [START create_storage_reference]
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
-        if(null != getArguments() && getArguments().containsKey("chatUserId") && getArguments().containsKey("isGroup")) {
+        if(null != getArguments() && getArguments().containsKey(DIRECTION_ARGUMENTS_KEY_CHAT_USER_ID) && getArguments().containsKey(DIRECTION_ARGUMENTS_KEY_IS_GROUP)) {
             //mCurrentUserId = MessagesFragmentArgs.fromBundle(getArguments()).getCurrentUserId();//logged in user
             mChatUserId = MessagesFragmentArgs.fromBundle(getArguments()).getChatUserId();// any user
             //mCurrentUserId = MessagesFragmentArgs.fromBundle(getArguments()).getCurrentUserId();
@@ -150,9 +153,9 @@ public class MessagesFragment extends Fragment {
         mMessagesAdapter = new MessagesAdapter(mContext); // Pass chat id because it's needed to update message revelation
 
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
-        mChatsRef = mDatabaseRef.child("chats");
-        mMessagesRef = mDatabaseRef.child("messages");
-        mNotificationsRef = mDatabaseRef.child("notifications");
+        mChatsRef = mDatabaseRef.child(DATABASE_REF_CHATS);
+        mMessagesRef = mDatabaseRef.child(DATABASE_REF_MESSAGES);
+        mNotificationsRef = mDatabaseRef.child(DATABASE_REF_NOTIFICATIONS);
 
         // start init  mMessagesViewModel here after mCurrentUserId and chat user is received//
         // extend mMessagesViewModel to pass Chat Key value and chat user key //
@@ -268,7 +271,7 @@ public class MessagesFragment extends Fragment {
         mViewModel.itemPagedList.observe(getViewLifecycleOwner(), new Observer<PagedList<Message>>() {
             @Override
             public void onChanged(@Nullable final PagedList<Message> items) {
-                System.out.println("mama onChanged");
+                System.out.println("onChanged");
                 if (items != null ){
                     // your code here
                     // Create new Thread to loop until items.size() is greater than 0
@@ -594,7 +597,7 @@ public class MessagesFragment extends Fragment {
 
             for (int i = 0; i < statusList.size(); i++) {
                 Log.d(TAG, "statusList message= "+statusList.get(i).getMessage() + " key= "+statusList.get(i).getKey() + " status= "+statusList.get(i).getStatus());
-                updateMap.put(statusList.get(i).getKey()+"/status", statusList.get(i).getStatus());
+                updateMap.put(statusList.get(i).getKey()+"/"+DATABASE_REF_MESSAGE_STATUS, statusList.get(i).getStatus());
             }
 
             /*// Get broken avatars list from the adapter
@@ -690,7 +693,7 @@ public class MessagesFragment extends Fragment {
         if(mChatUser != null){
             if (!TextUtils.isEmpty(mChatUser.getAvatar())) {
                 // Lets get avatar
-                StorageReference userAvatarStorageRef = mStorageRef.child("images/"+ mChatUser.getKey() +"/"+ AVATAR_THUMBNAIL_NAME);
+                StorageReference userAvatarStorageRef = mStorageRef.child(STORAGE_REF_IMAGES +"/"+ mChatUser.getKey() +"/"+ AVATAR_THUMBNAIL_NAME);
                 // Download directly from StorageReference using Glide
                 GlideApp.with(mContext)
                         .load(userAvatarStorageRef)
@@ -837,7 +840,7 @@ public class MessagesFragment extends Fragment {
             //DatabaseNotification notification = new DatabaseNotification(getContext().getString(R.string.notification_like_title), getContext().getString(R.string.notification_like_message, name), "like", currentUserId, name, avatar);
             databaseNotification = new DatabaseNotification(NOTIFICATION_TYPE_MESSAGE, mCurrentUserId, mCurrentUser.getName(), mCurrentUser.getAvatar(), mChatId);
             notificationValues = databaseNotification.toMap();
-            childUpdates.put("/notifications/messages/" + mChatUserId + "/" +notificationKey, notificationValues);
+            childUpdates.put(DATABASE_REF_NOTIFICATIONS +"/"+ DATABASE_REF_NOTIFICATIONS_MESSAGES  +"/"+ mChatUserId + "/" +notificationKey, notificationValues);
 
         }else{
             // Create new chat from scratch
@@ -851,7 +854,7 @@ public class MessagesFragment extends Fragment {
             //DatabaseNotification notification = new DatabaseNotification(getContext().getString(R.string.notification_like_title), getContext().getString(R.string.notification_like_message, name), "like", currentUserId, name, avatar);
             databaseNotification = new DatabaseNotification(NOTIFICATION_TYPE_MESSAGE, mCurrentUserId, mCurrentUser.getName(), mCurrentUser.getAvatar(), mChatId);
             notificationValues = databaseNotification.toMap();
-            childUpdates.put("/notifications/alerts/" + mChatUserId + "/" +notificationKey, notificationValues);
+            childUpdates.put(DATABASE_REF_NOTIFICATIONS +"/"+ DATABASE_REF_NOTIFICATIONS_ALERTS +"/"+ mChatUserId + "/" +notificationKey, notificationValues);
         }
 
         /*Map<String, Object> chatValues = new HashMap<>();
@@ -864,12 +867,12 @@ public class MessagesFragment extends Fragment {
         childUpdates.put("/chats/" + mChatId + "/lastSent/", ServerValue.TIMESTAMP);*/
 
 
-        childUpdates.put("/messages/" + mChatId + "/" + messageKey, messageValues);
-        childUpdates.put("/chats/" + mChatId ,chatValues);
+        childUpdates.put(DATABASE_REF_MESSAGES +"/"+ mChatId +"/"+ messageKey, messageValues);
+        childUpdates.put(DATABASE_REF_CHATS +"/"+ mChatId ,chatValues);
 
         // only if Lookup is needed
-        childUpdates.put("/userChats/" + mCurrentUserId + "/" + mChatId, chatValues);
-        childUpdates.put("/userChats/" + mChatUserId + "/" + mChatId, chatValues);
+        childUpdates.put(DATABASE_REF_USER_CHATS +"/"+ mCurrentUserId +"/"+ mChatId, chatValues);
+        childUpdates.put(DATABASE_REF_USER_CHATS +"/"+ mChatUserId + "/" + mChatId, chatValues);
 
         /*// Update counts
         childUpdates.put("/counts/" + mCurrentUserId + "/chats/" + mChatId, null);

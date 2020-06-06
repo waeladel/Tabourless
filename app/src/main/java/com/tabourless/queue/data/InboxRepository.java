@@ -20,6 +20,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.tabourless.queue.App.DATABASE_REF_CHAT_LAST_SENT;
+import static com.tabourless.queue.App.DATABASE_REF_USER_CHATS;
+
 public class InboxRepository {
 
     private final static String TAG = InboxRepository.class.getSimpleName();
@@ -113,7 +116,7 @@ public class InboxRepository {
                 }
             } else {
                 // no data
-                Log.w(TAG, "mama getAfter no users exist");
+                Log.w(TAG, "getAfter no users exist");
             }
             printListeners();
             isAfterFirstLoaded =  false;
@@ -123,7 +126,7 @@ public class InboxRepository {
         @Override
         public void onCancelled(DatabaseError databaseError) {
             // Getting Post failed, log a message
-            Log.w(TAG, "mama getAfter loadPost:onCancelled", databaseError.toException());
+            Log.w(TAG, "getAfter loadPost:onCancelled", databaseError.toException());
         }
     };
 
@@ -136,7 +139,7 @@ public class InboxRepository {
             if (!isBeforeFirstLoaded){
                 // Remove post value event listener
                 removeListeners();
-                Log.d(TAG, "mama getBefore Invalidated removeEventListener");
+                Log.d(TAG, "getBefore Invalidated removeEventListener");
                 //isBeforeFirstLoaded =  true;
                 Log.d(TAG, "getBefore onInvalidated(). isBeforeFirstLoaded = "+ isBeforeFirstLoaded);
                 invalidatedCallback.onInvalidated();
@@ -160,7 +163,7 @@ public class InboxRepository {
 
                 if(chatsList.size() != 0){
                     //callback.onResult(messagesList);
-                    Log.d(TAG, "mama getBefore  List.size= " +  chatsList.size()+ " last key= "+chatsList.get(chatsList.size()-1).getKey());
+                    Log.d(TAG, "getBefore  List.size= " +  chatsList.size()+ " last key= "+chatsList.get(chatsList.size()-1).getKey());
                     Collections.reverse(chatsList);
                     getLoadBeforeCallback().onResult(chatsList);
                     totalItemsList.addAll(chatsList); // add items to totalItems ArrayList to be used to get the initial key position
@@ -173,7 +176,7 @@ public class InboxRepository {
                 }
             } else {
                 // no data
-                Log.w(TAG, "mama getBefore no users exist");
+                Log.w(TAG, "getBefore no users exist");
             }
             printListeners();
             isBeforeFirstLoaded =  false;
@@ -183,7 +186,7 @@ public class InboxRepository {
         @Override
         public void onCancelled(DatabaseError databaseError) {
             // Getting Post failed, log a message
-            Log.w(TAG, "mama getMessagesBefore:onCancelled", databaseError.toException());
+            Log.w(TAG, "getMessagesBefore:onCancelled", databaseError.toException());
         }
     };
 
@@ -191,9 +194,9 @@ public class InboxRepository {
     public InboxRepository(String userKey, @NonNull DataSource.InvalidatedCallback onInvalidatedCallback){
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
         // use received chatKey to create a database ref
-        mChatsRef = mDatabaseRef.child("userChats").child(userKey);
+        mChatsRef = mDatabaseRef.child(DATABASE_REF_USER_CHATS).child(userKey);
         isFirstLoaded = true;
-        Log.d(TAG, "mama mDatabaseRef init");
+        Log.d(TAG, "mDatabaseRef init");
         // call back to invalidate data
         this.invalidatedCallback = onInvalidatedCallback;
 
@@ -201,7 +204,7 @@ public class InboxRepository {
         isAfterFirstLoaded = true;
         isBeforeFirstLoaded = true;
 
-        Log.d(TAG, "mama mDatabaseRef init. isInitialFirstLoaded= " + isInitialFirstLoaded+ " after= "+isAfterFirstLoaded + " before= "+isBeforeFirstLoaded);
+        Log.d(TAG, "mDatabaseRef init. isInitialFirstLoaded= " + isInitialFirstLoaded+ " after= "+isAfterFirstLoaded + " before= "+isBeforeFirstLoaded);
 
         if(mListenersList == null){
             mListenersList = new ArrayList<>();
@@ -254,7 +257,7 @@ public class InboxRepository {
                     if (!isInitialFirstLoaded) {
                         // Remove post value event listener
                         removeListeners();
-                        Log.d(TAG, "mama chatsChanged Invalidated removeEventListener");
+                        Log.d(TAG, "chatsChanged Invalidated removeEventListener");
                         //isInitialFirstLoaded =  true;
                         Log.d(TAG, "onInvalidated(). isInitialFirstLoaded = " + isInitialFirstLoaded);
                         invalidatedCallback.onInvalidated();
@@ -284,7 +287,7 @@ public class InboxRepository {
                             // Add chats to totalItemsList ArrayList to be used to get the initial key position
                             totalItemsList.addAll(chatsList);
                             printTotalItems("Initial");
-                            Log.d(TAG, "mama getMessages  List.size= " + chatsList.size() + " last key= " + chatsList.get(chatsList.size() - 1).getKey());
+                            Log.d(TAG, "getMessages  List.size= " + chatsList.size() + " last key= " + chatsList.get(chatsList.size() - 1).getKey());
                         }
 
                     } else {
@@ -297,7 +300,7 @@ public class InboxRepository {
                             // If no data and we are doing a query with Initial Key, try another query without it
                             isInitialKey = false; // Make isInitialKey boolean false so that we don't loop forever
                             Query chatsQuery = mChatsRef
-                                    .orderByChild("lastSent")//limitToLast to start from the last (page size) items
+                                    .orderByChild(DATABASE_REF_CHAT_LAST_SENT)//limitToLast to start from the last (page size) items
                                     .limitToLast(size);
 
                             Log.d(TAG, "isInitialKey. initialListener is added to Query without InitialKey "+ isInitialKey);
@@ -313,39 +316,39 @@ public class InboxRepository {
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
                     // Getting Post failed, log a message
-                    Log.w(TAG, "mama loadPost:onCancelled", databaseError.toException());
+                    Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
                 }
             };
 
         if (initialKey == null) {// if it's loaded for the first time. Key is null
-            Log.d(TAG, "mama getChats initialKey= " + initialKey);
+            Log.d(TAG, "getChats initialKey= " + initialKey);
             isInitialKey = false;
             chatsQuery = mChatsRef
-                    .orderByChild("lastSent")//limitToLast to start from the last (page size) items
+                    .orderByChild(DATABASE_REF_CHAT_LAST_SENT)//limitToLast to start from the last (page size) items
                     .limitToLast(size);
 
 
         } else {// not the first load. Key is the last seen key
-            Log.d(TAG, "mama getChats initialKey= " + initialKey);
+            Log.d(TAG, "getChats initialKey= " + initialKey);
             isInitialKey = true;
             switch (mScrollDirection){
                 // No need to detected reaching to bottom
                 /*case REACHED_THE_BOTTOM:
                     Log.d(TAG, "messages query = REACHED_THE_BOTTOM. ScrollDirection= "+mScrollDirection+ " mVisibleItem= "+ mVisibleItem + " totalItemsList size= "+totalItemsList.size());
                     chatsQuery = mChatsRef
-                            .orderByChild("lastSent")//limitToLast to start from the last (page size) items
+                            .orderByChild(DATABASE_REF_CHAT_LAST_SENT)//limitToLast to start from the last (page size) items
                             .limitToFirst(size);
                     break;*/
                 case REACHED_THE_TOP:
                     Log.d(TAG, "messages query = REACHED_THE_TOP. ScrollDirection= "+mScrollDirection+ " mVisibleItem= "+ mVisibleItem + " totalItemsList size= "+totalItemsList.size());
                     chatsQuery = mChatsRef
-                            .orderByChild("lastSent")//limitToLast to start from the last (page size) items
+                            .orderByChild(DATABASE_REF_CHAT_LAST_SENT)//limitToLast to start from the last (page size) items
                             .limitToLast(size);
                     break;
                 case SCROLLING_UP:
                     /*Log.d(TAG, "messages query = Load data from top to bottom (above InitialKey cause list is reversed). ScrollDirection= "+mScrollDirection+ " InitialKey Position= "+getInitialKeyPosition() +" mVisibleItem= "+mVisibleItem+ " Item Message= "+ totalItemsList.get(mVisibleItem).getLastMessage() +" totalItemsList size= "+totalItemsList.size());
                     chatsQuery = mChatsRef
-                            .orderByChild("lastSent")//limitToLast to start from the last (page size) items
+                            .orderByChild(DATABASE_REF_CHAT_LAST_SENT)//limitToLast to start from the last (page size) items
                             .endAt(initialKey)
                             .limitToLast(size);*/
 
@@ -354,21 +357,21 @@ public class InboxRepository {
                     // list is reversed, load data above InitialKey
                     Log.d(TAG, "messages query = Load data from top to bottom (above InitialKey cause list is reversed). ScrollDirection= "+mScrollDirection+ " InitialKey Position= "+getInitialKeyPosition() +" first VisibleItem= "+ mVisibleItem + " Item Message= "+ totalItemsList.get(mVisibleItem).getLastMessage() +" totalItemsList size= "+totalItemsList.size());
                     chatsQuery = mChatsRef
-                            .orderByChild("lastSent")
+                            .orderByChild(DATABASE_REF_CHAT_LAST_SENT)
                             .endAt(getItem(mVisibleItem).getLastSentLong())//Using first visible item key instead of initial key
                             .limitToLast(size);
                     break;
                 case SCROLLING_DOWN:
                     /*Log.d(TAG, "messages query = Load data from bottom to top (below InitialKey cause list is reversed). ScrollDirection= "+mScrollDirection+ " InitialKey Position= "+getInitialKeyPosition() +" mVisibleItem= "+mVisibleItem+ " Item Message= "+ totalItemsList.get(mVisibleItem).getLastMessage() +" totalItemsList size= "+totalItemsList.size());
                     chatsQuery = mChatsRef
-                            .orderByChild("lastSent")//limitToLast to start from the last (page size) items
+                            .orderByChild(DATABASE_REF_CHAT_LAST_SENT)//limitToLast to start from the last (page size) items
                             .startAt(initialKey)
                             .limitToFirst(size);*/
                     // InitialKey is in the bottom, must load data from bottom to top
                     // list is reversed, load data below InitialKey
                     Log.d(TAG, "messages query = Load data from bottom to top (below InitialKey cause list is reversed). ScrollDirection= "+mScrollDirection+ " InitialKey Position= "+getInitialKeyPosition() +"  last VisibleItem= "+ mVisibleItem + " Item Message= "+ totalItemsList.get(mVisibleItem).getLastMessage() +" totalItemsList size= "+totalItemsList.size());
                     chatsQuery = mChatsRef
-                            .orderByChild("lastSent")
+                            .orderByChild(DATABASE_REF_CHAT_LAST_SENT)
                             .startAt(getItem(mVisibleItem).getLastSentLong())//Using last visible item key instead of initial key
                             .limitToFirst(size);
                     break;
@@ -379,7 +382,7 @@ public class InboxRepository {
                         // list is reversed, load data below InitialKey
                         Log.d(TAG, "messages query = Load data from bottom to top (below InitialKey cause list is reversed). ScrollDirection= "+mScrollDirection+ " InitialKey Position= "+getInitialKeyPosition() +" mVisibleItem= "+ mVisibleItem + " totalItemsList size= "+totalItemsList.size());
                         chatsQuery = mChatsRef
-                                .orderByChild("lastSent")//limitToLast to start from the last (page size) items
+                                .orderByChild(DATABASE_REF_CHAT_LAST_SENT)//limitToLast to start from the last (page size) items
                                 .startAt(initialKey)
                                 .limitToFirst(size);
 
@@ -389,14 +392,14 @@ public class InboxRepository {
                         // list is reversed, load data above InitialKey
                         Log.d(TAG, "messages query = Load data from top to bottom (above InitialKey cause list is reversed). ScrollDirection= "+mScrollDirection+ " InitialKey Position= "+getInitialKeyPosition() +" mVisibleItem= "+ mVisibleItem + " totalItemsList size= "+totalItemsList.size());
                         chatsQuery = mChatsRef
-                                .orderByChild("lastSent")//limitToLast to start from the last (page size) items
+                                .orderByChild(DATABASE_REF_CHAT_LAST_SENT)//limitToLast to start from the last (page size) items
                                 .endAt(initialKey)
                                 .limitToLast(size);
                     }
                     break;*/
                     Log.d(TAG, "messages query = default. ScrollDirection= "+mScrollDirection+ " mVisibleItem= "+ mVisibleItem + " totalItemsList size= "+totalItemsList.size());
                     chatsQuery = mChatsRef
-                            .orderByChild("lastSent")//limitToLast to start from the last (page size) items
+                            .orderByChild(DATABASE_REF_CHAT_LAST_SENT)//limitToLast to start from the last (page size) items
                             .limitToLast(size);
             }
         }
@@ -417,14 +420,14 @@ public class InboxRepository {
             Log.d(TAG, "mama getUsersAfter init. afterKey= " +  key+ "entireUsersList= "+entireUsersList.get(entireUsersList.size()-1).getCreatedLong());
             return;
         }*/
-        Log.d(TAG, "mama getAfter. AfterKey= " + key);
+        Log.d(TAG, "getAfter. AfterKey= " + key);
 
         isAfterFirstLoaded = true;
         //this.afterKey = key;
         Query afterQuery;
 
         afterQuery = mChatsRef
-                .orderByChild("lastSent")
+                .orderByChild(DATABASE_REF_CHAT_LAST_SENT)
                 .startAt(key)
                 .limitToFirst(size);
 
@@ -436,7 +439,7 @@ public class InboxRepository {
     // to get previous data
     public void getChatsBefore(final Long key, final int size,
                               @NonNull final ItemKeyedDataSource.LoadCallback<Chat> callback){
-        Log.d(TAG, "mama getBefore. BeforeKey= " +  key);
+        Log.d(TAG, "getBefore. BeforeKey= " +  key);
         /*if(key == entireUsersList.get(0).getCreatedLong()){
             return;
         }*/
@@ -445,7 +448,7 @@ public class InboxRepository {
         Query beforeQuery;
 
         beforeQuery = mChatsRef
-                .orderByChild("lastSent")
+                .orderByChild(DATABASE_REF_CHAT_LAST_SENT)
                 .endAt(key)
                 .limitToLast(size);
 
@@ -462,7 +465,7 @@ public class InboxRepository {
     // to invalidate the data whenever a change happen
     /*public void ChatsChanged(final DataSource.InvalidatedCallback InvalidatedCallback) {
 
-        final Query query = mChatsRef.orderByChild("lastSent");
+        final Query query = mChatsRef.orderByChild(DATABASE_REF_CHAT_LAST_SENT);
 
         ChatsChangesListener = new ValueEventListener() {
 

@@ -18,6 +18,16 @@ import com.tabourless.queue.models.User;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.tabourless.queue.App.DATABASE_REF_CHATS_MEMBERS;
+import static com.tabourless.queue.App.DATABASE_REF_CHATS_MEMBER_READ;
+import static com.tabourless.queue.App.DATABASE_REF_NOTIFICATIONS;
+import static com.tabourless.queue.App.DATABASE_REF_NOTIFICATIONS_ALERTS;
+import static com.tabourless.queue.App.DATABASE_REF_NOTIFICATIONS_SEEN;
+import static com.tabourless.queue.App.DATABASE_REF_USERS;
+import static com.tabourless.queue.App.DATABASE_REF_USER_CHATS;
+import static com.tabourless.queue.App.STORAGE_REF_AVATAR;
+import static com.tabourless.queue.App.STORAGE_REF_COVER;
+
 public class UserRepository {
 
     private final static String TAG = UserRepository.class.getSimpleName();
@@ -116,9 +126,9 @@ public class UserRepository {
 
     public UserRepository(){
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
-        mUsersRef = mDatabaseRef.child("users");
-        mChatsRef = mDatabaseRef.child("userChats");
-        mNotificationsRef = mDatabaseRef.child("notifications").child("alerts");
+        mUsersRef = mDatabaseRef.child(DATABASE_REF_USERS);
+        mChatsRef = mDatabaseRef.child(DATABASE_REF_USER_CHATS);
+        mNotificationsRef = mDatabaseRef.child(DATABASE_REF_NOTIFICATIONS).child(DATABASE_REF_NOTIFICATIONS_ALERTS);
         //usersList = new ArrayList<>();
         //entireUsersList = new ArrayList<>();
         isFirstLoaded = true;
@@ -235,7 +245,7 @@ public class UserRepository {
 
         // order by members/userKey/read get only false results
         Query chatsQuery = mChatsRef.child(userId)
-                .orderByChild("members/"+userId+"/read").equalTo(false);
+                .orderByChild(DATABASE_REF_CHATS_MEMBERS +"/"+ userId +"/"+ DATABASE_REF_CHATS_MEMBER_READ).equalTo(false);
 
         Log.d(TAG, "getChatsCount initiated: " + userId+ " chatsQuery= "+chatsQuery);
 
@@ -282,7 +292,7 @@ public class UserRepository {
 
         // order by members/userKey/read get only false results
         Query query = mNotificationsRef.child(userId)
-                .orderByChild("seen").equalTo(false);
+                .orderByChild(DATABASE_REF_NOTIFICATIONS_SEEN).equalTo(false);
 
         Log.d(TAG, "getChatsCount initiated: " + userId+ " chatsQuery= "+query);
 
@@ -329,10 +339,10 @@ public class UserRepository {
         DatabaseReference UserRef = mUsersRef.child(userId);
         if(isAvatar){
             // Lets update avatar
-            UserRef.child("avatar").setValue(String.valueOf(uri));
+            UserRef.child(STORAGE_REF_AVATAR).setValue(String.valueOf(uri));
         }else{
             // Lets update Cover
-            UserRef.child("coverImage").setValue(String.valueOf(uri));
+            UserRef.child(STORAGE_REF_COVER).setValue(String.valueOf(uri));
         }
     }
 

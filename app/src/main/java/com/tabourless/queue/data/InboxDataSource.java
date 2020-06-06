@@ -16,7 +16,7 @@ public class InboxDataSource extends ItemKeyedDataSource<Long, Chat> {
     public InboxDataSource(String userKey){
         //chatsRepository = new ChatsRepository(chatKey);
         this.mUserKey = userKey;
-        Log.d(TAG, "mama InboxDataSource initiated ");
+        Log.d(TAG, "InboxDataSource initiated ");
        /* usersRepository.getUsersChangeSubject().observeOn(Schedulers.io()).subscribeOn(Schedulers.computation()).subscribe();{
             invalidate();
             Log.d(TAG, "mama invalidate ");
@@ -32,7 +32,7 @@ public class InboxDataSource extends ItemKeyedDataSource<Long, Chat> {
     @Override
     public void addInvalidatedCallback(@NonNull InvalidatedCallback onInvalidatedCallback) {
         //super.addInvalidatedCallback(onInvalidatedCallback);
-        Log.d(TAG, "mama Callback ChatsDataSource addInvalidatedCallback ");
+        Log.d(TAG, "Callback ChatsDataSource addInvalidatedCallback ");
         // pass firebase Callback to ChatsRepository
         inboxRepository = new InboxRepository(mUserKey, onInvalidatedCallback);
         //chatsRepository.ChatsChanged(onInvalidatedCallback);
@@ -41,7 +41,7 @@ public class InboxDataSource extends ItemKeyedDataSource<Long, Chat> {
 
     @Override
     public void invalidate() {
-        Log.d(TAG, "mama Invalidated ");
+        Log.d(TAG, "Invalidated ");
         super.invalidate();
     }
 
@@ -56,7 +56,7 @@ public class InboxDataSource extends ItemKeyedDataSource<Long, Chat> {
     public void loadInitial(@NonNull LoadInitialParams<Long> params, @NonNull LoadInitialCallback<Chat> callback) {
         /*List<User> items = usersRepository.getMessages(params.requestedInitialKey, params.requestedLoadSize);
         callback.onResult(items);*/
-        Log.d(TAG, "mama loadInitial params key" +params.requestedInitialKey+" LoadSize " + params.requestedLoadSize);
+        Log.d(TAG, "loadInitial params key" +params.requestedInitialKey+" LoadSize " + params.requestedLoadSize);
         inboxRepository.getChats(params.requestedInitialKey, params.requestedLoadSize, callback);
         //usersRepository.getMessages( 0L, params.requestedLoadSize, callback);
 
@@ -68,7 +68,7 @@ public class InboxDataSource extends ItemKeyedDataSource<Long, Chat> {
         /*List<User> items = usersRepository.getMessages(params.key, params.requestedLoadSize);
         callback.onResult(items);*/
         inboxRepository.setLoadBeforeCallback(params.key , callback);
-        Log.d(TAG, "mama loadAfter params key " + params.key+" LoadSize " + params.requestedLoadSize);
+        Log.d(TAG, "loadAfter params key " + params.key+" LoadSize " + params.requestedLoadSize);
         // using getBefore instead of getAfter because the order is reversed
         //chatsRepository.getBefore(params.key -1, params.requestedLoadSize, callback);
         inboxRepository.getChatsBefore(params.key , params.requestedLoadSize, callback);
@@ -80,7 +80,7 @@ public class InboxDataSource extends ItemKeyedDataSource<Long, Chat> {
         /*List<User> items = fetchItemsBefore(params.key, params.requestedLoadSize);
         callback.onResult(items);*/
         inboxRepository.setLoadAfterCallback(params.key , callback);
-        Log.d(TAG, "mama loadBefore params " + params.key+" LoadSize " + params.requestedLoadSize);
+        Log.d(TAG, "loadBefore params " + params.key+" LoadSize " + params.requestedLoadSize);
         // using getAfter instead of getBefore because the order is reversed
         //chatsRepository.getAfter(params.key +1, params.requestedLoadSize, callback);
         inboxRepository.getChatsAfter(params.key , params.requestedLoadSize, callback);

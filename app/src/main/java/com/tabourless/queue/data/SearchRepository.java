@@ -35,6 +35,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.tabourless.queue.App.DATABASE_REF_CUSTOMERS;
+import static com.tabourless.queue.App.DATABASE_REF_PLACES;
+import static com.tabourless.queue.App.DATABASE_REF_USERS;
+import static com.tabourless.queue.App.DATABASE_REF_USER_QUEUES;
+
 public class SearchRepository {
 
     private final static String TAG = SearchRepository.class.getSimpleName();
@@ -139,9 +144,9 @@ public class SearchRepository {
 
     public SearchRepository(){
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
-        mPlacesRef = mDatabaseRef.child("places");
-        mCustomersRef = mDatabaseRef.child("customers");;
-        mUsersRef = mDatabaseRef.child("users");
+        mPlacesRef = mDatabaseRef.child(DATABASE_REF_PLACES);
+        mCustomersRef = mDatabaseRef.child(DATABASE_REF_CUSTOMERS);;
+        mUsersRef = mDatabaseRef.child(DATABASE_REF_USERS);
         mGeoFire = new GeoFire(mPlacesRef);
 
         //Get current logged in user
@@ -283,8 +288,8 @@ public class SearchRepository {
         Map<String, Object> customerValues = customer.toMap();
         Map<String, Object> queueValues = userQueue.toMap();
 
-        childUpdates.put("/customers/" + userQueue.getPlaceId() + "/"+ userQueue.getKey() + "/" + customerPushKey, customerValues);
-        childUpdates.put("/userQueues/" + mCurrentUserId+ "/" + userQueue.getKey() ,queueValues);
+        childUpdates.put(DATABASE_REF_CUSTOMERS +"/"+ userQueue.getPlaceId() +"/"+ userQueue.getKey() + "/" + customerPushKey, customerValues);
+        childUpdates.put( DATABASE_REF_USER_QUEUES +"/"+ mCurrentUserId+ "/" + userQueue.getKey() ,queueValues);
 
         mDatabaseRef.updateChildren(childUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override

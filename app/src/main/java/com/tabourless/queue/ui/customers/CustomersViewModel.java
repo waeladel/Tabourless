@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 
+import static com.tabourless.queue.App.DATABASE_REF_CUSTOMERS;
+
 public class CustomersViewModel extends ViewModel {
     private final static String TAG = CustomersViewModel.class.getSimpleName();
     private CustomersDataFactory mCustomersDataFactory;
@@ -60,11 +62,11 @@ public class CustomersViewModel extends ViewModel {
         // pass chatKey to the constructor of MessagesDataFactory
         mCustomersDataFactory = new CustomersDataFactory(placeKey, queueKey);
 
-        Log.d(TAG, "MessagesViewModel init");
+        Log.d(TAG, "CustomersViewModel init");
 
         //Enabling Offline Capabilities//
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
-        mCustomersRef = mDatabaseRef.child("customers").child(placeKey).child(queueKey);
+        mCustomersRef = mDatabaseRef.child(DATABASE_REF_CUSTOMERS).child(placeKey).child(queueKey);
         mCustomersRef.keepSynced(true);
 
         config = (new PagedList.Config.Builder())
@@ -97,7 +99,7 @@ public class CustomersViewModel extends ViewModel {
 
     @Override
     protected void onCleared() {
-        Log.d(TAG, "mama MessagesViewModel onCleared:");
+        Log.d(TAG, "CustomersViewModel onCleared:");
 
         // Remove all Listeners
         mCustomersDataFactory.removeListeners();

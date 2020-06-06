@@ -45,7 +45,7 @@ public class AddPlaceViewModel extends ViewModel {
     @Override
     protected void onCleared() {
         super.onCleared();
-        Log.d(TAG, "mama EditProfileViewModel onCleared:");
+        Log.d(TAG, "AddPlaceViewModel onCleared:");
         // Remove all Listeners from relationRepository
         mAddPlaceRepository.removeListeners();
     }

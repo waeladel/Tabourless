@@ -71,8 +71,6 @@ public class AddCounterAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
 
         final Counter counterItem = mQueueCountersMap.get(mCountersMapKeys[position]); // get shown counter item from the counter's map
-        Log.d(TAG, "onSave: counter name= "+counterItem.getName()+ " counter gender= "
-                + counterItem.getGender()+ " counter age= "+ counterItem.getAge()+ " counter disability= "+ counterItem.getDisability());
 
         if (holder instanceof ViewHolder) {
             final ViewHolder counterHolder = (ViewHolder) holder;

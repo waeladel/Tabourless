@@ -20,6 +20,8 @@ import com.tabourless.queue.models.Queue;
 import com.tabourless.queue.models.UserQueue;
 import com.tabourless.queue.ui.inbox.InboxViewModel;
 
+import static com.tabourless.queue.App.DATABASE_REF_USER_QUEUES;
+
 public class QueuesViewModel extends ViewModel {
 
     private final static String TAG = QueuesViewModel.class.getSimpleName();
@@ -48,7 +50,7 @@ public class QueuesViewModel extends ViewModel {
 
         // keepSync UserChatsRef to work offline
         if(mCurrentUserId != null){
-            mUserQueuesRef = mDatabaseRef.child("userQueues").child(mCurrentUserId);
+            mUserQueuesRef = mDatabaseRef.child(DATABASE_REF_USER_QUEUES).child(mCurrentUserId);
             mUserQueuesRef.keepSynced(true);
         }
 

@@ -67,6 +67,7 @@ import java.util.Calendar;
 import java.util.Map;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
+import static com.tabourless.queue.App.CUSTOMER_STATUS_WAITING;
 
 
 /**
@@ -108,11 +109,6 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
     private static final int MAX_WAIT_TIME  = 20 * 60 * 1000;
     private static final long EXPIRATION_DURATION = 30 * 60 * 1000L;
     private static final int DISPLACEMENT = 10;
-
-    private static final String CUSTOMER_STATUS_WAITING = "waiting";
-    private static final String CUSTOMER_STATUS_NEXT = "next";
-    private static final String CUSTOMER_STATUS_FRONT = "front";
-    private static final String CUSTOMER_STATUS_AWAY = "away";
 
     @Override
     public void onAttach(@NonNull Context context) {

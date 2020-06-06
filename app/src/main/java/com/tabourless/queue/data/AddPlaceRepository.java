@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.tabourless.queue.App.DATABASE_REF_PLACES;
+
 public class AddPlaceRepository {
 
     private final static String TAG = AddPlaceRepository.class.getSimpleName();
@@ -71,7 +73,7 @@ public class AddPlaceRepository {
 
     public AddPlaceRepository(){
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
-        mPlacesRef = mDatabaseRef.child("places");
+        mPlacesRef = mDatabaseRef.child(DATABASE_REF_PLACES);
 
         mPlace = new MutableLiveData<>();
 

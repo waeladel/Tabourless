@@ -57,6 +57,11 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static com.tabourless.queue.App.AVATAR_THUMBNAIL_NAME;
+import static com.tabourless.queue.App.DATABASE_REF_USERS;
+import static com.tabourless.queue.App.DATABASE_REF_USER_LAST_ONLINE;
+import static com.tabourless.queue.App.DATABASE_REF_USER_TOKENS;
+import static com.tabourless.queue.App.STORAGE_REF_IMAGES;
 import static com.tabourless.queue.Utils.MenuHelper.menuIconWithText;
 
 public class MainActivity extends AppCompatActivity {
@@ -103,11 +108,6 @@ public class MainActivity extends AppCompatActivity {
     private Intent intent;
 
     private FragmentManager fragmentManager;
-
-    private static final String AVATAR_THUMBNAIL_NAME = "avatar.jpg";
-    private static final String COVER_THUMBNAIL_NAME = "cover.jpg";
-    private static final String AVATAR_ORIGINAL_NAME = "original_avatar.jpg";
-    private static final String COVER_ORIGINAL_NAME = "original_cover.jpg";
 
     // To navigate when item clicked
     /*private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -648,7 +648,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Read from the database just once
         Log.d(TAG, "currentUserId Value is: " + currentUserId);
-        mUserRef = mDatabaseRef.child("users").child(currentUserId);
+        mUserRef = mDatabaseRef.child(DATABASE_REF_USERS).child(currentUserId);
 
         // [START single_value_read]
         //ValueEventListener postListener = new ValueEventListener() {
@@ -674,7 +674,7 @@ public class MainActivity extends AppCompatActivity {
                     //Display header avatar
                     if (!TextUtils.isEmpty(mUser.getAvatar())) {
                         // Lets get avatar
-                        StorageReference userAvatarStorageRef = mStorageRef.child("images/"+ mUserId +"/"+ AVATAR_THUMBNAIL_NAME);
+                        StorageReference userAvatarStorageRef = mStorageRef.child(STORAGE_REF_IMAGES +"/"+ mUserId +"/"+ AVATAR_THUMBNAIL_NAME);
                         GlideApp.with(MainActivity.this)
                                 .load(userAvatarStorageRef)
                                 //.placeholder(R.mipmap.account_circle_72dp)
@@ -697,8 +697,8 @@ public class MainActivity extends AppCompatActivity {
 
                     // Don't update tokens or lastOnline unless user exist, that's why references are moved here
                     // database references for online
-                    myConnectionsRef = mDatabaseRef.child("users").child(currentUserId).child("connections");
-                    lastOnlineRef  = mDatabaseRef.child("users").child(currentUserId).child("lastOnline");
+                    myConnectionsRef = mDatabaseRef.child(DATABASE_REF_USERS).child(currentUserId).child("connections");
+                    lastOnlineRef  = mDatabaseRef.child(DATABASE_REF_USERS).child(currentUserId).child(DATABASE_REF_USER_LAST_ONLINE);
 
                     // database reference that holds information about user presence
                     connectedRef  = FirebaseDatabase.getInstance().getReference(".info/connected");
@@ -723,7 +723,7 @@ public class MainActivity extends AppCompatActivity {
                                         // Get new Instance ID token
                                         String token = task.getResult().getToken();
                                         //mTokensRef.child(mUserId).child(token).setValue(true);
-                                        mUserRef.child("tokens").child(token).setValue(true);
+                                        mUserRef.child(DATABASE_REF_USER_TOKENS).child(token).setValue(true);
                                     }
                                 }
                             });

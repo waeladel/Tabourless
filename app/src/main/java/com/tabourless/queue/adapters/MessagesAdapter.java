@@ -43,20 +43,21 @@ import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static com.tabourless.queue.App.AVATAR_THUMBNAIL_NAME;
+import static com.tabourless.queue.App.DATABASE_REF_MESSAGES;
+import static com.tabourless.queue.App.Message_STATUS_DELIVERED;
+import static com.tabourless.queue.App.Message_STATUS_SENDING;
+import static com.tabourless.queue.App.Message_STATUS_SENT;
+import static com.tabourless.queue.App.STORAGE_REF_IMAGES;
+
 public class MessagesAdapter extends PagedListAdapter<Message, RecyclerView.ViewHolder> {
 
     private final static String TAG = MessagesAdapter.class.getSimpleName();
     private FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
     private String currentUserId = currentUser != null ? currentUser.getUid() : null;
 
-    private static final String AVATAR_THUMBNAIL_NAME = "avatar.jpg";
-    private static final String COVER_THUMBNAIL_NAME = "cover.jpg";
     private static final int VIEW_TYPE_MESSAGE_SENT = 1;
     private static final int VIEW_TYPE_MESSAGE_RECEIVED = 2;
-
-    private static final String Message_STATUS_SENDING = "Sending";
-    private static final String Message_STATUS_SENT = "Sent";
-    private static final String Message_STATUS_DELIVERED = "Delivered";
 
     private StorageReference mStorageRef;
 
@@ -89,7 +90,7 @@ public class MessagesAdapter extends PagedListAdapter<Message, RecyclerView.View
         mStorageRef = FirebaseStorage.getInstance().getReference();
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
         // use received chatKey to create a database ref
-        mMessagesRef = mDatabaseRef.child("messages");
+        mMessagesRef = mDatabaseRef.child(DATABASE_REF_MESSAGES);
 
         // Only create the static list if it's null
         if(totalStatusList == null){
@@ -245,7 +246,7 @@ public class MessagesAdapter extends PagedListAdapter<Message, RecyclerView.View
 
                 // Lets get avatar
                 if(!TextUtils.isEmpty(message.getSenderAvatar())){
-                    StorageReference userAvatarStorageRef = mStorageRef.child("images/"+ message.getSenderId() +"/"+ AVATAR_THUMBNAIL_NAME);
+                    StorageReference userAvatarStorageRef = mStorageRef.child(STORAGE_REF_IMAGES +"/"+ message.getSenderId() +"/"+ AVATAR_THUMBNAIL_NAME);
                     // Download directly from StorageReference using Glide
                     GlideApp.with(mContext)
                             .load(userAvatarStorageRef)

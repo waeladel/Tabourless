@@ -21,6 +21,8 @@ import com.tabourless.queue.models.User;
 
 import java.util.Timer;
 
+import static com.tabourless.queue.App.DATABASE_REF_MESSAGES;
+
 public class MessagesViewModel extends ViewModel {
     private final static String TAG = MessagesViewModel.class.getSimpleName();
     private MessagesDataFactory messagesDataFactory;
@@ -56,7 +58,7 @@ public class MessagesViewModel extends ViewModel {
 
         //Enabling Offline Capabilities//
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
-        mUserMessagesRef = mDatabaseRef.child("messages").child(chatKey);
+        mUserMessagesRef = mDatabaseRef.child(DATABASE_REF_MESSAGES).child(chatKey);
         mUserMessagesRef.keepSynced(true);
 
         config = (new PagedList.Config.Builder())
@@ -119,7 +121,7 @@ public class MessagesViewModel extends ViewModel {
 
     @Override
     protected void onCleared() {
-        Log.d(TAG, "mama MessagesViewModel onCleared:");
+        Log.d(TAG, "MessagesViewModel onCleared:");
 
         // Remove all Listeners from messagesRepository
         messagesRepository.removeListeners();
