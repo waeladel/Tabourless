@@ -378,7 +378,7 @@ public class MainActivity extends AppCompatActivity {
                     if(mUser != null ){
                         mUser = null;
                     }
-                    goToMain();
+                    goToQueue(); // to go to start destination when logged out
                     // set selected binding.bottomNavView to main icon
                     //binding.bottomNavView.setSelectedItemId(R.id.navigation_home);
                     initiateLogin(); // start login activity
@@ -764,7 +764,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Go to Queues fragment
-    private void goToMain() {
+    private void goToQueue() {
         if (null != navController.getCurrentDestination() && R.id.queues != navController.getCurrentDestination().getId()) {
             navController.navigate(R.id.queues);
         }

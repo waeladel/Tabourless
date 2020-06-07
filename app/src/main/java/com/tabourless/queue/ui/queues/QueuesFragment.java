@@ -60,6 +60,9 @@ public class QueuesFragment extends Fragment implements ItemClickListener {
     private static int mScrollDirection;
     private static int mLastVisibleItem;
 
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -79,7 +82,66 @@ public class QueuesFragment extends Fragment implements ItemClickListener {
         mArrayList = new ArrayList<>();
         mAdapter = new QueuesAdapter(this);
 
-        mViewModel = new ViewModelProvider(this).get(QueuesViewModel.class);
+        mAuth = FirebaseAuth.getInstance();
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                // User is signed in
+                if (user != null) {
+                    // If user is logged in display his or her queues. It's better to use a listener because user may change profile or re login
+                    mViewModel = new ViewModelProvider(QueuesFragment.this).get(QueuesViewModel.class);
+                    // It's best to observe on onActivityCreated so that we dona't have to update ViewModel manually.
+                    // This is because LiveData will not call the observer since it had already delivered the last result to that observer.
+                    // But recycler adapter is updated any way despite that LiveData delivers updates only when data changes, and only to active observers.
+                    // Use getViewLifecycleOwner() instead of this, to get only one observer for this view
+                    mViewModel.getItemPagedList().observe(getViewLifecycleOwner(), new Observer<PagedList<UserQueue>>() {
+                        @Override
+                        public void onChanged(@Nullable final PagedList<UserQueue> items) {
+
+                            if (items != null ){
+                                // your code here
+                                Log.d(TAG, "queues onChanged submitList size" +  items.size());
+                                // Create new Thread to loop until items.size() is greater than 0
+                                new Thread(new Runnable() {
+                                    int sleepCounter = 0;
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            while(items.size()==0) {
+                                                //Keep looping as long as items size is 0
+                                                Thread.sleep(20);
+                                                Log.d(TAG, "queues onChanged. sleep 1000. size= "+items.size()+" sleepCounter="+sleepCounter++);
+                                                if(sleepCounter == 1000){
+                                                    break;
+                                                }
+                                                //handler.post(this);
+                                            }
+                                            //Now items size is greater than 0, let's submit the List
+                                            Log.d(TAG, "ChatsFragment onChanged. after  sleep finished. size= "+items.size());
+                                            if(items.size() == 0 && sleepCounter == 1000){
+                                                // If we submit List after loop is finish with 0 results
+                                                // we may erase another results submitted via newer thread
+                                                Log.d(TAG, "ChatsFragment onChanged. Loop finished with 0 items. Don't submitList");
+                                            }else{
+                                                Log.d(TAG, "ChatsFragment onChanged. submitList= "+items.size());
+                                                mAdapter.submitList(items);
+                                            }
+
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
+
+                                    }
+                                }).start();
+
+                            }
+                        }
+                    });
+                }
+            }
+        };
+
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -94,54 +156,6 @@ public class QueuesFragment extends Fragment implements ItemClickListener {
             @Override
             public void onClick(View v) {
                 navController.navigate(R.id.search);
-            }
-        });
-
-        // It's best to observe on onActivityCreated so that we dona't have to update ViewModel manually.
-        // This is because LiveData will not call the observer since it had already delivered the last result to that observer.
-        // But recycler adapter is updated any way despite that LiveData delivers updates only when data changes, and only to active observers.
-        // Use getViewLifecycleOwner() instead of this, to get only one observer for this view
-        mViewModel.getItemPagedList().observe(getViewLifecycleOwner(), new Observer<PagedList<UserQueue>>() {
-            @Override
-            public void onChanged(@Nullable final PagedList<UserQueue> items) {
-
-                if (items != null ){
-                    // your code here
-                    Log.d(TAG, "queues onChanged submitList size" +  items.size());
-                    // Create new Thread to loop until items.size() is greater than 0
-                    new Thread(new Runnable() {
-                        int sleepCounter = 0;
-                        @Override
-                        public void run() {
-                            try {
-                                while(items.size()==0) {
-                                    //Keep looping as long as items size is 0
-                                    Thread.sleep(20);
-                                    Log.d(TAG, "queues onChanged. sleep 1000. size= "+items.size()+" sleepCounter="+sleepCounter++);
-                                    if(sleepCounter == 1000){
-                                        break;
-                                    }
-                                    //handler.post(this);
-                                }
-                                //Now items size is greater than 0, let's submit the List
-                                Log.d(TAG, "ChatsFragment onChanged. after  sleep finished. size= "+items.size());
-                                if(items.size() == 0 && sleepCounter == 1000){
-                                    // If we submit List after loop is finish with 0 results
-                                    // we may erase another results submitted via newer thread
-                                    Log.d(TAG, "ChatsFragment onChanged. Loop finished with 0 items. Don't submitList");
-                                }else{
-                                    Log.d(TAG, "ChatsFragment onChanged. submitList= "+items.size());
-                                    mAdapter.submitList(items);
-                                }
-
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-
-                        }
-                    }).start();
-
-                }
             }
         });
 
@@ -309,6 +323,21 @@ public class QueuesFragment extends Fragment implements ItemClickListener {
         itemTouchHelper.attachToRecyclerView(mBinding.queuesRecycler);
 
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d(TAG, "MainActivity onStop");
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
     }
 
     @Override

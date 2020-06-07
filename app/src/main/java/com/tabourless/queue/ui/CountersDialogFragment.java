@@ -23,12 +23,12 @@ import java.util.Map;
 
 import static com.tabourless.queue.App.COUNTER_SPINNER_ANY;
 import static com.tabourless.queue.App.COUNTER_SPINNER_BOTH;
-import static com.tabourless.queue.App.COUNTER_SPINNER_GENDER_ABLED;
-import static com.tabourless.queue.App.COUNTER_SPINNER_GENDER_DISABLED;
+import static com.tabourless.queue.App.COUNTER_SPINNER_DISABILITY_ABLED;
+import static com.tabourless.queue.App.COUNTER_SPINNER_DISABILITY_DISABLED;
 import static com.tabourless.queue.App.COUNTER_SPINNER_GENDER_FEMALE;
 import static com.tabourless.queue.App.COUNTER_SPINNER_GENDER_MALE;
-import static com.tabourless.queue.App.COUNTER_SPINNER_GENDER_OLD;
-import static com.tabourless.queue.App.COUNTER_SPINNER_GENDER_YOUNG;
+import static com.tabourless.queue.App.COUNTER_SPINNER_AGE_OLD;
+import static com.tabourless.queue.App.COUNTER_SPINNER_AGE_YOUNG;
 
 public class CountersDialogFragment extends DialogFragment  {
     private final static String TAG = CountersDialogFragment.class.getSimpleName();
@@ -137,11 +137,11 @@ public class CountersDialogFragment extends DialogFragment  {
                         mBinding.spinnerAgeValue.setSelection(0);
                         Log.d(TAG, "display 0 option on sorting spinner");
                         break;
-                    case COUNTER_SPINNER_GENDER_OLD:
+                    case COUNTER_SPINNER_AGE_OLD:
                         mBinding.spinnerAgeValue.setSelection(1);
                         Log.d(TAG, "display 1 option on sorting spinner");
                         break;
-                    case COUNTER_SPINNER_GENDER_YOUNG:
+                    case COUNTER_SPINNER_AGE_YOUNG:
                         mBinding.spinnerAgeValue.setSelection(2);
                         Log.d(TAG, "display 2 option on sorting spinner");
                         break;
@@ -159,11 +159,11 @@ public class CountersDialogFragment extends DialogFragment  {
                         mBinding.spinnerDisabilityValue.setSelection(0);
                         Log.d(TAG, "display 0 option on sorting spinner");
                         break;
-                    case COUNTER_SPINNER_GENDER_DISABLED:
+                    case COUNTER_SPINNER_DISABILITY_DISABLED:
                         mBinding.spinnerDisabilityValue.setSelection(1);
                         Log.d(TAG, "display 1 option on sorting spinner");
                         break;
-                    case COUNTER_SPINNER_GENDER_ABLED:
+                    case COUNTER_SPINNER_DISABILITY_ABLED:
                         mBinding.spinnerDisabilityValue.setSelection(2);
                         Log.d(TAG, "display 2 option on sorting spinner");
                         break;
@@ -213,10 +213,10 @@ public class CountersDialogFragment extends DialogFragment  {
                             sCounter.setAge(COUNTER_SPINNER_ANY); // Update current counter gender value
                             break;
                         case 1:
-                            sCounter.setAge(COUNTER_SPINNER_GENDER_OLD); // Update current counter gender value
+                            sCounter.setAge(COUNTER_SPINNER_AGE_OLD); // Update current counter gender value
                             break;
                         case 2:
-                            sCounter.setAge(COUNTER_SPINNER_GENDER_YOUNG); // Update current counter gender value
+                            sCounter.setAge(COUNTER_SPINNER_AGE_YOUNG); // Update current counter gender value
                             break;
                         case 3:
                             sCounter.setAge(COUNTER_SPINNER_BOTH); // Update current counter gender value
@@ -231,10 +231,10 @@ public class CountersDialogFragment extends DialogFragment  {
                             sCounter.setDisability(COUNTER_SPINNER_ANY); // Update current counter gender value
                             break;
                         case 1:
-                            sCounter.setDisability(COUNTER_SPINNER_GENDER_DISABLED); // Update current counter gender value
+                            sCounter.setDisability(COUNTER_SPINNER_DISABILITY_DISABLED); // Update current counter gender value
                             break;
                         case 2:
-                            sCounter.setDisability(COUNTER_SPINNER_GENDER_ABLED); // Update current counter gender value
+                            sCounter.setDisability(COUNTER_SPINNER_DISABILITY_ABLED); // Update current counter gender value
                             break;
                         case 3:
                             sCounter.setDisability(COUNTER_SPINNER_BOTH); // Update current counter gender value

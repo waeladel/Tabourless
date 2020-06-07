@@ -38,13 +38,14 @@ public class InboxViewModel extends ViewModel {
         mFirebaseCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
         mCurrentUserId = mFirebaseCurrentUser != null ? mFirebaseCurrentUser.getUid() : null;
 
-        Log.d(TAG, "InboxViewModel: initiated");
-        mInboxDataFactory = new InboxDataFactory(mCurrentUserId);
-
-        //Enabling Offline Capabilities//
-        mDatabaseRef = FirebaseDatabase.getInstance().getReference();
         // keepSync UserChatsRef to work offline
         if(mCurrentUserId != null){
+            Log.d(TAG, "InboxViewModel: initiated");
+            mInboxDataFactory = new InboxDataFactory(mCurrentUserId);
+
+            //Enabling Offline Capabilities//
+            mDatabaseRef = FirebaseDatabase.getInstance().getReference();
+
             mUserChatsRef = mDatabaseRef.child(DATABASE_REF_USER_CHATS).child(mCurrentUserId);
             mUserChatsRef.keepSynced(true);
         }

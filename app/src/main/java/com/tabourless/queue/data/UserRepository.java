@@ -25,8 +25,8 @@ import static com.tabourless.queue.App.DATABASE_REF_NOTIFICATIONS_ALERTS;
 import static com.tabourless.queue.App.DATABASE_REF_NOTIFICATIONS_SEEN;
 import static com.tabourless.queue.App.DATABASE_REF_USERS;
 import static com.tabourless.queue.App.DATABASE_REF_USER_CHATS;
-import static com.tabourless.queue.App.STORAGE_REF_AVATAR;
-import static com.tabourless.queue.App.STORAGE_REF_COVER;
+import static com.tabourless.queue.App.DATABASE_REF_USER_AVATAR;
+import static com.tabourless.queue.App.DATABASE_REF_USER_COVER;
 
 public class UserRepository {
 
@@ -339,10 +339,10 @@ public class UserRepository {
         DatabaseReference UserRef = mUsersRef.child(userId);
         if(isAvatar){
             // Lets update avatar
-            UserRef.child(STORAGE_REF_AVATAR).setValue(String.valueOf(uri));
+            UserRef.child(DATABASE_REF_USER_AVATAR).setValue(String.valueOf(uri));
         }else{
             // Lets update Cover
-            UserRef.child(STORAGE_REF_COVER).setValue(String.valueOf(uri));
+            UserRef.child(DATABASE_REF_USER_COVER).setValue(String.valueOf(uri));
         }
     }
 

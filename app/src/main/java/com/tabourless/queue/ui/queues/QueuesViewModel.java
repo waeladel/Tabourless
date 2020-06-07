@@ -42,26 +42,25 @@ public class QueuesViewModel extends ViewModel {
         mFirebaseCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
         mCurrentUserId = mFirebaseCurrentUser != null ? mFirebaseCurrentUser.getUid() : null;
 
-        Log.d(TAG, "QueuesViewModel: initiated");
-        mQueuesDataFactory = new QueuesDataFactory(mCurrentUserId);
-
-        //Enabling Offline Capabilities//
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
 
         // keepSync UserChatsRef to work offline
         if(mCurrentUserId != null){
             mUserQueuesRef = mDatabaseRef.child(DATABASE_REF_USER_QUEUES).child(mCurrentUserId);
             mUserQueuesRef.keepSynced(true);
+
+            Log.d(TAG, "QueuesViewModel: initiated");
+            mQueuesDataFactory = new QueuesDataFactory(mCurrentUserId);
+
+            config = (new PagedList.Config.Builder())
+                    .setPageSize(10)//10
+                    .setInitialLoadSizeHint(10)//30
+                    //.setPrefetchDistance(10)//10
+                    .setEnablePlaceholders(false)
+                    .build();
+
+            itemPagedList = new LivePagedListBuilder<>(mQueuesDataFactory, config).build();
         }
-
-        config = (new PagedList.Config.Builder())
-                .setPageSize(10)//10
-                .setInitialLoadSizeHint(10)//30
-                //.setPrefetchDistance(10)//10
-                .setEnablePlaceholders(false)
-                .build();
-
-        itemPagedList = new LivePagedListBuilder<>(mQueuesDataFactory, config).build();
 
     }
 
@@ -82,7 +81,9 @@ public class QueuesViewModel extends ViewModel {
     @Override
     protected void onCleared() {
         Log.d(TAG, "QueuesViewModel onCleared:");
-        mQueuesDataFactory.removeListeners();
+        if(mQueuesDataFactory != null){
+            mQueuesDataFactory.removeListeners();
+        }
         super.onCleared();
     }
 }

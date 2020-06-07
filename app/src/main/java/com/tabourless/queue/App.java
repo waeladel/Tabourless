@@ -47,15 +47,17 @@ public class App extends MultiDexApplication { // had to enable MultiDex after a
     public static final String COUNTER_SPINNER_BOTH = "both";
     public static final String COUNTER_SPINNER_GENDER_MALE = "male";
     public static final String COUNTER_SPINNER_GENDER_FEMALE = "female";
-    public static final String COUNTER_SPINNER_GENDER_YOUNG = "young";
-    public static final String COUNTER_SPINNER_GENDER_OLD = "old";
-    public static final String COUNTER_SPINNER_GENDER_DISABLED = "disabled";
-    public static final String COUNTER_SPINNER_GENDER_ABLED = "abled";
+    public static final String COUNTER_SPINNER_AGE_YOUNG = "young";
+    public static final String COUNTER_SPINNER_AGE_OLD = "old";
+    public static final String COUNTER_SPINNER_DISABILITY_DISABLED = "disabled";
+    public static final String COUNTER_SPINNER_DISABILITY_ABLED = "abled";
 
     public static final String USER_SPINNER_GENDER_MALE = "male";
     public static final String USER_SPINNER_GENDER_FEMALE = "female";
 
     public static final String DATABASE_REF_USERS = "users";
+    public static final String DATABASE_REF_USER_AVATAR = "avatar";
+    public static final String DATABASE_REF_USER_COVER = "coverImage";
     public static final String DATABASE_REF_USER_LAST_ONLINE = "lastOnline";
     public static final String DATABASE_REF_USER_QUEUES = "userQueues";
     public static final String DATABASE_REF_USER_CHATS = "userChats";
@@ -82,8 +84,6 @@ public class App extends MultiDexApplication { // had to enable MultiDex after a
 
 
     public static final String STORAGE_REF_IMAGES = "images";
-    public static final String STORAGE_REF_AVATAR = "avatar";
-    public static final String STORAGE_REF_COVER = "coverImage";
     public static final String AVATAR_THUMBNAIL_NAME = "avatar.jpg";
     public static final String COVER_THUMBNAIL_NAME = "cover.jpg";
     public static final String AVATAR_ORIGINAL_NAME = "original_avatar.jpg";
