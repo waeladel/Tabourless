@@ -328,14 +328,16 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
     // Add new queue when long click
     @Override
     public void onMapLongClick(LatLng latLng) {
-        mBinding.placeInfo.setVisibility(View.INVISIBLE);
+        mBinding.placeInfo.setVisibility(View.INVISIBLE); // Hide place info
+        mBinding.addQueueButton.setVisibility(View.VISIBLE); // Show add place button
         addPlaceMarker(latLng);
     }
 
     // get queue id when click on a place
     @Override
     public void onMapClick(LatLng latLng) {
-        mBinding.placeInfo.setVisibility(View.INVISIBLE);
+        mBinding.placeInfo.setVisibility(View.INVISIBLE); // Hide place info
+        mBinding.addQueueButton.setVisibility(View.VISIBLE); // Show add place button
     }
 
     // listen to camera idle to update nearby places
@@ -400,7 +402,8 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
             }
         }else{
             // Hide place info card
-            mBinding.placeInfo.setVisibility(View.INVISIBLE);
+            mBinding.placeInfo.setVisibility(View.INVISIBLE); // Hide place info
+            mBinding.addQueueButton.setVisibility(View.VISIBLE); // Show add place button
         }
 
         return false; // return false if you want map to keep handling click listeners
@@ -413,6 +416,8 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
             goToAddPlace(marker.getPosition());
         }
     }
+
+
 
     private void addPlaceMarker(LatLng latLng) {
         if(mViewModel.getMap() != null){
@@ -476,6 +481,7 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
     private void showPlaceInfo(Place place) {
         mSelectedPlaceKey = place.getKey(); // will be used when click on edit place
         mBinding.placeInfo.setVisibility(View.VISIBLE); // Make info card view visible
+        mBinding.addQueueButton.setVisibility(View.INVISIBLE); // Hide add place button
         mBinding.placeName.setText(place.getName()); // set selected place's name
 
         mBinding.servicesChipGroup.clearCheck();
