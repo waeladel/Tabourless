@@ -217,12 +217,36 @@ public class AddPlaceFragment extends Fragment implements ItemClickListener {
     // To split place object to place's  items for the recycler. each field in a single item, and item for each queue
     private void showPlace(Place place) {
         if (null!= place) {
-            Field[] fields = place.getClass().getDeclaredFields();
-            for (Field f : fields) {
-                //Log.d(TAG, "fields=" + f.getName());
-                //Log.d(TAG, "fields="+f.get);
-                getDynamicMethod(f.getName(), place);
+
+            placeItemsList.add(new PlaceItem(getString(R.string.add_place_name_title)+"*", place.getName(), getString(R.string.add_place_name_hint),getString(R.string.add_place_name_helper), PlaceItem.VIEW_TYPE_TEXT_INPUT));
+            placeItemsList.add(new PlaceItem(getString(R.string.add_place_parent_title), place.getParent(), getString(R.string.add_place_parent_hint),getString(R.string.add_place_parent_helper), PlaceItem.VIEW_TYPE_TEXT_INPUT));
+            // To items for each queue. If first created, just add one empty queue
+            Log.d(TAG, "getDynamicMethod: queues size= "+place.getQueues().size());
+            if(0 == place.getQueues().size()){
+                // Crete temp queue
+                showQueue(null,2);
+            }else{
+                // show queues data, each queue in a separate item
+                // loop to get all queues HashMap
+                int QueuesStartPosition = 2;
+                for (Object o : place.getQueues().entrySet()) {
+                    Map.Entry pair = (Map.Entry) o;
+                    Log.d(TAG, "queues objects = " + pair.getKey() + " = " + pair.getValue());
+
+                    Queue queue = place.getQueues().get(String.valueOf(pair.getKey()));
+                    if (queue != null) {
+                        queue.setKey(String.valueOf(pair.getKey()));
+                        int position = QueuesStartPosition ++; // position = 2 now, but it will increment to 3 next loop
+                        Log.d(TAG, "added queue position"+ position);
+                        showQueue(queue, position);
+                    }
+                }
             }
+
+            // Add button at the end of recycler
+            placeItemsList.add(new PlaceItem(null, null, null,null, PlaceItem.VIEW_TYPE_BUTTON));
+
+
             //Update adapter's data and notify changes
             mAddPlaceAdapter.setPlaceItemsList(placeItemsList);
             mAddPlaceAdapter.setPlaceQueuesMap(mViewModel.getPlace().getQueues());
@@ -230,7 +254,7 @@ public class AddPlaceFragment extends Fragment implements ItemClickListener {
         }
     }
 
-    private void getDynamicMethod(String fieldName, Place place) {
+   /* private void getDynamicMethod(String fieldName, Place place) {
 
         Method[] methods = place.getClass().getMethods();
 
@@ -251,12 +275,12 @@ public class AddPlaceFragment extends Fragment implements ItemClickListener {
 
                         if(fieldName.equals("name")){
                             // To and item for name field
-                            placeItemsList.add(new PlaceItem(getString(R.string.add_place_name_title)+"*", value, getString(R.string.add_place_name_hint),getString(R.string.add_place_name_helper), PlaceItem.VIEW_TYPE_TEXT_INPUT));
+                            placeItemsList.add(0,  new PlaceItem(getString(R.string.add_place_name_title)+"*", value, getString(R.string.add_place_name_hint),getString(R.string.add_place_name_helper), PlaceItem.VIEW_TYPE_TEXT_INPUT));
                         }
 
                         if(fieldName.equals("parent")){
                             // To and item for parent field
-                            placeItemsList.add(new PlaceItem(getString(R.string.add_place_parent_title), value, getString(R.string.add_place_parent_hint),getString(R.string.add_place_parent_helper), PlaceItem.VIEW_TYPE_TEXT_INPUT));
+                            placeItemsList.add( 1, new PlaceItem(getString(R.string.add_place_parent_title), value, getString(R.string.add_place_parent_hint),getString(R.string.add_place_parent_helper), PlaceItem.VIEW_TYPE_TEXT_INPUT));
                         }
 
                         if(fieldName.equals("queues")){
@@ -299,7 +323,7 @@ public class AddPlaceFragment extends Fragment implements ItemClickListener {
                 }
             }
         }
-    }
+    }*/
 
     private void showQueue(Queue queue, int position) {
 
