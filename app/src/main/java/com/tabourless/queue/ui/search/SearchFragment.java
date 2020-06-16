@@ -41,6 +41,7 @@ import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -366,7 +367,8 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                             MarkerOptions markerOptions = new MarkerOptions();
                             markerOptions.position(new LatLng(place.getLatitude(), place.getLongitude()))
                                     .title(place.getName())
-                                    //.icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_front_car_black))
+                                    .icon(BitmapDescriptorFactory.defaultMarker(13.0F))
+                                    //.icon(BitmapDescriptorFactory.fromResource(R.mipmap.account_circle_72dp))
                                     .draggable(false);
                                     //.snippet(place.getQueues().size());
                             // Only add place's marker if it wasn't added before
@@ -431,6 +433,7 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
             markerOptions.position(latLng)
                     .title(getString(R.string.add_marker_title))
                     //.icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_front_car_black))
+                    .icon(BitmapDescriptorFactory.defaultMarker(165.0F))
                     .draggable(true)
                     .snippet(getString(R.string.add_marker_snippet));
 
@@ -451,7 +454,8 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                 MarkerOptions markerOptions = new MarkerOptions();
                 markerOptions.position(placeMarker.getMarker().getPosition())
                         .title(placeMarker.getMarker().getTitle())
-                        //.icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_front_car_black))
+                        //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                        .icon(BitmapDescriptorFactory.defaultMarker(13.0F))
                         .draggable(false);
                 //.snippet(place.getQueues().size());
 

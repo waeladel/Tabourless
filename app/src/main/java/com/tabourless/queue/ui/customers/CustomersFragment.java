@@ -346,7 +346,7 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
                         new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
                                 .addBackgroundColor(ContextCompat.getColor(mContext, R.color.colorError))
                                 .addActionIcon(R.drawable.ic_delete_sweep_24dp)
-                                .setActionIconTint(R.color.color_on_error)
+                                .setActionIconTint(R.color.colorOnError)
                                 .create()
                                 .decorate();
                         super.onChildDraw(c, recyclerView, viewHolder, (dX -translationX), dY, actionState, isCurrentlyActive);
@@ -361,7 +361,7 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
                         new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, -translationX, dY, actionState, isCurrentlyActive)
                                 .addBackgroundColor(ContextCompat.getColor(mContext, R.color.disabled_button))
                                 .addActionIcon(R.drawable.ic_delete_sweep_24dp)
-                                .setActionIconTint(R.color.color_on_error)
+                                .setActionIconTint(R.color.colorOnError)
                                 .create()
                                 .decorate();
                         viewHolder.itemView.setTranslationX(-translationX);

@@ -312,7 +312,7 @@ public class QueuesFragment extends Fragment implements ItemClickListener {
                     new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
                             .addBackgroundColor(ContextCompat.getColor(mContext, R.color.colorError))
                             .addActionIcon(R.drawable.ic_delete_sweep_24dp)
-                            .setActionIconTint(R.color.color_on_error)
+                            .setActionIconTint(R.color.colorOnError)
                             .create()
                             .decorate();
                     super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);

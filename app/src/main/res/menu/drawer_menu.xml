@@ -6,16 +6,16 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@id/profile"
-            android:icon="@drawable/ic_location_on_black_24dp"
+            android:icon="@drawable/ic_round_account_filled_72"
             android:title="@string/menu_profile"/>
 
-        <item
+        <!--<item
             android:id="@id/settings"
             android:icon="@drawable/ic_location_on_black_24dp"
-            android:title="@string/menu_settings" />
+            android:title="@string/menu_settings" />-->
         <item
             android:id="@+id/logout"
-            android:icon="@drawable/ic_location_on_black_24dp"
+            android:icon="@drawable/ic_logout"
             android:title="@string/menu_log_out" />
     </group>
 </menu>

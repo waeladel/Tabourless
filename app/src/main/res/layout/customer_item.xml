@@ -5,13 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?android:attr/selectableItemBackground">
-
+    <!--android:layout_marginTop="@dimen/recycler_item_margin"
+    android:layout_marginBottom="@dimen/recycler_item_margin"-->
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/customer_image"
         android:layout_width="@dimen/medium_avatar"
         android:layout_height="@dimen/medium_avatar"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:contentDescription="@string/profile_image_description"
         android:scaleType="centerCrop"
@@ -28,18 +30,20 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:singleLine="true"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
+        android:textAppearance="@style/TextAppearance.MyTheme.Headline6"
         app:layout_constraintStart_toEndOf="@id/customer_image"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="@tools:sample/first_names" />
 
     <TextView
         android:id="@+id/number_value"
-        style="@style/TextAppearance.MaterialComponents.Headline6"
         android:layout_width="@dimen/medium_avatar"
         android:layout_height="@dimen/medium_avatar"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         android:background="@drawable/text_rounded_background_waiting"
+        android:textAppearance ="@style/TextAppearance.MaterialComponents.Headline6"
         android:gravity="center"
         android:singleLine="true"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -52,13 +56,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
         android:singleLine="true"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/customer_image"
         app:layout_constraintTop_toBottomOf="@+id/gender_icon"
+        tools:text="@tools:sample/date/hhmm" />
+
+    <TextView
+        android:id="@+id/counter_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:singleLine="true"
+        android:textAppearance="@style/TextAppearance.MyTheme.Body2"
+        app:layout_constraintStart_toEndOf="@+id/customer_image"
+        app:layout_constraintTop_toBottomOf="@id/customer_name"
         tools:text="@tools:sample/date/hhmm" />
 
     <ImageView
@@ -66,10 +78,10 @@
         android:layout_width="@dimen/small_icon"
         android:layout_height="@dimen/small_icon"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:contentDescription="@string/queue_item_location_icon"
         app:layout_constraintStart_toEndOf="@+id/customer_image"
-        app:layout_constraintTop_toBottomOf="@+id/customer_name"
+        app:layout_constraintTop_toBottomOf="@+id/counter_value"
         app:srcCompat="@drawable/ic_business_man" />
 
     <ImageView
@@ -77,10 +89,10 @@
         android:layout_width="@dimen/small_icon"
         android:layout_height="@dimen/small_icon"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:contentDescription="@string/queue_item_location_icon"
         app:layout_constraintStart_toEndOf="@+id/gender_icon"
-        app:layout_constraintTop_toBottomOf="@+id/customer_name"
+        app:layout_constraintTop_toBottomOf="@+id/counter_value"
         app:srcCompat="@drawable/ic_not_old_man_with_cane" />
 
     <ImageView
@@ -88,10 +100,10 @@
         android:layout_width="@dimen/small_icon"
         android:layout_height="@dimen/small_icon"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:contentDescription="@string/queue_item_location_icon"
         app:layout_constraintStart_toEndOf="@+id/age_icon"
-        app:layout_constraintTop_toBottomOf="@+id/customer_name"
+        app:layout_constraintTop_toBottomOf="@+id/counter_value"
         app:srcCompat="@drawable/ic_fit_person_stretching_exercises" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

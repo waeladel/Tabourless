@@ -1,20 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#6200EE</color>
-    <color name="colorPrimaryDark">#3700B3</color>
-    <color name="colorAccent">#03DAC5</color>
-    <color name="colorError">#FA297E</color> <!--#fa297e  EB3B81-->
-    <color name="color_on_background">#000000</color>
-    <color name="color_on_error">#ffffff</color>
 
+    <color name="colorPrimary">#08CCB1</color> <!--#7900DB-->
+    <color name="colorPrimaryVariant">#62ffe3</color>
+    <color name="colorPrimaryDark">#009a82</color>
+    <color name="colorSecondary">#F26F63</color> <!--#F9DE83 F9BC7B F2BE22 #FFE03C FF542E 9af976-->
+    <color name="colorSecondaryVariant">#ff514b</color>
+    <color name="colorSecondaryDark">#930000</color>
+
+    <color name="colorError">#F33B5A</color> <!--B00020 #fa297e  EB3B81-->
+    <color name="colorBackground">#F8F9FA</color>
+    <color name="colorSurface">#FFFFFF</color>
+
+
+    <!--"On" colors define how text, icons and strokes are colored in relation to the surface-->
+    <!--on which they appear.-->
+    <color name="colorOnPrimary">#000000</color>
+    <color name="colorOnSecondary">#000000</color>
+    <color name="colorOnBackground">#000000</color>
+    <color name="colorOnSurface">#000000</color>
+    <color name="colorOnError">#FFFFFF</color>
 
     <color name="disabled_button">#80E0E0E0</color>
     <color name="transparent_edit_image">#80000000</color>
     <color name="color_highlighted_item">#335c648e</color> <!--#405c648e-->
-    <color name="color_on_surface_emphasis_high">#C7000000</color>
-    <color name="color_on_surface_emphasis_medium">#8A000000</color>
+    <!--<color name="color_on_surface_emphasis_high">#C7000000</color>
+    <color name="color_on_surface_emphasis_medium">#99000000</color> &lt;!&ndash;#B3000000  99000000&ndash;&gt;-->
+    <color name="color_on_primary_emphasis_high_inverted">#F2ffffff</color>
 
-    <color name="color_served_status_background">#2dc937</color> <!--#2dc937 #008450-->
-    <color name="color_next_status_background">#EFB700</color> <!--#e7b416 #EFB700-->
-    <color name="color_waiting_status_background">#B81D13</color>  <!--#cc3232 #B81D13-->
+    <color name="color_served_status_background">#0ACBB1</color> <!--#2dc937 #008450-->
+    <color name="color_next_status_background">#f6e766 </color> <!-- efcc00 F2D479 #e7b416 #EFB700-->
+    <color name="color_waiting_status_background">#F26F63</color>  <!-- d14646 #cc3232 #B81D13-->
+
 </resources>

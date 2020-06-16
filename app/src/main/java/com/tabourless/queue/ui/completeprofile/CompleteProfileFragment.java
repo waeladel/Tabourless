@@ -2,11 +2,17 @@ package com.tabourless.queue.ui.completeprofile;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.ColorFilter;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.core.widget.ImageViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -188,10 +194,11 @@ public class CompleteProfileFragment extends Fragment {
         //NavigationUI.setupWithNavController(mBinding.drawerNavView, navController);
 
         // Add black color filter to circle image
-        /*int blackColor = mContext.getResources().getColor(R.color.transparent_edit_image);
+        int blackColor = (ContextCompat.getColor(mContext, R.color.transparent_edit_image));
+        //ImageViewCompat.setImageTintList(mBinding.avatarImage, ColorStateList.valueOf(blackColor));
         ColorFilter colorFilter = new PorterDuffColorFilter(blackColor, PorterDuff.Mode.DARKEN);
         mBinding.avatarImage.setColorFilter(colorFilter);
-        mBinding.coverImage.setColorFilter(colorFilter);*/
+        //mBinding.coverImage.setColorFilter(colorFilter);
 
         // Save profile when save button is clicked
         mBinding.saveButton.setOnClickListener(new View.OnClickListener() {

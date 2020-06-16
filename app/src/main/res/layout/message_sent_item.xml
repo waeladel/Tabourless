@@ -29,6 +29,7 @@
         android:background="@drawable/current_user_message_background"
         android:padding="@dimen/button_padding"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+        android:textColor="@color/color_on_primary_emphasis_high_inverted"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_max="wrap"

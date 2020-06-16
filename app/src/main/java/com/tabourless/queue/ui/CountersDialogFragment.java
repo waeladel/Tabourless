@@ -3,7 +3,9 @@ package com.tabourless.queue.ui;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -106,7 +108,14 @@ public class CountersDialogFragment extends DialogFragment  {
         // if counter key is not null, display data
         Log.d(TAG, "onCreateView: counter key ="+ sCounter.getKey());
         if(sCounter != null && sCounter.getKey() != null){
-            mBinding.valueText.setText(sCounter.getName());
+            mBinding.nameValue.setText(sCounter.getName());
+
+            // If counter is open, switch must be checked
+            if(sCounter.isOpen()){
+                mBinding.openValueSwitch.setChecked(true);
+            }else{
+                mBinding.openValueSwitch.setChecked(false);
+            }
 
             // set selected value in gender spinner
             if(null != sCounter.getGender()) {
@@ -182,13 +191,20 @@ public class CountersDialogFragment extends DialogFragment  {
             public void onClick(View v) {
                 if (sCounter != null) {
                     // return if counter name is empty
-                    if(TextUtils.isEmpty(String.valueOf(mBinding.valueText.getText()))){
+                    if(TextUtils.isEmpty(String.valueOf(mBinding.nameValue.getText()))){
                         Toast.makeText(mContext, R.string.add_place_counter_error, Toast.LENGTH_LONG).show();
                         return;
                     }
 
                     // Get values from dialog then set counter
-                    sCounter.setName(String.valueOf(mBinding.valueText.getText()));
+                    sCounter.setName(String.valueOf(mBinding.nameValue.getText()));
+
+                    // Get the value of open switch
+                    if(mBinding.openValueSwitch.isChecked()){
+                        sCounter.setOpen(true);
+                    }else{
+                        sCounter.setOpen(false);
+                    }
 
                     // set gender value
                     switch (mBinding.spinnerGenderValue.getSelectedItemPosition()){
@@ -254,6 +270,23 @@ public class CountersDialogFragment extends DialogFragment  {
             @Override
             public void onClick(View v) {
                 dismiss();
+            }
+        });
+
+        // listen to counter name value to set error when it's empty
+        mBinding.nameValue.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(TextUtils.isEmpty((String.valueOf(editable).trim()))){
+                    // It's empty string, set error icon
+                    mBinding.nameValue.setError(getString(R.string.add_place_counter_error));
+                }
             }
         });
 

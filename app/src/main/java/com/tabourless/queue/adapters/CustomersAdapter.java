@@ -1,7 +1,6 @@
 package com.tabourless.queue.adapters;
 
 import android.content.Context;
-import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,8 +14,6 @@ import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
@@ -31,8 +28,6 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-
-import de.hdodenhof.circleimageview.CircleImageView;
 
 import static com.tabourless.queue.App.AVATAR_THUMBNAIL_NAME;
 import static com.tabourless.queue.App.COUNTER_SPINNER_GENDER_FEMALE;
@@ -87,7 +82,7 @@ public class CustomersAdapter extends PagedListAdapter<Customer, CustomersAdapte
 
 
     @Override
-    public void onBindViewHolder(@NonNull final CustomersAdapter.ViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
 
         final Customer customer = getItem(position);
         if (customer != null) {
@@ -124,20 +119,21 @@ public class CustomersAdapter extends PagedListAdapter<Customer, CustomersAdapte
                 switch (customer.getStatus()){
                     case CUSTOMER_STATUS_NEXT:
                         holder.mBinding.numberValue.setBackgroundResource(R.drawable.text_rounded_background_next);
-                        holder.mBinding.numberValue.setTextColor(ContextCompat.getColor(mContext, R.color.color_on_surface_emphasis_medium));
+                        //holder.mBinding.numberValue.setTextColor(ContextCompat.getColor(mContext, R.color.color_on_surface_emphasis_medium));
+                        holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_medium_trype);
                         break;
                     case CUSTOMER_STATUS_FRONT:
                         holder.mBinding.numberValue.setBackgroundResource(R.drawable.text_rounded_background_front);
-                        holder.mBinding.numberValue.setTextColor(ContextCompat.getColor(mContext, R.color.color_on_surface_emphasis_high));
+                        holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_medium_trype);
                         break;
                     case CUSTOMER_STATUS_AWAY:
                         holder.mBinding.numberValue.setBackgroundResource(R.drawable.text_rounded_background_away);
-                        holder.mBinding.numberValue.setTextColor(ContextCompat.getColor(mContext, R.color.material_on_surface_disabled));
+                        holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_disabled_trype);
                         break;
                     default:
                         // default is waiting
                         holder.mBinding.numberValue.setBackgroundResource(R.drawable.text_rounded_background_waiting);
-                        holder.mBinding.numberValue.setTextColor(ContextCompat.getColor(mContext, R.color.material_on_primary_emphasis_high_type));
+                        holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_high_type);
                         break;
                 }
             }else{
@@ -157,6 +153,12 @@ public class CustomersAdapter extends PagedListAdapter<Customer, CustomersAdapte
                 holder.mBinding.joinedTimeValue.setText(null);
             }
 
+            // counter
+            if (!TextUtils.isEmpty(customer.getCounter())) {
+                holder.mBinding.counterValue.setText(customer.getCounter());
+            }else{
+                holder.mBinding.counterValue.setText(R.string.no_counter_specified);
+            }
             // Gender icon
             if (null != customer.getGender()) {
                 switch (customer.getGender()) {

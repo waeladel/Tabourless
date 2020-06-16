@@ -1,13 +1,11 @@
 package com.tabourless.queue.adapters;
 
 import android.graphics.Typeface;
-import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -17,8 +15,6 @@ import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
@@ -36,8 +32,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
-
-import de.hdodenhof.circleimageview.CircleImageView;
 
 import static com.tabourless.queue.App.AVATAR_THUMBNAIL_NAME;
 import static com.tabourless.queue.App.STORAGE_REF_IMAGES;
@@ -145,7 +139,7 @@ public class InboxAdapter extends PagedListAdapter<Chat, InboxAdapter.ViewHolder
                                 // Bold text
                                 Log.d(TAG, "currentMember=" + currentMember.getName() + " isRead= "+ currentMember.isRead() + " message= "+ chat.getLastMessage() );
                                 holder.mBinding.lastMessage.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
-                                holder.mBinding.lastMessage.setTextColor(fragment.getResources().getColor(R.color.color_on_surface_emphasis_high));
+                                holder.mBinding.lastMessage.setTextColor(fragment.getResources().getColor(R.drawable.my_color_on_surface_emphasis_high_type));
                                 /*holder.mLastMessage.setTextAppearance(App.getContext(), R.style.TextAppearance_MyTheme_Headline5);
                                 holder.mLastMessage.setTextColor(R.drawable.my_on_surface_emphasis_high_type);*/
                                 //holder.mLastMessage.setAlpha(0.78f);
@@ -156,7 +150,7 @@ public class InboxAdapter extends PagedListAdapter<Chat, InboxAdapter.ViewHolder
                                 // Normal text
                                 Log.d(TAG, "currentMember=" + currentMember.getName() + " isRead= "+ currentMember.isRead() + " message= "+ chat.getLastMessage() );
                                 holder.mBinding.lastMessage.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
-                                holder.mBinding.lastMessage.setTextColor(fragment.getResources().getColor(R.color.color_on_surface_emphasis_medium));
+                                holder.mBinding.lastMessage.setTextColor(fragment.getResources().getColor(R.drawable.my_color_on_surface_emphasis_medium_trype));
                                 //holder.mLastMessage.setTextAppearance(App.getContext(), R.style.TextAppearance_MyTheme_Body2);
                                 //holder.mLastMessage.setTextColor(App.getContext().getResources().getColor(R.color.color_on_background));
                                 //holder.mLastMessage.setAlpha(0.54f);

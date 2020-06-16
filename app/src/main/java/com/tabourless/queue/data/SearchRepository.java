@@ -348,7 +348,9 @@ public class SearchRepository {
             mListenersList.clear();
 
             // Clear geo fire Listeners and places arrayList
-            mGeoQuery.removeAllListeners();
+            if(mGeoQuery != null){
+                mGeoQuery.removeAllListeners();
+            }
             //mPlacesArrayList.clear();
             //mPlacesMap.clear();
         }

@@ -6,34 +6,32 @@
     android:layout_height="wrap_content"
     android:background="?android:attr/selectableItemBackground">
 
-
-
     <TextView
         android:id="@+id/current_number_value"
         android:layout_width="@dimen/medium_avatar"
-        android:layout_height="@dimen/medium_avatar"
+        android:layout_height="40dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         android:background="@drawable/text_rounded_background_front"
         android:gravity="center"
         android:singleLine="true"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="@tools:sample/us_zipcodes" />
+        tools:text="@tools:sample/us_zipcodes[0]" />
 
     <TextView
         android:id="@+id/number_value"
         android:layout_width="@dimen/medium_avatar"
-        android:layout_height="@dimen/medium_avatar"
+        android:layout_height="40dp"
         android:layout_marginStart="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginTop="4dp"
         android:background="@drawable/text_rounded_background_waiting"
         android:gravity="center"
         android:singleLine="true"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/current_number_value"
         tools:text="@tools:sample/us_zipcodes" />
 
     <TextView
@@ -43,17 +41,16 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:singleLine="true"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
+        android:textAppearance="@style/TextAppearance.MyTheme.Headline6"
         app:layout_constraintStart_toEndOf="@id/current_number_value"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="@tools:sample/first_names" />
 
     <ImageView
         android:id="@+id/place_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/small_icon"
+        android:layout_height="@dimen/small_icon"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         android:contentDescription="@string/queue_item_location_icon"
         app:layout_constraintStart_toEndOf="@id/current_number_value"
         app:layout_constraintTop_toBottomOf="@+id/queue_name"
@@ -65,7 +62,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:singleLine="true"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+        android:textAppearance="@style/TextAppearance.MyTheme.Body2"
         app:layout_constraintBottom_toBottomOf="@id/place_icon"
         app:layout_constraintStart_toEndOf="@id/place_icon"
         app:layout_constraintTop_toTopOf="@id/place_icon"
@@ -73,10 +70,9 @@
 
     <ImageView
         android:id="@+id/remaining_customer_icon"
-        android:layout_width="22dp"
-        android:layout_height="22dp"
+        android:layout_width="@dimen/small_icon"
+        android:layout_height="@dimen/small_icon"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         android:contentDescription="@string/queue_item_location_icon"
         app:layout_constraintStart_toEndOf="@id/current_number_value"
         app:layout_constraintTop_toBottomOf="@id/place_name"
@@ -88,7 +84,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:singleLine="true"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+        android:textAppearance="@style/TextAppearance.MyTheme.Body2"
         app:layout_constraintBottom_toBottomOf="@+id/remaining_customer_icon"
         app:layout_constraintStart_toEndOf="@+id/remaining_customer_icon"
         app:layout_constraintTop_toTopOf="@+id/remaining_customer_icon"
@@ -96,10 +92,9 @@
 
     <ImageView
         android:id="@+id/waiting_time_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/small_icon"
+        android:layout_height="@dimen/small_icon"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         android:contentDescription="@string/queue_item_location_icon"
         app:layout_constraintStart_toEndOf="@id/current_number_value"
         app:layout_constraintTop_toBottomOf="@+id/remaining_customers_value"
@@ -111,7 +106,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:singleLine="true"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+        android:textAppearance="@style/TextAppearance.MyTheme.Body2"
         app:layout_constraintBottom_toBottomOf="@+id/waiting_time_icon"
         app:layout_constraintStart_toEndOf="@+id/waiting_time_icon"
         app:layout_constraintTop_toTopOf="@+id/waiting_time_icon"
@@ -122,11 +117,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginTop="4dp"
         android:singleLine="true"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/current_number_value"
         app:layout_constraintTop_toBottomOf="@+id/waiting_time_value"
         tools:text="@tools:sample/date/hhmm" />

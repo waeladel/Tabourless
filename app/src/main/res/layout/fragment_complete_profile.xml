@@ -78,7 +78,6 @@
                     android:layout_height="100dp"
                     android:contentDescription="@string/profile_image_description"
                     android:scaleType="centerCrop"
-                    android:tint="@color/transparent_edit_image"
                     app:srcCompat="@drawable/ic_round_account_filled_72" />
 
                 <ImageView
@@ -89,7 +88,7 @@
                     android:layout_marginBottom="@dimen/small_margin"
                     android:contentDescription="@string/add_image_button_description"
                     android:scaleType="centerCrop"
-                    app:srcCompat="@drawable/ic_add_a_photo_black_24dp" />
+                    app:srcCompat="@drawable/ic_add_a_photo_white_24dp" />
 
                 <ImageView
                     android:id="@+id/avatar_progress_icon"
@@ -175,7 +174,7 @@
                     android:layout_marginBottom="@dimen/small_margin"
                     android:contentDescription="@string/add_image_button_description"
                     android:scaleType="centerCrop"
-                    app:srcCompat="@drawable/ic_add_a_photo_black_24dp" />
+                    app:srcCompat="@drawable/ic_add_a_photo_white_24dp" />
 
                 <ImageView
                     android:id="@+id/cover_progress_icon"

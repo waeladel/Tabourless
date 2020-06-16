@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,6 +59,7 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import static com.tabourless.queue.App.AVATAR_THUMBNAIL_NAME;
+import static com.tabourless.queue.App.COVER_THUMBNAIL_NAME;
 import static com.tabourless.queue.App.DATABASE_REF_USERS;
 import static com.tabourless.queue.App.DATABASE_REF_USER_LAST_ONLINE;
 import static com.tabourless.queue.App.DATABASE_REF_USER_TOKENS;
@@ -108,6 +110,12 @@ public class MainActivity extends AppCompatActivity {
     private Intent intent;
 
     private FragmentManager fragmentManager;
+
+    private ActivityMainBinding mBinding;
+    private ToolbarBinding mToolbarBinding;
+    private CircleImageView mHeaderAvatar;
+    private ImageView mHeaderCover;
+    private TextView mHeaderName;
 
     // To navigate when item clicked
     /*private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -167,11 +175,6 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private ActivityMainBinding mBinding;
-    private ToolbarBinding mToolbarBinding;
-    private CircleImageView mHeaderAvatar;
-    private TextView mHeaderName;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -179,6 +182,7 @@ public class MainActivity extends AppCompatActivity {
         mBinding = ActivityMainBinding.inflate(getLayoutInflater());
         mToolbarBinding = mBinding.toolbar;
         mHeaderAvatar = mBinding.drawerNavView.getHeaderView(0).findViewById(R.id.header_avatar_image);
+        mHeaderCover = mBinding.drawerNavView.getHeaderView(0).findViewById(R.id.header_coverImage);
         mHeaderName = mBinding.drawerNavView.getHeaderView(0).findViewById(R.id.header_user_name);
 
         // [START create_storage_reference]
@@ -563,8 +567,8 @@ public class MainActivity extends AppCompatActivity {
                         .setAvailableProviders(providers)
                         .setLogo(R.mipmap.ic_launcher)      // Set logo drawable
                         .setAlwaysShowSignInMethodScreen(true)
-                        //.setTheme(R.style.Background_FirebaseUI)      // Set theme
-                        .setTosAndPrivacyPolicyUrls("https://sites.google.com/view/basbes/terms-of-service","https://sites.google.com/view/basbes/privacy-policy")
+                        .setTheme(R.style.Background_FirebaseUI)      // Set theme
+                        .setTosAndPrivacyPolicyUrls("https://sites.google.com/view/tabourless/terms-of-service","https://sites.google.com/view/tabourless/privacy-policy")
                         .build(),
                 RC_SIGN_IN);
 
@@ -690,6 +694,27 @@ public class MainActivity extends AppCompatActivity {
                     }else{
                         // end of user avatar
                         mHeaderAvatar.setImageResource(R.drawable.ic_round_account_filled_72);
+                    }
+
+                    //Display header cover
+                    if (!TextUtils.isEmpty(mUser.getAvatar())) {
+                        // Lets get avatar
+                        StorageReference userCoverStorageRef = mStorageRef.child(STORAGE_REF_IMAGES +"/"+ mUserId +"/"+ COVER_THUMBNAIL_NAME);
+                        GlideApp.with(MainActivity.this)
+                                .load(userCoverStorageRef)
+                                //.placeholder(R.mipmap.account_circle_72dp)
+                                .placeholder(R.drawable.ic_picture_gallery)
+                                .error(R.drawable.ic_broken_image_512px)
+                                .into(mHeaderCover);
+                        /*mHeaderAvatar.setImageResource(R.drawable.ic_round_account_filled_72);
+                        Picasso.get()
+                                .load(mUser.getAvatar())
+                                .placeholder(R.mipmap.account_circle_72dp)
+                                .error(R.drawable.ic_round_broken_image_72px)
+                                .into(mHeaderAvatar);*/
+                    }else{
+                        // end of user avatar
+                        mHeaderCover.setImageResource(R.drawable.ic_picture_gallery);
                     }
 
                     // Display header avatar
