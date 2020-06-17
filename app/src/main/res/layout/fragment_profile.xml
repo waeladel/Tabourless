@@ -87,11 +87,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
                 android:clickable="true"
                 android:focusable="true"
                 app:layout_constraintEnd_toStartOf="@+id/block_edit_button"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintHorizontal_chainStyle="spread"
+                app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/user_name_text"
                 app:srcCompat="@drawable/ic_baseline_chat_24px" />
@@ -100,11 +100,11 @@
                 android:id="@+id/block_edit_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:clickable="true"
                 android:focusable="true"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/message_button"
                 app:layout_constraintTop_toBottomOf="@+id/user_name_text"
                 app:srcCompat="@drawable/ic_block_24dp" />
@@ -164,11 +164,11 @@
                 android:layout_height="24dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
+                app:layout_constraintEnd_toStartOf="@+id/user_gender_value"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/user_gender_headline"
-                app:layout_constraintEnd_toStartOf="@+id/user_gender_value"
-                tools:src="@tools:sample/avatars"
-                tools:ignore="ContentDescription" />
+                tools:ignore="ContentDescription"
+                tools:src="@tools:sample/avatars" />
 
 
             <View
@@ -204,8 +204,8 @@
                 android:layout_marginTop="8dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/user_age_headline"
-                tools:ignore="ContentDescription"
-                app:srcCompat="@drawable/ic_cake_24dp" />
+                app:srcCompat="@drawable/ic_cake_24dp"
+                tools:ignore="ContentDescription" />
 
             <TextView
                 android:id="@+id/user_age_value"
