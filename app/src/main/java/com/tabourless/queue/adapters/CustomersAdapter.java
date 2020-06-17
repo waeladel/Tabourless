@@ -179,27 +179,23 @@ public class CustomersAdapter extends PagedListAdapter<Customer, CustomersAdapte
             }
 
             // Age icon
-            if (customer.getAge() != 0) {
-                if(customer.getAge()<60){
-                    // customer is young
-                    holder.mBinding.ageIcon.setImageResource(R.drawable.ic_not_old_man_with_cane);
-                    holder.mBinding.ageIcon.setVisibility(View.VISIBLE);
-                }else{
-                    // customer is old
-                    holder.mBinding.ageIcon.setImageResource(R.drawable.ic_old_man_with_cane);
-                    holder.mBinding.ageIcon.setVisibility(View.VISIBLE);
-                }
+            if(customer.getAge()<60){
+                // customer is young
+                holder.mBinding.ageIcon.setImageResource(R.drawable.ic_not_old_man_with_cane);
+                holder.mBinding.ageIcon.setVisibility(View.VISIBLE);
             }else{
-                holder.mBinding.ageIcon.setVisibility(View.GONE);
+                // customer is old
+                holder.mBinding.ageIcon.setImageResource(R.drawable.ic_old_man_with_cane);
+                holder.mBinding.ageIcon.setVisibility(View.VISIBLE);
             }
 
             // Disability icon
             if (customer.isDisabled()) {
                 holder.mBinding.disabilityIcon.setImageResource(R.drawable.ic_wheelchair_accessible);
-                holder.mBinding.disabilityIcon.setVisibility(View.VISIBLE);
+                //holder.mBinding.disabilityIcon.setVisibility(View.VISIBLE);
             }else{
                 holder.mBinding.disabilityIcon.setImageResource(R.drawable.ic_fit_person_stretching_exercises);
-                holder.mBinding.disabilityIcon.setVisibility(View.VISIBLE);
+                //holder.mBinding.disabilityIcon.setVisibility(View.VISIBLE);
             }
 
         }
