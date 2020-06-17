@@ -5,9 +5,13 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.media.AudioAttributes;
 import android.net.Uri;
 import android.os.Build;
+import android.util.Base64;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatDelegate;
@@ -20,6 +24,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import static androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode;
+
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * Created on 25/03/2017.
@@ -124,6 +134,7 @@ public class App extends MultiDexApplication { // had to enable MultiDex after a
         super.onCreate();
 
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+
         // Activate the saved theme in preferences
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this /* Activity context */);
         String darkModeValue = sharedPreferences.getString(PREFERENCE_KEY_NIGHT, "");
@@ -164,14 +175,19 @@ public class App extends MultiDexApplication { // had to enable MultiDex after a
 
         sApplicationContext = getApplicationContext();
         Log.i(TAG, "Application class onCreate");
-        // Initialize the SDK before executing any other operations,
-        //FacebookSdk.sdkInitialize(sApplicationContext);
+        // Initialize the SDK before executing any other operations, observe how frequently users activate your app,
+        // how much time they spend using it, and view other demographic information through Facebook Analytics for Apps.
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        AppEventsLogger.activateApp(this);
 
         // [START Firebase Database enable persistence]
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         // [END rtdb_enable_persistence]
         currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         currentUserId = currentFirebaseUser != null ? currentFirebaseUser.getUid() : null;
+
+        //Only use if you need to know the key hash for facebook
+        //printHashKey(getBaseContext());
     }
 
     public static Context getContext() {
@@ -184,5 +200,21 @@ public class App extends MultiDexApplication { // had to enable MultiDex after a
         return currentUserId;
         //return instance.getApplicationContext();
     }
+
+     /*public static void printHashKey(Context pContext) {
+        try {
+            PackageInfo info = pContext.getPackageManager().getPackageInfo(pContext.getPackageName(), PackageManager.GET_SIGNATURES);
+            for (Signature signature : info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                String hashKey = new String(Base64.encode(md.digest(), 0));
+                Log.i(TAG, "printHashKey() Hash Key: " + hashKey);
+            }
+        } catch (NoSuchAlgorithmException e) {
+            Log.e(TAG, "printHashKey()", e);
+        } catch (Exception e) {
+            Log.e(TAG, "printHashKey()", e);
+        }
+    }*/
 }
 

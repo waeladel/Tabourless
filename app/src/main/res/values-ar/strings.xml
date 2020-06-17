@@ -1,0 +1,161 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+    <!--buttons and menus -->
+    <string name="title_queues">الطوابير</string>
+    <string name="title_inbox">الوارد</string>
+    <string name="title_notifications">التنبيهات</string>
+    <string name="title_profile">الملف الشخصي</string>
+    <string name="title_settings">الإعدادات</string>
+    <string name="title_complete_profile">استكمل الحساب</string>
+    <string name="title_edit_profile">تعديل الملف الشخصي</string>
+    <string name="edit_button_title">تعديل</string>
+
+    <string name="title_add_place_add_counter">أضف شباك</string>
+    <string name="title_customers">الطابور</string>
+
+    <string name="title_messages">الرسائل الخاصة</string>
+    <string name="title_search">بحث</string>
+    <string name="title_add_place">أضف مكان</string>
+    <string name="title_logout">تسجيل خروج</string>
+    <string name="title_Photo">عرض الصورة</string>
+
+    <string name="menu_save">حفظ</string>
+    <string name="upload_button">تحميل</string>
+
+    <string name="popup_menu_block">حظر</string>
+    <string name="popup_menu_block_delete">حظر وحذف الرسائل</string>
+    <string name="message_button_hint">أرسل</string>
+    <string name="block_button">حظر</string>
+    <string name="unblock_button">إلغاء الحظر</string>
+    <string name="add_marker_title">أضف مكان</string>
+    <string name="add_marker_snippet">اضغط مع الاستمرار لتغيير الموقع</string>
+
+    <string name="add_service_button_title">أضف المزيد من الخدمات</string>
+    <string name="add_counter_button_title">أضف المزيد من الشبابيك</string>
+
+    <!--buttons and menus -->
+
+    <!--hints and titles-->
+    <string name="user_gender_headline">النوع</string>
+    <string name="user_birth_headline">سنة الميلاد</string>
+    <string name="user_age_headline">السن</string>
+    <string name="user_avatar_headline">صورة الملف الشخصي</string>
+    <string name="user_cover_headline">غلاف الغلاف</string>
+    <string name="user_name_hint">الاسم</string>
+    <string name="user_disability_headline">الإعاقة</string>
+    <string name="crop_activity_title">قص</string>
+    <string name="send_message_hint">اكتب رسالة…</string>
+    <string name="user_active_now">نشط الآن</string>
+    <string name="user_active_ago">نشط %1$s</string>
+
+    <string name="add_counter_filters_headline">مُرشِح الزبائن</string>
+    <string name="add_counter_open_headline">مفتوح</string>
+    <string name="add_counter_open_description">عطِّل المفتاح إذا كان الشباك مغلقًا مؤقتًا.</string>
+    <string name="add_place_name_title">الاسم</string>
+    <string name="add_place_name_hint">بيتزا هات، سينما جلاكسى سينبلكس، مصلحة الجوازات والهجرة</string>
+    <string name="add_place_name_helper">اسم المكان يساعد المستخدمين في البحث عنه.</string>
+
+    <string name="add_place_parent_title">المكان الحاوي</string>
+    <string name="add_place_parent_hint">كارفور، مول العرب، مجمع التحرير</string>
+    <string name="add_place_parent_helper">أضف مكانا حاويا إذا كان هذا المكان يقع داخل مكان آخر أكبر.</string>
+
+    <string name="add_place_queue_title">الخدمة</string>
+    <string name="select_queue_title">اختر خدمة</string>
+    <string name="book_button_title">احجز</string>
+    <string name="add_place_queue_hint">خدمة عملاء، إيداع، شراء تذاكر</string>
+    <string name="add_place_queue_helper">لو المكان يقدم خدمات متعددة، أضف الخدمات كلها لإنشاء قائمة انتظار لكل خدمة.</string>
+
+
+    <string name="add_place_counter_title">اسم الشباك*</string>
+    <string name="add_place_counter_hint">الرئيسي، شباك أ، شباك كبار السن</string>
+    <!--    <string name="add_place_counter_helper">Only add multiple counters if this service can serve more than one customer simultaneously. If you see multiple queues in front of a single counter, add only one counter then use filters to separate the queues</string>-->
+    <string name="add_place_counter_helper">اختر أسماء مثل (شباك أ، ب) بدلا من (1، 2) لتوضيح أن الشبابيك مسماه من اليمن لليسار. لو ترى شباك يقدم خدمة لأكثر من طابور، أضف شباكا منفصلا لكل طابور.</string>
+    <string name="customer_number_title" translatable="false">#:</string>
+
+    <!--toast and error messages -->
+    <string name="sign_in_cancelled">تم إلغاء تسجيل الدخول</string>
+    <string name="no_internet_connection">لا يوجد اتصال بشبكة الإنترنت.</string>
+    <string name="unknown_error">وقع خطأ غير معروف.</string>
+    <string name="upload_image_error">نأسف، تعذر ارسال صورتك.</string>
+    <string name="download_image_error">نأسف، تعذر تحميل صورتك.</string>
+    <string name="update_profile_error">نأسف، تعذر تحديث ملفك الشخصي.</string>
+    <string name="empty_profile_avatar_error">صورة ملف شخصي يجب ألا تكون خالية.</string>
+    <string name="empty_profile_name_error">يجب ادخال اسمك.</string>
+    <string name="send_message_error">نأسف، تعذر ارسال رسالتك.</string>
+
+    <string name="confirm_block_dialog_message">لن يمكنك تبادل الرسائل مع هذا الشخص بعد الآن.</string>
+    <string name="confirm_block_delete_dialog_message">لن يمكنك تبادل الرسائل مع هذا الشخص بعد الآن وسيتم حذف محادثتكما.</string>
+    <string name="user_confirm_dialog_enable">مكن</string>
+    <string name="user_confirm_dialog_positive">نعم</string>
+    <string name="user_confirm_blocking_dialog">حظر</string>
+    <string name="user_confirm_dialog_negative">إلغاء</string>
+    <string name="confirm_dialog_positive_button">موافق</string>
+    <string name="confirm_undo_button">تراجع</string>
+    <string name="chat_blocked_alert_dialog_title">تم تعطيل المحادثة</string>
+    <string name="chat_blocked_dialog_message">غير مسموح بالتحدث مع هذا الشخص في الوقت الراهن.</string>
+
+    <string name="permission_denied">تم رفض إذن الحصول على موقعك الحالي.</string>
+    <string name="location_access_required">مطلوب الوصول إلى موقعك لعرض الأماكن والطوابير القريبة.</string>
+    <string name="access_location">تمكين الوصول إلى الموقع</string>
+    <string name="permission_not_granted">عذرًا، لا يمكننا تفعيل هذه الخدمة حتى تمنحنا الإذن.</string>
+    <string name="permission_not_granted_title">تم رفض الإذن</string>
+
+    <string name="add_place_name_error">اسم المكان يجب ألا يكون خاليا.</string>
+    <string name="add_place_service_error">اسم الخدمة يجب ألا يكون خاليا.</string>
+    <string name="add_place_service_empty_error">يجب أن تضيف خدمة واحدة على الأقل.</string>
+    <string name="add_place_counter_empty_error">يجب أن تضيف خدمة واحدة على الأقل.</string>
+    <string name="add_place_counter_error">اسم الشباك يجب ألا يكون خاليا.</string>
+    <string name="select_service_error">يجب اختيار خدمة.</string>
+    <string name="fetch_place_error">تعذر الحصول على بيانات المكان، حاول مرة أخرى لاحقًا.</string>
+    <string name="book_queue_error">تعذر الانضمام إلى الطابور، حاول مرة أخرى لاحقًا.</string>
+    <string name="fetch_profile_error">تعذر الحصول على بيانات ملفك الشخصي، حاول مرة أخرى لاحقًا.</string>
+    <string name="save_place_error">فشل في حفظ المكان، حاول مرة أخرى لاحقًا.</string>
+    <string name="alert_confirm_removing_customer">%1$s تم حذف</string>
+    <string name="alert_confirm_removing_booking">تم إلغاء حجزك.</string>
+    <string name="alert_confirm_removing_queue">تم حذف الطابور.</string>
+    <string name="customer_name_constant">الزبون</string>
+    <string name="swipe_item_disabled_toast">لا يمكنك حذف زبون لم يتلق الخدمة بعد.</string>
+    <string name="joined_time_ended">انتهى</string>
+
+    <!--Images content Description-->
+    <string name="cover_image_description">غلاف ملفك الشخصي</string>
+    <string name="profile_image_description">صورة ملفك الشخصي</string>
+    <string name="add_image_button_description">زر أضف صورة</string>
+    <string name="original_profile_image_description">صورة ملفك الشخصي</string>
+    <string name="send_text_icon">زر إرسال رسالة</string>
+    <string name="message_sent_icon">علامة إتمام ارسال الرسالة</string>
+    <string name="remove_counter_icon">زر حذف شباك</string>
+    <string name="queue_item_location_icon">أيقونة مكان</string>
+
+    <!--Input text helper-->
+    <string name="required_helper">*إجباري</string>
+
+    <!-- gender array -->
+    <string name="male">ذكر</string>
+    <string name="female">أنثى</string>
+    <!-- gender type array -->
+
+    <string name="no_counter_specified">لم يتم تحديد شباك</string>
+    <string name="not_specified">غير محدد</string>
+    <string name="yes">نعم</string>
+    <string name="no">لا</string>
+    <string name="title_activity_maps">الخريطة</string>
+
+    <!-- counter gender spinner array -->
+    <string name="counter_gender_only_males">الذكور فقط</string>
+    <string name="counter_gender_only_females">الإناث فقط</string>
+    <string name="counter_any">أي شخص</string>
+    <!--    <string name="counter_both">Both in separate queues</string>-->
+    <!-- gender type array -->
+
+    <!-- counter age spinner array -->
+    <string name="counter_age_only_old">كبار السن فقط</string>
+    <string name="counter_age_only_young">الشباب فقط</string>
+    <!-- gender age array -->
+
+    <!-- counter disability spinner array -->
+    <string name="counter_age_only_disabled">المعاقين فقط</string>
+    <string name="counter_age_only_able">القادرين جسديا فقط</string>
+    <!-- gender disability array -->
+
+</resources>

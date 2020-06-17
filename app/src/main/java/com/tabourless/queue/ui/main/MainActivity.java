@@ -547,8 +547,8 @@ public class MainActivity extends AppCompatActivity {
             // Choose authentication providers
             providers = Arrays.asList(
                     new AuthUI.IdpConfig.EmailBuilder().build(),
-                    //new AuthUI.IdpConfig.FacebookBuilder().build(),
-                    //new AuthUI.IdpConfig.TwitterBuilder().build(),
+                    new AuthUI.IdpConfig.FacebookBuilder().build(),
+                    new AuthUI.IdpConfig.TwitterBuilder().build(),
                     new AuthUI.IdpConfig.GoogleBuilder().build());
 
         }else{
@@ -556,7 +556,7 @@ public class MainActivity extends AppCompatActivity {
             // Choose authentication providers
             providers = Arrays.asList(
                     new AuthUI.IdpConfig.EmailBuilder().build(),
-                    //new AuthUI.IdpConfig.FacebookBuilder().build(),
+                    new AuthUI.IdpConfig.FacebookBuilder().build(),
                     new AuthUI.IdpConfig.GoogleBuilder().build());
         }
 

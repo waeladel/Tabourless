@@ -34,21 +34,21 @@
         <item>@string/counter_any</item>
         <item>@string/counter_gender_only_females</item>
         <item>@string/counter_gender_only_males</item>
-        <item>@string/counter_both</item>
+<!--        <item>@string/counter_both</item>-->
     </string-array>
 
     <string-array name="counter_age">
         <item>@string/counter_any</item>
         <item>@string/counter_age_only_old</item>
         <item>@string/counter_age_only_young</item>
-        <item>@string/counter_both</item>
+<!--        <item>@string/counter_both</item>-->
     </string-array>
 
     <string-array name="counter_disability">
         <item>@string/counter_any</item>
         <item>@string/counter_age_only_disabled</item>
         <item>@string/counter_age_only_able</item>
-        <item>@string/counter_both</item>
+<!--        <item>@string/counter_both</item>-->
     </string-array>
 
 </resources>
