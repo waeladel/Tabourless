@@ -11,6 +11,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
+import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -48,6 +49,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipDrawable;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.tabourless.queue.R;
@@ -64,7 +67,9 @@ import com.tabourless.queue.models.UserQueue;
 import com.tabourless.queue.ui.DeniedPermissionAlertFragment;
 import com.tabourless.queue.ui.ExplainPermissionAlertFragment;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Map;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
@@ -152,7 +157,8 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         mBinding = FragmentSearchBinding.inflate(inflater, container, false);
-        mChipBinding = ChipItemBinding.inflate(inflater, container, false);
+        //mChipBinding = ChipItemBinding.inflate(inflater, container, false);
+
         View view = mBinding.getRoot();
 
         // To get notified when the map is ready to be used.
@@ -503,7 +509,13 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                 UserQueue userQueue = new UserQueue(queue.getKey(), queue.getName(), place.getKey());
                 // Don't display more than 30 character
                 String shortenString = queue.getName().substring(0, Math.min(queue.getName().length(), 30));
+                //Chip mChipBinding = new Chip(mContext);
+                //mChipBinding.setText(shortenString);
+                ChipItemBinding mChipBinding = ChipItemBinding.inflate(getLayoutInflater(), mBinding.servicesChipGroup, false);
                 mChipBinding.chipItem.setText(shortenString);
+                mChipBinding.chipItem.setId(ViewCompat.generateViewId());
+                //ChipDrawable chipDrawable = ChipDrawable.createFromAttributes(mContext, null, 0, R.style.Widget_MaterialComponents_Chip_Choice);
+                //chip.setChipDrawable(chipDrawable);
                 mBinding.servicesChipGroup.addView(mChipBinding.chipItem);
                 mViewModel.chipsQueuesMap.put(mChipBinding.chipItem.getId(), userQueue); // a map to get selected service
                 /*mBinding.servicesChipGroup.setOnCheckedChangeListener(new ChipGroup.OnCheckedChangeListener() {
