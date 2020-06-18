@@ -343,9 +343,19 @@ public class MainActivity extends AppCompatActivity {
                             // It's not the first time to open the app
                             // and the user is logged in. just updateCurrentUserId();
                             mViewModel.updateCurrentUserId(user.getUid());
+                            // Hide notifications badge if it's 0
+                            /*if(notificationsBadge != null && notificationsBadge.getNumber() == 0){
+                                notificationsBadge.setVisible(false);
+                            }
+
+                            // Hide Chats badge if it's 0
+                            if(inboxBadge != null && inboxBadge.getNumber() == 0){
+                                inboxBadge.setVisible(false);
+                            }*/
                             Log.d(TAG, "onAuthStateChanged: second time to log in. user was logged in. updateCurrentUserId. oldCurrentUserId = " + currentUserId+ " new id= "+user.getUid());
                         }
                     }// End of checking if it's the same user or not
+
 
                     // set current user id, will be used when comparing new logged in id with the old one
                     Log.d(TAG, "onAuthStateChanged: oldCurrentUserId = " + currentUserId+ " new id= "+user.getUid());
@@ -586,8 +596,8 @@ public class MainActivity extends AppCompatActivity {
                 public void onChanged(Long count) {
                     Log.d(TAG, "getNotificationsCount onChanged notifications count = "+ count + " currentUserId= "+userKey);
                     // Display chats count if > 0
+                    notificationsBadge = mBinding.bottomNavView.getOrCreateBadge(R.id.notifications); //showBadge() show badge over chats menu item
                     if(count != null && count != 0){
-                        notificationsBadge = mBinding.bottomNavView.getOrCreateBadge(R.id.notifications); //showBadge() show badge over chats menu item
                         notificationsBadge.setMaxCharacterCount(3); // Max number is 99
                         //chatsBadge.setBackgroundColor(R.drawable.badge_background_shadow);
                         /*notificationsBadge.setBackgroundColor(getResources().getColor(R.color.color_primary));
@@ -615,6 +625,7 @@ public class MainActivity extends AppCompatActivity {
     // start observation for chats count
     private void initiateObserveInboxCount(final String userKey) {
         // Get counts for unread chats. first use currentUserId then update it whenever it changed using AuthStateListener
+        Log.d(TAG, "getChatsCount initiateObserveInboxCount is called. userKey= "+userKey);
         if(userKey != null){ // in case user is logged out, don't get chat count
             // initiate chats count observer
             mViewModel.getInboxCount(userKey).observe(this, new Observer<Long>() {
@@ -622,8 +633,8 @@ public class MainActivity extends AppCompatActivity {
                 public void onChanged(Long count) {
                     Log.d(TAG, "getChatsCount onChanged chats count = "+ count + " currentUserId= "+userKey);
                     // Display chats count if > 0
+                    inboxBadge = mBinding.bottomNavView.getOrCreateBadge(R.id.inbox); // showBadge() show badge over chats menu item
                     if(count != null && count != 0){
-                        inboxBadge = mBinding.bottomNavView.getOrCreateBadge(R.id.inbox); // showBadge() show badge over chats menu item
                         inboxBadge.setMaxCharacterCount(3); // Max number is 99
                         //chatsBadge.setBackgroundColor(R.drawable.badge_background_shadow);
                         /*chatsBadge.setBackgroundColor(getResources().getColor(R.color.color_primary));
