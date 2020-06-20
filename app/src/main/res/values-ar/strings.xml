@@ -24,7 +24,7 @@
 
     <string name="popup_menu_block">حظر</string>
     <string name="popup_menu_block_delete">حظر وحذف الرسائل</string>
-    <string name="message_button_hint">أرسل</string>
+    <string name="message_button_hint">مراسلة</string>
     <string name="block_button">حظر</string>
     <string name="unblock_button">إلغاء الحظر</string>
     <string name="add_marker_title">أضف مكان</string>
@@ -40,9 +40,9 @@
     <string name="user_birth_headline">سنة الميلاد</string>
     <string name="user_age_headline">السن</string>
     <string name="user_avatar_headline">صورة الملف الشخصي</string>
-    <string name="user_cover_headline">غلاف الغلاف</string>
+    <string name="user_cover_headline">صورة الغلاف</string>
     <string name="user_name_hint">الاسم</string>
-    <string name="user_disability_headline">الإعاقة</string>
+    <string name="user_disability_headline">متحدي إعاقة</string>
     <string name="crop_activity_title">قص</string>
     <string name="send_message_hint">اكتب رسالة…</string>
     <string name="user_active_now">نشط الآن</string>
@@ -68,8 +68,7 @@
 
     <string name="add_place_counter_title">اسم الشباك*</string>
     <string name="add_place_counter_hint">الرئيسي، شباك أ، شباك كبار السن</string>
-    <!--    <string name="add_place_counter_helper">Only add multiple counters if this service can serve more than one customer simultaneously. If you see multiple queues in front of a single counter, add only one counter then use filters to separate the queues</string>-->
-    <string name="add_place_counter_helper">اختر أسماء مثل (شباك أ، ب) بدلا من (1، 2) لتوضيح أن الشبابيك مسماه من اليمن لليسار. لو ترى شباك يقدم خدمة لأكثر من طابور، أضف شباكا منفصلا لكل طابور.</string>
+    <string name="add_place_counter_helper">في حالة عدم وجود لافتة للشباك، اختر أسماء مثل (شباك أ، ب) بدلا من (1، 2) لتوضيح أن الشبابيك مسماه من اليمن لليسار. لو ترى شباك يقدم خدمة لأكثر من طابور، أضف شباكا منفصلا لكل طابور.</string>
     <string name="customer_number_title" translatable="false">#:</string>
 
     <!--toast and error messages -->
@@ -154,8 +153,8 @@
     <!-- gender age array -->
 
     <!-- counter disability spinner array -->
-    <string name="counter_age_only_disabled">المعاقين فقط</string>
-    <string name="counter_age_only_able">القادرين جسديا فقط</string>
+    <string name="counter_disability_only_disabled">متحدو الإعاقة فقط</string>
+    <string name="counter_disability_only_able">القادرين جسديا فقط</string>
     <!-- gender disability array -->
 
 </resources>

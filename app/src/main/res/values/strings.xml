@@ -70,7 +70,7 @@
     <string name="add_place_counter_title">Counter name*</string>
     <string name="add_place_counter_hint">Main, Counter A, Elderly Counter</string>
 <!--    <string name="add_place_counter_helper">Only add multiple counters if this service can serve more than one customer simultaneously. If you see multiple queues in front of a single counter, add only one counter then use filters to separate the queues</string>-->
-    <string name="add_place_counter_helper">Use names like (counter A,B) instead of (1,2) to be clear they are named from left to right. If you see a counter is serving multiple queues, add a separate counter for each queue.</string>
+    <string name="add_place_counter_helper">If the counter has no sign, use names like (counter A,B) instead of (1,2) to be clear they are named from left to right. If you see a counter serving multiple queues, add a separate counter for each queue.</string>
     <string name="customer_number_title" translatable="false">#:</string>
 
     <!--toast and error messages -->
@@ -155,8 +155,8 @@
     <!-- gender age array -->
 
     <!-- counter disability spinner array -->
-    <string name="counter_age_only_disabled">Disabled only</string>
-    <string name="counter_age_only_able">Able-bodied only</string>
+    <string name="counter_disability_only_disabled">Disabled only</string>
+    <string name="counter_disability_only_able">Able-bodied only</string>
     <!-- gender disability array -->
 
 </resources>

@@ -46,8 +46,8 @@
 
     <string-array name="counter_disability">
         <item>@string/counter_any</item>
-        <item>@string/counter_age_only_disabled</item>
-        <item>@string/counter_age_only_able</item>
+        <item>@string/counter_disability_only_disabled</item>
+        <item>@string/counter_disability_only_able</item>
 <!--        <item>@string/counter_both</item>-->
     </string-array>
 
