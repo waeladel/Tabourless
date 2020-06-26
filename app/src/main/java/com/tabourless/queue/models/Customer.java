@@ -7,6 +7,7 @@ import com.google.firebase.database.IgnoreExtraProperties;
 import com.google.firebase.database.ServerValue;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @IgnoreExtraProperties
@@ -17,8 +18,10 @@ public class Customer {
     private String userId;
     private Object joined;
     private Long lastHere;
+    private Long started;
     private String status;
     private String counter;
+    private Map<String, Boolean> counters = new LinkedHashMap<>();
     private int number;
 
     private String avatar;
@@ -57,8 +60,10 @@ public class Customer {
         result.put("userId", userId);
         result.put("joined", ServerValue.TIMESTAMP);
         result.put("lastHere", lastHere);
+        result.put("started", started);
         result.put("status", status);
         result.put("counter", counter);
+        result.put("counters", counters);
         result.put("number", number);
         result.put("avatar", avatar);
         result.put("name", name);
@@ -104,6 +109,14 @@ public class Customer {
         this.lastHere = lastHere;
     }
 
+    public Long getStarted() {
+        return started;
+    }
+
+    public void setStarted(Long started) {
+        this.started = started;
+    }
+
     public int getNumber() {
         return number;
     }
@@ -126,6 +139,14 @@ public class Customer {
 
     public void setCounter(String counter) {
         this.counter = counter;
+    }
+
+    public Map<String, Boolean> getCounters() {
+        return counters;
+    }
+
+    public void setCounters(Map<String, Boolean> counters) {
+        this.counters = counters;
     }
 
     public String getAvatar() {

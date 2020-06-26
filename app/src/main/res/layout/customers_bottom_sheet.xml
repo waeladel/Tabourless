@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bottom_sheet_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bottom_sheet_rounded_background"
+    android:clickable="true"
+    android:elevation="6dp"
+    android:focusable="true"
+    app:behavior_hideable="false"
+    app:behavior_peekHeight="?attr/actionBarSize"
+    app:layout_behavior="@string/bottom_sheet_behavior">
+
+    <ImageView
+        android:id="@+id/maximize_icon"
+        android:layout_width="40dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="8dp"
+        android:contentDescription="@string/bottom_sheet_maximize_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_maximize_24px" />
+
+    <ImageView
+        android:id="@+id/customers_icon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:contentDescription="@string/customers_queue_icon_description"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_people_queue" />
+
+    <TextView
+        android:id="@+id/ahead_customers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:singleLine="true"
+        android:textAppearance="@style/TextAppearance.MyTheme.Body2"
+        app:layout_constraintStart_toEndOf="@+id/customers_icon"
+        app:layout_constraintTop_toTopOf="@+id/customers_icon"
+        tools:text="@string/queue_info_ahead_customers" />
+
+    <TextView
+        android:id="@+id/total_customers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:singleLine="true"
+        android:textAppearance="@style/TextAppearance.MyTheme.Body2"
+        app:layout_constraintStart_toStartOf="@+id/ahead_customers"
+        app:layout_constraintTop_toBottomOf="@+id/ahead_customers"
+        tools:text="@string/queue_info_total_customers" />
+
+    <View
+        android:id="@+id/number_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/total_customers" />
+
+    <ImageView
+        android:id="@+id/number_icon"
+        android:layout_width="@dimen/small_icon"
+        android:layout_height="@dimen/small_icon"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:contentDescription="@string/number_icon_description"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/number_divider"
+        app:srcCompat="@drawable/ic_hashtag" />
+
+    <TextView
+        android:id="@+id/served_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:singleLine="true"
+        android:textAppearance="@style/TextAppearance.MyTheme.Body2"
+        app:layout_constraintStart_toEndOf="@+id/number_icon"
+        app:layout_constraintTop_toTopOf="@+id/number_icon"
+        tools:text="@string/queue_info_current_number" />
+
+    <TextView
+        android:id="@+id/your_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:singleLine="true"
+        android:textAppearance="@style/TextAppearance.MyTheme.Body2"
+        app:layout_constraintStart_toStartOf="@+id/served_number"
+        app:layout_constraintTop_toBottomOf="@+id/served_number"
+        tools:text="@string/queue_info_your_number" />
+
+    <View
+        android:id="@+id/waiting_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/your_number" />
+
+    <ImageView
+        android:id="@+id/waiting_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="8dp"
+        android:contentDescription="@string/time_icon_description"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/waiting_divider"
+        app:srcCompat="@drawable/ic_hourglass" />
+
+    <TextView
+        android:id="@+id/expected_waiting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textAppearance="@style/TextAppearance.MyTheme.Body2"
+        app:layout_constraintStart_toStartOf="@+id/served_number"
+        app:layout_constraintTop_toTopOf="@+id/waiting_icon"
+        tools:text="@string/queue_info_expected_waiting" />
+
+    <TextView
+        android:id="@+id/average_waiting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:singleLine="true"
+        android:textAppearance="@style/TextAppearance.MyTheme.Body2"
+        app:layout_constraintStart_toStartOf="@+id/served_number"
+        app:layout_constraintTop_toBottomOf="@+id/expected_waiting"
+        tools:text="@string/queue_info_average_waiting" />
+
+    <TextView
+        android:id="@+id/service_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="8dp"
+        android:singleLine="true"
+        android:textAppearance="@style/TextAppearance.MyTheme.Body2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/served_number"
+        app:layout_constraintTop_toBottomOf="@+id/average_waiting"
+        tools:text="@string/queue_info_service_time" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="seconds">
+        <item quantity="zero">صفر</item>
+        <item quantity="one">ثانية</item>
+        <item quantity="two">ثانيتان</item>
+        <item quantity="few">%1$d ثوانٍ</item>
+        <item quantity="many">%1$d ثانية</item>
+        <item quantity="other">%1$d ثانية</item>
+    </plurals>
+
+    <plurals name="minutes">
+        <item quantity="zero">صفر</item>
+        <item quantity="one">دقيقة</item>
+        <item quantity="two">دقيقتان</item>
+        <item quantity="few">%1$d دقائق</item>
+        <item quantity="many">%1$d دقيقة</item>
+        <item quantity="other">%1$d دقيقة</item>
+    </plurals>
+
+    <plurals name="hours">
+        <item quantity="zero">صفر</item>
+        <item quantity="one">ساعة</item>
+        <item quantity="two">ساعتان</item>
+        <item quantity="few">%1$d ساعات</item>
+        <item quantity="many">%1$d ساعة</item>
+        <item quantity="other">%1$d ساعة</item>
+    </plurals>
+
+    <plurals name="days">
+        <item quantity="zero">صفر</item>
+        <item quantity="one">يوم</item>
+        <item quantity="two">يومان</item>
+        <item quantity="few">%1$d أيام</item>
+        <item quantity="many">%1$d يوم</item>
+        <item quantity="other">%1$d يوم</item>
+    </plurals>
+
+    <plurals name="weeks">
+        <item quantity="zero">صفر</item>
+        <item quantity="one">أسبوع</item>
+        <item quantity="two">أسبوعان</item>
+        <item quantity="few">%1$d أسابيع</item>
+        <item quantity="many">%1$d أسبوع</item>
+        <item quantity="other">%1$d أسبوع</item>
+    </plurals>
+
+    <plurals name="months">
+        <item quantity="zero">صفر</item>
+        <item quantity="one">شهر</item>
+        <item quantity="two">شهران</item>
+        <item quantity="few">%1$d أشهر</item>
+        <item quantity="many">%1$d شهر</item>
+        <item quantity="other">%1$d شهر</item>
+    </plurals>
+
+    <plurals name="years">
+        <item quantity="zero">صفر</item>
+        <item quantity="one">سنة</item>
+        <item quantity="two">سنتان</item>
+        <item quantity="few">%1$d سنوات</item>
+        <item quantity="many">%1$d سنة</item>
+        <item quantity="other">%1$d سنة</item>
+    </plurals>
+</resources>

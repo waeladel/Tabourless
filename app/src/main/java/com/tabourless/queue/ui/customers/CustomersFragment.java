@@ -6,9 +6,13 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -20,28 +24,35 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.tabourless.queue.R;
 import com.tabourless.queue.adapters.CustomersAdapter;
+import com.tabourless.queue.databinding.CustomersBottomSheetBinding;
 import com.tabourless.queue.databinding.FragmentCustomersBinding;
 import com.tabourless.queue.interfaces.ItemClickListener;
+import com.tabourless.queue.models.Counter;
 import com.tabourless.queue.models.Customer;
+import com.tabourless.queue.models.Queue;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
 import static com.tabourless.queue.App.CUSTOMER_STATUS_FRONT;
 import static com.tabourless.queue.App.DIRECTION_ARGUMENTS_KEY_PLACE_ID;
 import static com.tabourless.queue.App.DIRECTION_ARGUMENTS_KEY_QUEUE_ID;
+import static com.tabourless.queue.Utils.DateHelper.getRelativeTime;
 import static com.tabourless.queue.Utils.StringUtils.getFirstWord;
 
 
@@ -70,6 +81,12 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
     private static final int REACHED_THE_BOTTOM = -2;
     private static int mScrollDirection;
     private static int mLastVisibleItem;
+
+    private CustomersBottomSheetBinding mBottomSheetBinding;
+    private BottomSheetBehavior mBottomSheetBehavior;
+
+    private Customer mCurrentCustomer;
+    private Queue mQueue;
 
     public CustomersFragment() {
         // Required empty public constructor
@@ -125,7 +142,23 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         mBinding = FragmentCustomersBinding.inflate(inflater, container, false);
+        mBottomSheetBinding = mBinding.bottomSheetLayout;
+        mBottomSheetBehavior = BottomSheetBehavior.from(mBottomSheetBinding.bottomSheetLayout);
         View view = mBinding.getRoot();
+
+        // Expand the bottom sheet when clicked
+        mBottomSheetBinding.bottomSheetLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mBottomSheetBehavior.getState()== BottomSheetBehavior.STATE_EXPANDED){
+                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }else{
+                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                }
+            }
+        });
+
+        //mBottomSheetBinding.aheadCustomers.setText(getString(R.string.queue_info_ahead_customers, 2));
 
         navController = NavHostFragment.findNavController(this);
 
@@ -182,6 +215,104 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
         mLinearLayoutManager = new LinearLayoutManager(mContext);
         mBinding.customersRecycler.setLayoutManager(mLinearLayoutManager);
         mBinding.customersRecycler.setAdapter(mAdapter);
+
+        // Get current Customer/user
+         /*mViewModel.getCurrentCustomer().observe(getViewLifecycleOwner(), new Observer<Customer>() {
+            @Override
+            public void onChanged(Customer customer) {
+                LiveData<Customer> mCurrentCustomer = customer;
+            }
+        });*/
+
+        // To listen to changes of current customer and queue at the same time
+        final MediatorLiveData liveDataMerger  = new MediatorLiveData<>();
+        liveDataMerger.addSource(mViewModel.getCurrentCustomer(), new Observer<Customer>() {
+            @Override
+            public void onChanged(Customer customer) {
+                if (customer != null){
+                    Log.d(TAG, "mama getCurrentCustomer onChanged: customer number= "+ customer.getNumber()+ " userId= "+ customer.getUserId());
+                    mCurrentCustomer = customer;
+                    liveDataMerger.setValue(customer);
+                }
+            }
+        });
+
+        liveDataMerger.addSource(mViewModel.getQueue(), new Observer<Queue>() {
+            @Override
+            public void onChanged(Queue queue) {
+                if(queue != null){
+                    Log.d(TAG, "mama getQueue onChanged: getTotalCustomers= "+ queue.getTotalCustomers());
+                    mQueue = queue;
+                    liveDataMerger.setValue(queue);
+                }
+            }
+        });
+
+        // live data merger can now listen to changes in queue and current customers
+        liveDataMerger.observe(getViewLifecycleOwner(), new Observer() {
+            @Override
+            public void onChanged(Object object) {
+                Log.d(TAG, "mama liveDataMerger onChanged: getTotalCustomers= ");
+                if (mQueue != null) {
+                    Log.d(TAG, "getQueue onChanged: " + mQueue.getTotalCustomers());
+                    // Display total customers
+                    mBottomSheetBinding.totalCustomers.setText(getString(R.string.queue_info_total_customers, mQueue.getTotalCustomers()));
+
+                    if(mCurrentCustomer != null){
+                        // Display total ahead customers
+                        int biggestFrontNumber = 0;
+                        long shortestWaitingTime = 0;
+                        long shortestServiceTime = 0;
+                        long expectedWaitingTime = 0;
+
+                        // loop throw all counters to get the biggest front number
+                        for (Object o : mQueue.getCounters().entrySet()) {
+                            Map.Entry pair = (Map.Entry) o;
+                            Log.d(TAG, "queue.getCounters() map key/val = " + pair.getKey() + " = " + pair.getValue());
+                            Counter counter = mQueue.getCounters().get(String.valueOf(pair.getKey()));
+                            if (counter != null) {
+                                // get the biggest front number that doesn't exceed current customer number
+                                if (counter.getFrontNumber() >= biggestFrontNumber && counter.getFrontNumber() <= mCurrentCustomer.getNumber()) {
+                                    biggestFrontNumber = counter.getFrontNumber();
+                                }
+
+                                // get the shortest Waiting Time
+                                if (shortestWaitingTime == 0 || counter.getWaitingTime() <= shortestWaitingTime) {
+                                    shortestWaitingTime = counter.getWaitingTime();
+                                }
+
+                                // get the shortest Waiting Time
+                                if (shortestServiceTime == 0 || counter.getServiceTime() <= shortestServiceTime) {
+                                    shortestServiceTime = counter.getServiceTime();
+                                }
+                            }
+                        }// End loop
+
+                        int aheadCustomers = mCurrentCustomer.getNumber() - biggestFrontNumber;// - queue.getFrontNumber;
+                        mBottomSheetBinding.aheadCustomers.setText(getString(R.string.queue_info_ahead_customers, aheadCustomers));
+
+                        // Display expected waiting time
+                        expectedWaitingTime = shortestServiceTime * aheadCustomers;
+                        mBottomSheetBinding.expectedWaiting.setText(getString(R.string.queue_info_expected_waiting, getRelativeTime(expectedWaitingTime, mContext)));
+
+                        // Display average waiting time
+                        mBottomSheetBinding.averageWaiting.setText(getString(R.string.queue_info_average_waiting, getRelativeTime(shortestWaitingTime, mContext)));
+
+
+                        // Display average service time
+                        mBottomSheetBinding.serviceTime.setText(getString(R.string.queue_info_service_time, getRelativeTime(shortestServiceTime, mContext)));
+
+                        // Display current customer number
+                        mBottomSheetBinding.yourNumber.setText(getString(R.string.queue_info_your_number, mCurrentCustomer.getNumber()));
+
+                        // Display front number
+                        mBottomSheetBinding.servedNumber.setText(getString(R.string.queue_info_current_number, biggestFrontNumber));
+                    }
+
+                }
+            }
+        });
+
 
         mBinding.customersRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -375,6 +506,7 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
         return view;
     }
 
+
     @Override
     public void onStop() {
         super.onStop();
@@ -417,4 +549,5 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
             }
         }
     }
+
 }

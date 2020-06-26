@@ -72,6 +72,13 @@
 <!--    <string name="add_place_counter_helper">Only add multiple counters if this service can serve more than one customer simultaneously. If you see multiple queues in front of a single counter, add only one counter then use filters to separate the queues</string>-->
     <string name="add_place_counter_helper">If the counter has no sign, use names like (counter A,B) instead of (1,2) to be clear they are named from left to right. If you see a counter serving multiple queues, add a separate counter for each queue.</string>
     <string name="customer_number_title" translatable="false">#:</string>
+    <string name="queue_info_current_number">Serving token: %1$d</string>
+    <string name="queue_info_your_number">Your token: %1$d</string>
+    <string name="queue_info_ahead_customers">Customers Ahead: %1$d</string>
+    <string name="queue_info_total_customers">Total customers: %1$d</string>
+    <string name="queue_info_expected_waiting">Expected waiting: %1$s</string>
+    <string name="queue_info_average_waiting">Average waiting: %1$s</string>
+    <string name="queue_info_service_time">Service time: %1$s</string>
 
     <!--toast and error messages -->
     <string name="sign_in_cancelled">Sign in has been cancelled</string>
@@ -127,6 +134,10 @@
     <string name="message_sent_icon">Message sent icon</string>
     <string name="remove_counter_icon">Remove counter button</string>
     <string name="queue_item_location_icon">Place icon</string>
+    <string name="bottom_sheet_maximize_icon">Maximize icon</string>
+    <string name="number_icon_description">Token icon</string>
+    <string name="customers_queue_icon_description">Customer\'s icon</string>
+    <string name="time_icon_description">waiting icon</string>
 
     <!--Input text helper-->
     <string name="required_helper">*Required</string>

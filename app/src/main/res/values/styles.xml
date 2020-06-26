@@ -30,6 +30,11 @@
         <item name="textAppearanceHeadline6">@style/TextAppearance.MyTheme.Headline6</item>
         <item name="textAppearanceBody2">@style/TextAppearance.MyTheme.Body2</item>
 
+        <!--Material shape attributes-->
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.MyTheme.SmallComponent</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.MyTheme.MediumComponent</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.MyTheme.LargeComponent</item>
+
         <!--Component styles-->
         <item name="toolbarStyle">@style/ToolbarStyle.Primary.MyTheme</item>
 
@@ -86,5 +91,6 @@
         <!--<for background colors (API<12)>-->
         <item name="android:windowBackground">@color/colorBackground</item>
     </style>
+
 
 </resources>

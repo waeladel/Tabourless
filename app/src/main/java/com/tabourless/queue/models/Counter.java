@@ -13,6 +13,11 @@ public class Counter {
     // This is an object for counters map inside queues map
     private String key;
     private String name;
+    private String frontId;
+    private int frontNumber;
+    private String nextId;
+    private long waitingTime;
+    private long serviceTime;
     private boolean open;
     private String gender;
     private String age;
@@ -36,11 +41,16 @@ public class Counter {
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
         result.put("name", name);
+        result.put("frontId", frontId);
+        result.put("frontNumber", frontNumber);
+        result.put("nextId", nextId);
         result.put("open", open);
         result.put("gender", gender);
         result.put("age", age);
         result.put("disability", disability);
         result.put("nationality", nationality);
+        result.put("waitingTime", waitingTime);
+        result.put("serviceTime", serviceTime);
 
         return result;
     }
@@ -57,6 +67,46 @@ public class Counter {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getFrontId() {
+        return frontId;
+    }
+
+    public void setFrontId(String frontId) {
+        this.frontId = frontId;
+    }
+
+    public int getFrontNumber() {
+        return frontNumber;
+    }
+
+    public void setFrontNumber(int frontNumber) {
+        this.frontNumber = frontNumber;
+    }
+
+    public String getNextId() {
+        return nextId;
+    }
+
+    public void setNextId(String nextId) {
+        this.nextId = nextId;
+    }
+
+    public long getWaitingTime() {
+        return waitingTime;
+    }
+
+    public void setWaitingTime(long waitingTime) {
+        this.waitingTime = waitingTime;
+    }
+
+    public long getServiceTime() {
+        return serviceTime;
+    }
+
+    public void setServiceTime(long serviceTime) {
+        this.serviceTime = serviceTime;
     }
 
     public boolean isOpen() {

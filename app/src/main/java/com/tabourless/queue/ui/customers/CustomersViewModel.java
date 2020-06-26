@@ -5,42 +5,33 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-import androidx.paging.ItemKeyedDataSource;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.tabourless.queue.data.CustomersDataFactory;
-import com.tabourless.queue.data.MessagesDataFactory;
-import com.tabourless.queue.data.MessagesListRepository;
-import com.tabourless.queue.data.MessagesRepository;
-import com.tabourless.queue.interfaces.FirebaseMessageCallback;
-import com.tabourless.queue.interfaces.FirebaseOnCompleteCallback;
-import com.tabourless.queue.models.Chat;
+import com.tabourless.queue.data.QueueRepository;
 import com.tabourless.queue.models.Customer;
 import com.tabourless.queue.models.Message;
 import com.tabourless.queue.models.Queue;
 import com.tabourless.queue.models.User;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Timer;
+import com.tabourless.queue.models.UserQueue;
 
 import static com.tabourless.queue.App.DATABASE_REF_CUSTOMERS;
 
 public class CustomersViewModel extends ViewModel {
     private final static String TAG = CustomersViewModel.class.getSimpleName();
     private CustomersDataFactory mCustomersDataFactory;
+    public QueueRepository mQueueRepository;
     private PagedList.Config config;
     public LiveData<PagedList<Customer>> itemPagedList;
     public  MutableLiveData<PagedList<Message>> items;
     public  LiveData<User> mCurrentUser;
     public  LiveData<Queue> mQueue;
+    public  LiveData<Customer> mCurrentCustomer;
 
     private DatabaseReference mDatabaseRef;
     private DatabaseReference mCustomersRef;
@@ -61,6 +52,7 @@ public class CustomersViewModel extends ViewModel {
 
         // pass chatKey to the constructor of MessagesDataFactory
         mCustomersDataFactory = new CustomersDataFactory(placeKey, queueKey);
+        mQueueRepository = new QueueRepository();
 
         Log.d(TAG, "CustomersViewModel init");
 
@@ -79,8 +71,8 @@ public class CustomersViewModel extends ViewModel {
         itemPagedList = new LivePagedListBuilder<>(mCustomersDataFactory, config).build();
         /*itemPagedList = (new LivePagedListBuilder(messagesDataFactory,config))
                 .build();*/
-       /* mQueue = mCustomersDataFactory.getQueue(placeKey, queueKey);
-        mCurrentUser = mCustomersDataFactory.getCurrentUser(mCurrentUserId);*/
+        mQueue = mQueueRepository.getQueue(placeKey, queueKey);
+        mCurrentCustomer = mQueueRepository.getCurrentCustomer(placeKey, queueKey, mCurrentUserId);
 
     }
 
@@ -93,6 +85,13 @@ public class CustomersViewModel extends ViewModel {
         mCustomersDataFactory.setScrollDirection(scrollDirection, lastVisibleItem);
     }
 
+    public LiveData<Customer> getCurrentCustomer() {
+        return mCurrentCustomer;
+    }
+    public LiveData<Queue> getQueue() {
+        return mQueue;
+    }
+
     public void removeCustomer(Customer customer) {
         mCustomersDataFactory.removeCustomer(customer);
     }
@@ -103,6 +102,7 @@ public class CustomersViewModel extends ViewModel {
 
         // Remove all Listeners
         mCustomersDataFactory.removeListeners();
+        mQueueRepository.removeListeners();
         super.onCleared();
     }
 

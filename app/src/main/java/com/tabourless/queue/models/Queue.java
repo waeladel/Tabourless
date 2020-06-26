@@ -17,6 +17,7 @@ public class Queue {
     private String key;
     private String name;
     private Map<String, Counter> counters = new LinkedHashMap<>();
+    private int lastNumber, totalCustomers;
 
 
     public Queue() {
@@ -33,6 +34,8 @@ public class Queue {
         HashMap<String, Object> result = new HashMap<>();
         result.put("name", name);
         result.put("counters", counters);
+        result.put("lastNumber", lastNumber);
+        result.put("totalCustomers", totalCustomers);
 
         return result;
     }
@@ -51,13 +54,28 @@ public class Queue {
         this.name = name;
     }
 
-
     public Map<String, Counter> getCounters() {
         return counters;
     }
 
     public void setCounters(Map<String, Counter> counters) {
         this.counters = counters;
+    }
+
+    public int getLastNumber() {
+        return lastNumber;
+    }
+
+    public void setLastNumber(int lastNumber) {
+        this.lastNumber = lastNumber;
+    }
+
+    public int getTotalCustomers() {
+        return totalCustomers;
+    }
+
+    public void setTotalCustomers(int totalCustomers) {
+        this.totalCustomers = totalCustomers;
     }
 
     @Override
@@ -67,6 +85,8 @@ public class Queue {
         Queue queue1 = (Queue) o;
         return
                 TextUtils.equals(name, queue1.name)&&
+                lastNumber == queue1.lastNumber &&
+                totalCustomers == queue1.totalCustomers &&
                 (counters == queue1.counters || (counters!=null && counters.equals(queue1.counters)));
     }
 
@@ -75,6 +95,8 @@ public class Queue {
         //return Objects.hash(key, avatar, name, read);
         int result = 1;
         result = 31 * result + (name == null ? 0 : name.hashCode());
+        result = 31 * result + (lastNumber == 0 ? 0 : 1);
+        result = 31 * result + (totalCustomers == 0 ? 0 : 1);
         result = 31 * result + (counters == null ? 0 : counters.hashCode());
         return result;
     }

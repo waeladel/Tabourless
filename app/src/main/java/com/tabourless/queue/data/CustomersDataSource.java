@@ -3,10 +3,12 @@ package com.tabourless.queue.data;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
 import androidx.paging.ItemKeyedDataSource;
 
 import com.tabourless.queue.interfaces.FirebaseOnCompleteCallback;
 import com.tabourless.queue.models.Customer;
+import com.tabourless.queue.models.Queue;
 
 import java.util.List;
 
@@ -26,6 +28,7 @@ public class CustomersDataSource extends ItemKeyedDataSource<String, Customer> {
             invalidate();
             Log.d(TAG, "mama invalidate ");
         }*/
+        mCustomersRepository = new CustomersRepository(mPlaceKey, mQueueKey);
     }
 
     // a callback to invalidate the data whenever a change happen
@@ -34,10 +37,11 @@ public class CustomersDataSource extends ItemKeyedDataSource<String, Customer> {
         //super.addInvalidatedCallback(onInvalidatedCallback);
         Log.d(TAG, "CustomersDataSource addInvalidatedCallback ");
 
+        mCustomersRepository.setInvalidatedCallback(onInvalidatedCallback);
         // initiate messagesRepository here to pass  onInvalidatedCallback
         //messagesRepository = MessagesListRepository.getInstance();
         //messagesRepository = MessagesListRepository.init(mMessageKey, onInvalidatedCallback);
-        mCustomersRepository = new CustomersRepository(mPlaceKey, mQueueKey, onInvalidatedCallback);
+       // mCustomersRepository = new CustomersRepository(mPlaceKey, mQueueKey, onInvalidatedCallback);
         //messagesRepository.MessagesChanged(onInvalidatedCallback);
         //invalidate();
     }

@@ -17,15 +17,18 @@ public class UserQueue {
     private String key;
     private String name;
     private String placeId;
+    private String placeName;
+    private int number;
     private Object joined;
 
     public UserQueue() {
     }
 
-    public UserQueue(String key, String name, String placeId) {
+    public UserQueue(String key, String name, String placeId, String placeName) {
         this.key = key;
         this.name = name;
         this.placeId = placeId;
+        this.placeName = placeName;
     }
 
     // [START post_to_map]
@@ -35,6 +38,8 @@ public class UserQueue {
         result.put("name", name);
         result.put("joined", ServerValue.TIMESTAMP);
         result.put("placeId", placeId);
+        result.put("placeName", placeName);
+        result.put("number", number);
 
         return result;
     }
@@ -61,6 +66,22 @@ public class UserQueue {
         this.placeId = placeId;
     }
 
+    public String getPlaceName() {
+        return placeName;
+    }
+
+    public void setPlaceName(String placeName) {
+        this.placeName = placeName;
+    }
+
+    public int getNumber() {
+        return number;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
+    }
+
     public Object getJoined() {
         return joined;
     }
@@ -82,6 +103,8 @@ public class UserQueue {
         return
                 TextUtils.equals(name, queue1.name)&&
                 TextUtils.equals(placeId, queue1.placeId)&&
+                TextUtils.equals(placeName, queue1.placeName)&&
+                number == queue1.number &&
                 (joined == queue1.joined || (joined!=null && joined.equals(queue1.joined)));
     }
 
@@ -91,6 +114,8 @@ public class UserQueue {
         int result = 1;
         result = 31 * result + (name == null ? 0 : name.hashCode());
         result = 31 * result + (placeId == null ? 0 : placeId.hashCode());
+        result = 31 * result + (placeName == null ? 0 : placeName.hashCode());
+        result = 31 * result + (number == 0 ? 0 : 1);
         result = 31 * result + (joined == null ? 0 : joined.hashCode());
         return result;
     }

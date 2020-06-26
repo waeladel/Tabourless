@@ -70,6 +70,13 @@
     <string name="add_place_counter_hint">الرئيسي، شباك أ، شباك كبار السن</string>
     <string name="add_place_counter_helper">في حالة عدم وجود لافتة للشباك، اختر أسماء مثل (شباك أ، ب) بدلا من (1، 2) لتوضيح أن الشبابيك مسماه من اليمن لليسار. لو ترى شباك يقدم خدمة لأكثر من طابور، أضف شباكا منفصلا لكل طابور.</string>
     <string name="customer_number_title" translatable="false">#:</string>
+    <string name="queue_info_current_number">الرقم الحالي: %1$d</string>
+    <string name="queue_info_your_number">رقمك: %1$d</string>
+    <string name="queue_info_ahead_customers">العملاء أمامك: %1$d</string>
+    <string name="queue_info_total_customers">إجمالي العملاء: %1$d</string>
+    <string name="queue_info_expected_waiting">الانتظار المتوقع: %1$s</string>
+    <string name="queue_info_average_waiting">متوسط الانتظار: %1$s</string>
+    <string name="queue_info_service_time">الخدمة تستغرق: %1$s</string>
 
     <!--toast and error messages -->
     <string name="sign_in_cancelled">تم إلغاء تسجيل الدخول</string>
@@ -125,6 +132,11 @@
     <string name="message_sent_icon">علامة إتمام ارسال الرسالة</string>
     <string name="remove_counter_icon">زر حذف شباك</string>
     <string name="queue_item_location_icon">أيقونة مكان</string>
+    <string name="bottom_sheet_maximize_icon">أيقونة تكبير القائمة</string>
+    <string name="number_icon_description">أيقونة الرقم</string>
+    <string name="customers_queue_icon_description">أيقونة العملاء</string>
+    <string name="time_icon_description">أيقونة الانتظار</string>
+
 
     <!--Input text helper-->
     <string name="required_helper">*إجباري</string>

@@ -2,6 +2,7 @@ package com.tabourless.queue.adapters;
 
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -62,18 +63,27 @@ public class QueuesAdapter extends PagedListAdapter<UserQueue, QueuesAdapter.Vie
         final UserQueue userQueue = getItem(position);
         if (userQueue != null) {
             // Queue name text value
-            if (null != userQueue.getName()) {
+            if (!TextUtils.isEmpty(userQueue.getName())) {
                 holder.mBinding.queueName.setText(userQueue.getName());
             }else{
                 holder.mBinding.queueName.setText(null);
             }
 
             // Place name text value
-            if (null != userQueue.getName()) {
-                holder.mBinding.placeName.setText(userQueue.getPlaceId());
+            if (!TextUtils.isEmpty(userQueue.getName())) {
+                holder.mBinding.placeName.setText(userQueue.getPlaceName());
             }else{
                 holder.mBinding.placeName.setText(null);
             }
+
+            // customer's number
+            if (userQueue.getNumber() != 0) {
+                holder.mBinding.numberValue.setText(String.valueOf(userQueue.getNumber()));
+                holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_medium_trype);
+            }else{
+                holder.mBinding.placeName.setText(null);
+            }
+
 
             // Joined Time text value
             Log.d(TAG, "onBindViewHolder: ");

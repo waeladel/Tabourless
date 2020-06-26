@@ -23,6 +23,7 @@ import com.tabourless.queue.interfaces.FirebaseOnCompleteCallback;
 import com.tabourless.queue.models.Customer;
 import com.tabourless.queue.models.FirebaseListeners;
 import com.tabourless.queue.models.Message;
+import com.tabourless.queue.models.Queue;
 import com.tabourless.queue.models.User;
 
 import java.util.ArrayList;
@@ -32,6 +33,8 @@ import java.util.List;
 import java.util.Map;
 
 import static com.tabourless.queue.App.DATABASE_REF_CUSTOMERS;
+import static com.tabourless.queue.App.DATABASE_REF_PLACES;
+import static com.tabourless.queue.App.DATABASE_REF_QUEUES;
 import static com.tabourless.queue.App.DATABASE_REF_QUEUE_JOINED;
 import static com.tabourless.queue.App.DATABASE_REF_USER_QUEUES;
 
@@ -53,6 +56,7 @@ public class CustomersRepository {
     private String afterKey;
     private String beforeKey;
     private String mPlaceKey, mQueueKey;
+
 
     // Not static to only remove listeners of this repository instance
     // Start destination fragment is never destroyed , so when clicking on it's bottom navigation icon again it got destroyed to be recreated
@@ -203,9 +207,7 @@ public class CustomersRepository {
         }
     };
 
-    //private Query getMessagesQuery;
-
-    public CustomersRepository(String placeKey, String queueKey, @NonNull DataSource.InvalidatedCallback onInvalidatedCallback){
+    public CustomersRepository(String placeKey, String queueKey){
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
         // use received placeKey and queueKey to create a database ref
         Log.d(TAG, "CustomersRepository: placeId= "+ placeKey+ " queueId= "+ queueKey);
@@ -216,7 +218,6 @@ public class CustomersRepository {
         currentUserId = mFirebaseCurrentUser!= null ? mFirebaseCurrentUser.getUid() : null;
 
         // call back to invalidate data
-        this.invalidatedCallback = onInvalidatedCallback;
         this.mPlaceKey = placeKey;
         this.mQueueKey = queueKey;
 
@@ -666,4 +667,7 @@ public class CustomersRepository {
         invalidatedCallback.onInvalidated();
     }
 
+    public void setInvalidatedCallback(DataSource.InvalidatedCallback onInvalidatedCallback) {
+        this.invalidatedCallback = onInvalidatedCallback;
+    }
 }

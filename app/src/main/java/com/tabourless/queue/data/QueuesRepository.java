@@ -24,6 +24,8 @@ import java.util.Map;
 
 import static com.tabourless.queue.App.DATABASE_REF_CUSTOMERS;
 import static com.tabourless.queue.App.DATABASE_REF_CUSTOMER_USER_ID;
+import static com.tabourless.queue.App.DATABASE_REF_PLACES;
+import static com.tabourless.queue.App.DATABASE_REF_QUEUES;
 import static com.tabourless.queue.App.DATABASE_REF_QUEUE_JOINED;
 import static com.tabourless.queue.App.DATABASE_REF_USER_QUEUES;
 

@@ -15,9 +15,14 @@
  * limitations under the License.
  */
 package com.tabourless.queue.Utils;
+import android.content.Context;
+
+import com.tabourless.queue.R;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Helper for date handle
@@ -53,4 +58,55 @@ public abstract class DateHelper {
         }
 
     }
+
+    public static CharSequence getRelativeTime (long timePeriod, Context context) {
+
+        Long second = TimeUnit.MILLISECONDS.toSeconds(timePeriod);
+        Long minute = TimeUnit.MILLISECONDS.toMinutes(timePeriod);
+        Long hour   = TimeUnit.MILLISECONDS.toHours(timePeriod);
+        Long day  = TimeUnit.MILLISECONDS.toDays(timePeriod);
+
+        String relativeTime = null;
+
+
+        if (second < 60) {
+            // seconds
+            //relativeTime = second + " Seconds ";
+            relativeTime = context.getResources().getQuantityString(R.plurals.seconds, second.intValue(), second.intValue());
+        } else if (minute < 60) {
+            // minutes
+            //relativeTime = minute + " Minutes ";
+            relativeTime = context.getResources().getQuantityString(R.plurals.minutes, minute.intValue(), minute.intValue());
+        } else if (hour < 24) {
+            // hours
+            //relativeTime = hour + " Hours ";
+            relativeTime = context.getResources().getQuantityString(R.plurals.hours, hour.intValue(), hour.intValue());
+        } else if (day >= 7) {
+            if (day > 360) {
+                // Years
+                //relativeTime = (day / 360) + " Years " ;
+                Long days = day / 360;
+                relativeTime = context.getResources().getQuantityString(R.plurals.years, days.intValue(), days.intValue());
+            } else if (day > 30) {
+                // Months
+                //relativeTime = (day / 30) + " Months ";
+                Long days = day / 30;
+                relativeTime = context.getResources().getQuantityString(R.plurals.months, days.intValue(), days.intValue());
+            } else {
+                // Week
+                //relativeTime = (day / 7) + " Week ";
+                Long days = day / 7;
+                relativeTime = context.getResources().getQuantityString(R.plurals.weeks, days.intValue(), days.intValue());
+            }
+        } else if (day < 7) {
+            // day
+            //relativeTime = day+" Days ";
+            relativeTime = context.getResources().getQuantityString(R.plurals.days, day.intValue(), day.intValue());
+        }
+
+        //CharSequence ago = DateUtils.getRelativeTimeSpanString((now - timePeriod) , now, DateUtils.MINUTE_IN_MILLIS);
+        return relativeTime;
+
+    }
+
 }

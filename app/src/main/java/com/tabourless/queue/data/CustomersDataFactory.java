@@ -1,12 +1,10 @@
 package com.tabourless.queue.data;
 
+import androidx.lifecycle.LiveData;
 import androidx.paging.DataSource;
 
-import com.tabourless.queue.interfaces.FirebaseOnCompleteCallback;
 import com.tabourless.queue.models.Customer;
-import com.tabourless.queue.models.Message;
-
-import java.util.List;
+import com.tabourless.queue.models.Queue;
 
 public class CustomersDataFactory extends DataSource.Factory<String, Customer>{
 
