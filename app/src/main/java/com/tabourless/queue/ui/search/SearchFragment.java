@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.location.Location;
 import android.os.Bundle;
 
@@ -51,6 +52,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipDrawable;
+import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.tabourless.queue.R;
@@ -58,6 +60,7 @@ import com.tabourless.queue.databinding.ChipItemBinding;
 import com.tabourless.queue.databinding.FragmentSearchBinding;
 import com.tabourless.queue.interfaces.FirebaseOnCompleteCallback;
 import com.tabourless.queue.interfaces.FirebaseUserCallback;
+import com.tabourless.queue.interfaces.FirebaseUserQueueCallback;
 import com.tabourless.queue.models.Customer;
 import com.tabourless.queue.models.Place;
 import com.tabourless.queue.models.PlaceMarker;
@@ -206,10 +209,23 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                 // get selected service/queue
                 Log.d(TAG, "onClick: CheckedChipId = "+ mBinding.servicesChipGroup.getCheckedChipId());
                 //Chip selectedChip = mBinding.servicesChipGroup.getCheckedChipId();
-                UserQueue selectedUserQueue = mViewModel.chipsQueuesMap.get(mBinding.servicesChipGroup.getCheckedChipId());
+                final UserQueue selectedUserQueue = mViewModel.chipsQueuesMap.get(mBinding.servicesChipGroup.getCheckedChipId());
                 if(selectedUserQueue != null){
                     Log.d(TAG, "onClick: selectedQueue key= "+ selectedUserQueue.getKey() + " name= "+ selectedUserQueue.getName()+ " Place Id " + selectedUserQueue.getPlaceId());
-                    bookQueue(selectedUserQueue);
+                    // double check that user is not in this queue before
+                    mViewModel.getUserQueueOnce(mCurrentUserId, selectedUserQueue.getKey(), new FirebaseUserQueueCallback() {
+                        @Override
+                        public void onCallback(UserQueue userQueue) {
+                            if(userQueue != null){
+                                Log.d(TAG, "onCallback: current user already in the queue");
+                                return;
+                            }else{
+                                Log.d(TAG, "onCallback: current user didn't join the queue");
+                                bookQueue(selectedUserQueue);
+                            }
+                        }
+                    });
+
                 }
                 // join customer to queue key
             }
@@ -498,7 +514,7 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
         mBinding.servicesChipGroup.removeAllViews(); // remove all previous views to start fresh
         mViewModel.chipsQueuesMap.clear(); // To remove all chips associations with queues
 
-        // Loop throw queues to display it's chips
+        // Loop throw queues to display chips
         for (Object o : place.getQueues().entrySet()) {
             Map.Entry pair = (Map.Entry) o;
             Log.d(TAG, "showPlaceInfo place.getQueues() map key/val = " + pair.getKey() + " = " + pair.getValue());
@@ -518,14 +534,35 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                 //chip.setChipDrawable(chipDrawable);
                 mBinding.servicesChipGroup.addView(mChipBinding.chipItem);
                 mViewModel.chipsQueuesMap.put(mChipBinding.chipItem.getId(), userQueue); // a map to get selected service
-                /*mBinding.servicesChipGroup.setOnCheckedChangeListener(new ChipGroup.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(ChipGroup group, int checkedId) {
-
-                    }
-                });*/
             }
         }
+
+        // Listen to chip selection
+        mBinding.servicesChipGroup.setOnCheckedChangeListener(new ChipGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(ChipGroup group, int checkedId) {
+                UserQueue selectedUserQueue = mViewModel.chipsQueuesMap.get(checkedId);
+                if(selectedUserQueue != null){
+                    Log.d(TAG, "onCheckedChanged: "+selectedUserQueue.getKey());
+                    // Disable book button if already booked
+                    mViewModel.getUserQueueOnce(mCurrentUserId, selectedUserQueue.getKey(), new FirebaseUserQueueCallback() {
+                        @Override
+                        public void onCallback(UserQueue userQueue) {
+                            if(userQueue == null){
+                                Log.d(TAG, "onCallback: current user didn't join the queue");
+                                mBinding.bookButton.setEnabled(true);
+                                mBinding.bookButton.setClickable(true);
+                            }else{
+                                Log.d(TAG, "onCallback: current user already in the queue");
+                                mBinding.bookButton.setEnabled(false);
+                                mBinding.bookButton.setClickable(false);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+
     }
 
     // To add customer to queue

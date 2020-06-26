@@ -25,6 +25,8 @@
         android:id="@+id/place_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
         android:layout_gravity="bottom|end"
         android:visibility="invisible"
         map:cardCornerRadius="12dp"

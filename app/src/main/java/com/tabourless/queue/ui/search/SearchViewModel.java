@@ -15,6 +15,7 @@ import com.google.android.material.chip.Chip;
 import com.tabourless.queue.data.SearchRepository;
 import com.tabourless.queue.interfaces.FirebaseOnCompleteCallback;
 import com.tabourless.queue.interfaces.FirebaseUserCallback;
+import com.tabourless.queue.interfaces.FirebaseUserQueueCallback;
 import com.tabourless.queue.models.Customer;
 import com.tabourless.queue.models.Place;
 import com.tabourless.queue.models.PlaceMarker;
@@ -110,6 +111,11 @@ public class SearchViewModel extends ViewModel {
     public void getUserOnce(String userId, FirebaseUserCallback callback) {
         mSearchRepository.getUserOnce(userId, callback);
     }
+
+    public void getUserQueueOnce(String userId, String queueId, FirebaseUserQueueCallback callback) {
+        mSearchRepository.getUserQueueOnce(userId, queueId, callback);
+    }
+
 
     @Override
     protected void onCleared() {

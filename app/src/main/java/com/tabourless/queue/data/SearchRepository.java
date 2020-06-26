@@ -23,6 +23,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.tabourless.queue.interfaces.FirebaseOnCompleteCallback;
 import com.tabourless.queue.interfaces.FirebasePlaceCallback;
 import com.tabourless.queue.interfaces.FirebaseUserCallback;
+import com.tabourless.queue.interfaces.FirebaseUserQueueCallback;
 import com.tabourless.queue.models.Customer;
 import com.tabourless.queue.models.FirebaseListeners;
 import com.tabourless.queue.models.Place;
@@ -46,7 +47,7 @@ public class SearchRepository {
 
     // [START declare_database_ref]
     private DatabaseReference mDatabaseRef;
-    private DatabaseReference mPlacesRef , mCustomersRef, mUsersRef; // to get place, to add customer to queue, to get current user
+    private DatabaseReference mPlacesRef , mCustomersRef, mUsersRef, mUserQueuesRef; // to get place, to add customer to queue, to get current user
     private  GeoFire mGeoFire; // GeoFire database reference
     private GeoQuery mGeoQuery; // GeoFire Query
 
@@ -147,6 +148,7 @@ public class SearchRepository {
         mPlacesRef = mDatabaseRef.child(DATABASE_REF_PLACES);
         mCustomersRef = mDatabaseRef.child(DATABASE_REF_CUSTOMERS);;
         mUsersRef = mDatabaseRef.child(DATABASE_REF_USERS);
+        mUserQueuesRef = mDatabaseRef.child(DATABASE_REF_USER_QUEUES);
         mGeoFire = new GeoFire(mPlacesRef);
 
         //Get current logged in user
@@ -321,6 +323,37 @@ public class SearchRepository {
                     // So we don't create or update tokens and online presence
                     callback.onCallback(null);
                     Log.w(TAG, "getUserOnce User is null, no such user");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.w(TAG, "getUserOnce User onCancelled" +databaseError);
+            }
+        });
+    }
+
+    public void getUserQueueOnce(String userId, String queueId, final FirebaseUserQueueCallback callback){
+
+        DatabaseReference userQueueRef = mUserQueuesRef.child(userId).child(queueId);
+        //final MutableLiveData<User> mCurrentUser = new MutableLiveData<>();
+        Log.d(TAG, "getUserQueueOnce initiated: " + userId);
+
+        userQueueRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // Get user value
+                    UserQueue userQueue = dataSnapshot.getValue(UserQueue.class);
+                    if(userQueue != null){
+                        userQueue.setKey(dataSnapshot.getKey());
+                    }
+                    callback.onCallback(userQueue);
+                } else {
+                    // Return a null user to view model to know when user doesn't exist,
+                    // So we don't create or update tokens and online presence
+                    callback.onCallback(null);
+                    Log.w(TAG, "getUserQueue is null, this user didn't join the queue before");
                 }
             }
 
