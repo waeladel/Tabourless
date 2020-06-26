@@ -217,8 +217,13 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                         @Override
                         public void onCallback(UserQueue userQueue) {
                             if(userQueue != null){
-                                Log.d(TAG, "onCallback: current user already in the queue");
-                                return;
+                                if(userQueue.getJoinedLong() != 0){
+                                    Log.d(TAG, "onCallback: current user already in the queue");
+                                    return;
+                                }else{
+                                    Log.d(TAG, "onCallback: current user quited the queue");
+                                    bookQueue(selectedUserQueue);
+                                }
                             }else{
                                 Log.d(TAG, "onCallback: current user didn't join the queue");
                                 bookQueue(selectedUserQueue);
@@ -553,9 +558,15 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                                 mBinding.bookButton.setEnabled(true);
                                 mBinding.bookButton.setClickable(true);
                             }else{
-                                Log.d(TAG, "onCallback: current user already in the queue");
-                                mBinding.bookButton.setEnabled(false);
-                                mBinding.bookButton.setClickable(false);
+                                if(userQueue.getJoinedLong() != 0){
+                                    Log.d(TAG, "onCallback: current user already in the queue");
+                                    mBinding.bookButton.setEnabled(false);
+                                    mBinding.bookButton.setClickable(false);
+                                }else{
+                                    Log.d(TAG, "onCallback: current user quited the queue");
+                                    mBinding.bookButton.setEnabled(true);
+                                    mBinding.bookButton.setClickable(true);
+                                }
                             }
                         }
                     });
