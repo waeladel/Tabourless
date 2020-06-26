@@ -122,7 +122,11 @@ public class QueuesFragment extends Fragment implements ItemClickListener {
                                             if(items.size() == 0 && sleepCounter == 1000){
                                                 // If we submit List after loop is finish with 0 results
                                                 // we may erase another results submitted via newer thread
-                                                Log.d(TAG, "ChatsFragment onChanged. Loop finished with 0 items. Don't submitList");
+
+                                                //  Loop finished with 0 items. We must submitList to remove all items. also i can't count on just submitting null to adapter
+                                                //  when swipe last item because last item maybe deleted by another user.
+                                                Log.d(TAG, "onChanged. Loop finished with 0 items. We must submitList to remove all");
+                                                mAdapter.submitList(items);
                                             }else{
                                                 Log.d(TAG, "ChatsFragment onChanged. submitList= "+items.size());
                                                 mAdapter.submitList(items);
@@ -287,6 +291,10 @@ public class QueuesFragment extends Fragment implements ItemClickListener {
                                             // it's dismissed due to time out DISMISS_EVENT_TIMEOUT. Lets remove customer from database
                                             Log.d(TAG, "onDismissed: event is not click undo deletedCustomer= "+deletedQueue.getKey());
                                             mViewModel.removeQueue(mCurrentUserId, deletedQueue);
+                                            if(mAdapter.getItemCount() <= 1){
+                                                mAdapter.notifyItemRemoved(position);
+                                                mAdapter.submitList(null);
+                                            }
                                         }
                                     }
 

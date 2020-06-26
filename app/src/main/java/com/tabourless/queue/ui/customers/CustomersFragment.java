@@ -162,6 +162,12 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
 
         navController = NavHostFragment.findNavController(this);
 
+        // Initiate the RecyclerView
+        mBinding.customersRecycler.setHasFixedSize(true);
+        mLinearLayoutManager = new LinearLayoutManager(mContext);
+        mBinding.customersRecycler.setLayoutManager(mLinearLayoutManager);
+        mBinding.customersRecycler.setAdapter(mAdapter);
+
         // It's best to observe on onActivityCreated so that we dona't have to update ViewModel manually.
         // This is because LiveData will not call the observer since it had already delivered the last result to that observer.
         // But recycler adapter is updated any way despite that LiveData delivers updates only when data changes, and only to active observers.
@@ -169,7 +175,7 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
         mViewModel.getItemPagedList().observe(getViewLifecycleOwner(), new Observer<PagedList<Customer>>() {
             @Override
             public void onChanged(@Nullable final PagedList<Customer> items) {
-
+                Log.d(TAG, "mama customers item =" +  items.size());
                 if (items != null ){
                     // your code here
                     Log.d(TAG, "queues onChanged submitList size" +  items.size());
@@ -183,17 +189,21 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
                                     //Keep looping as long as items size is 0
                                     Thread.sleep(20);
                                     Log.d(TAG, "queues onChanged. sleep 1000. size= "+items.size()+" sleepCounter="+sleepCounter++);
-                                    if(sleepCounter == 1000){
+                                    if(sleepCounter == 500){
                                         break;
                                     }
                                     //handler.post(this);
                                 }
                                 //Now items size is greater than 0, let's submit the List
                                 Log.d(TAG, "onChanged. after  sleep finished. size= "+items.size());
-                                if(items.size() == 0 && sleepCounter == 1000){
+                                if(items.size() == 0 && sleepCounter == 500){
                                     // If we submit List after loop is finish with 0 results
                                     // we may erase another results submitted via newer thread
-                                    Log.d(TAG, "onChanged. Loop finished with 0 items. Don't submitList");
+
+                                    //  Loop finished with 0 items. We must submitList to remove all items. also i can't count on just submitting null to adapter
+                                    //  when swipe last item because last item maybe deleted by another user.
+                                    Log.d(TAG, "onChanged. Loop finished with 0 items. We must submitList to remove all");
+                                    mAdapter.submitList(items);
                                 }else{
                                     Log.d(TAG, "onChanged. submitList= "+items.size());
                                     mAdapter.submitList(items);
@@ -209,12 +219,6 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
                 }
             }
         }); // End of get itemPagedList//
-
-        // Initiate the RecyclerView
-        mBinding.customersRecycler.setHasFixedSize(true);
-        mLinearLayoutManager = new LinearLayoutManager(mContext);
-        mBinding.customersRecycler.setLayoutManager(mLinearLayoutManager);
-        mBinding.customersRecycler.setAdapter(mAdapter);
 
         // Get current Customer/user
          /*mViewModel.getCurrentCustomer().observe(getViewLifecycleOwner(), new Observer<Customer>() {
@@ -394,6 +398,8 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 Log.d(TAG, "onSwiped: AdapterPosition="+viewHolder.getAdapterPosition());
+                Log.d(TAG, "onSwiped: getItemCount="+ mAdapter.getItemCount());
+
                 //PagedList<Customer> items = mAdapter.getCurrentList(); // Get current list to remove deleted customer from it
                 /*switch (direction){
                     case ItemTouchHelper.START:
@@ -443,6 +449,10 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
                                                 // it's dismissed due to time out DISMISS_EVENT_TIMEOUT. Lets remove customer from database
                                                 Log.d(TAG, "onDismissed: event is not click undo deletedCustomer= "+deletedCustomer.getKey());
                                                 mViewModel.removeCustomer(deletedCustomer);
+                                                if(mAdapter.getItemCount() <= 1){
+                                                    mAdapter.notifyItemRemoved(position);
+                                                    mAdapter.submitList(null);
+                                                }
                                             }
                                         }
 
