@@ -187,7 +187,7 @@ public class App extends MultiDexApplication { // had to enable MultiDex after a
         currentUserId = currentFirebaseUser != null ? currentFirebaseUser.getUid() : null;
 
         //Only use if you need to know the key hash for facebook
-        //printHashKey(getBaseContext());
+        printHashKey(getBaseContext());
     }
 
     public static Context getContext() {
@@ -201,7 +201,7 @@ public class App extends MultiDexApplication { // had to enable MultiDex after a
         //return instance.getApplicationContext();
     }
 
-     /*public static void printHashKey(Context pContext) {
+     public static void printHashKey(Context pContext) {
         try {
             PackageInfo info = pContext.getPackageManager().getPackageInfo(pContext.getPackageName(), PackageManager.GET_SIGNATURES);
             for (Signature signature : info.signatures) {
@@ -215,6 +215,6 @@ public class App extends MultiDexApplication { // had to enable MultiDex after a
         } catch (Exception e) {
             Log.e(TAG, "printHashKey()", e);
         }
-    }*/
+    }
 }
 

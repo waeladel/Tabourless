@@ -440,8 +440,9 @@ public class AddPlaceFragment extends Fragment implements ItemClickListener {
             @Override
             public void onCallback(@NonNull Task<Void> task) {
                 if(task.isSuccessful()){
-                    // Go to customers recycler
+                    // Go back
                     Log.d(TAG, "FirebaseOnCompleteCallback onCallback: "+task.isSuccessful());
+                    navController.navigateUp();
                 }else{
                     Toast.makeText(mContext, R.string.save_place_error, Toast.LENGTH_LONG).show();
                 }
