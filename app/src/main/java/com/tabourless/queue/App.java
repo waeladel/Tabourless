@@ -46,6 +46,9 @@ public class App extends MultiDexApplication { // had to enable MultiDex after a
     private static FirebaseUser currentFirebaseUser;
     private static String currentUserId;
 
+    public static final String MESSAGES_CHANNEL_ID = "Messages_id";
+    public static final String QUEUES_CHANNEL_ID = "Queues_id";
+
     private static final String PREFERENCE_KEY_NIGHT = "night" ;
 
     private static final String NIGHT_VALUE_LIGHT = "light";
@@ -104,6 +107,7 @@ public class App extends MultiDexApplication { // had to enable MultiDex after a
     public static final String DIRECTION_ARGUMENTS_KEY_IS_EDIT = "isEdit";
     public static final String DIRECTION_ARGUMENTS_KEY_PLACE_ID = "placeId";
     public static final String DIRECTION_ARGUMENTS_KEY_QUEUE_ID = "queueId";
+    public static final String DIRECTION_ARGUMENTS_KEY_CHAT_ID = "chatId";
     public static final String DIRECTION_ARGUMENTS_KEY_CHAT_USER_ID = "chatUserId";
     public static final String DIRECTION_ARGUMENTS_KEY_IS_GROUP = "isGroup";
     public static final String DIRECTION_ARGUMENTS_KEY_USER_ID = "userId";
@@ -116,6 +120,9 @@ public class App extends MultiDexApplication { // had to enable MultiDex after a
     public static final String CUSTOMER_STATUS_AWAY = "away";
 
     public static final String NOTIFICATION_TYPE_MESSAGE = "message";
+    public static final String NOTIFICATION_TYPE_QUEUE_FRONT = "front"; // to inform the user about his or her position
+    public static final String NOTIFICATION_TYPE_QUEUE_NEXT= "next"; // to inform the user about his or her position
+
     public static final String Message_STATUS_SENDING = "sending";
     public static final String Message_STATUS_SENT = "sent";
     public static final String Message_STATUS_DELIVERED = "delivered";
@@ -126,6 +133,7 @@ public class App extends MultiDexApplication { // had to enable MultiDex after a
 
 
     private SharedPreferences sharedPreferences;
+    private AudioAttributes audioAttributes;
 
     public boolean isInForeground = false; // to check if app is open or not from alarm broadcast receiver
 
@@ -188,6 +196,8 @@ public class App extends MultiDexApplication { // had to enable MultiDex after a
 
         //Only use if you need to know the key hash for facebook
         //printHashKey(getBaseContext());
+
+        createNotificationsChannels();
     }
 
     public static Context getContext() {
@@ -216,5 +226,44 @@ public class App extends MultiDexApplication { // had to enable MultiDex after a
             Log.e(TAG, "printHashKey()", e);
         }
     }*/
+
+    private void createNotificationsChannels() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Create the NotificationChannel, but only on API 26+ because
+            // the NotificationChannel class is new and not in the support library
+
+            // Create audioAttributes for notification's sound
+            audioAttributes = new AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                    .build();
+
+            NotificationChannel QueuesChannel = new NotificationChannel(
+                    QUEUES_CHANNEL_ID,
+                    getString(R.string.queue_notification_channel_name),
+                    NotificationManager.IMPORTANCE_HIGH
+            );
+            QueuesChannel.setDescription(getString(R.string.queue_notification_channel_description));
+            //QueuesChannel.setSound(Uri.parse("android.resource://" + this.getPackageName() +"/raw/basbes"), audioAttributes);
+            //LikesChannel.setSound(Uri.parse("content://media/internal/audio/media/23"), audioAttributes);
+            /*if(mOutputFile.exists()){
+                LikesChannel.setSound(Uri.parse(mOutputFile.getPath()), audioAttributes);
+            }*/
+
+            NotificationChannel MessagesChannel = new NotificationChannel(
+                    MESSAGES_CHANNEL_ID,
+                    getString(R.string.messages_notification_channel_name),
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            MessagesChannel.setDescription(getString(R.string.messages_notification_channel_description));
+            //MessagesChannel.setSound(Uri.parse("android.resource://" + this.getPackageName() +"/raw/basbes"), audioAttributes);
+
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            if (manager != null) {
+                manager.createNotificationChannel(QueuesChannel);
+                manager.createNotificationChannel(MessagesChannel);
+            }
+        }
+    }
 }
 

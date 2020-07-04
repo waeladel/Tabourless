@@ -833,29 +833,20 @@ public class MessagesFragment extends Fragment {
                 mChat.setSender(mCurrentUserId);
             }
             chatValues = mChat.toMap();
-
-            // Update MESSAGE notifications
-            //notificationKey = mNotificationsRef.child(mChatUserId).push().getKey();
-            notificationKey = mCurrentUserId + NOTIFICATION_TYPE_MESSAGE;
-            //DatabaseNotification notification = new DatabaseNotification(getContext().getString(R.string.notification_like_title), getContext().getString(R.string.notification_like_message, name), "like", currentUserId, name, avatar);
-            databaseNotification = new DatabaseNotification(NOTIFICATION_TYPE_MESSAGE, mCurrentUserId, mCurrentUser.getName(), mCurrentUser.getAvatar(), mChatId);
-            notificationValues = databaseNotification.toMap();
-            childUpdates.put(DATABASE_REF_NOTIFICATIONS +"/"+ DATABASE_REF_NOTIFICATIONS_MESSAGES  +"/"+ mChatUserId + "/" +notificationKey, notificationValues);
-
         }else{
             // Create new chat from scratch
             Log.d(TAG, "sendMessage: chat is null, create new chat from scratch");
             Chat chat = new Chat(messageText, mCurrentUserId, members);
             chatValues = chat.toMap();
-
-            // Update PICK_UP notifications
-            //notificationKey = mNotificationsRef.child(mChatUserId).push().getKey();
-            notificationKey = mCurrentUserId + NOTIFICATION_TYPE_MESSAGE;
-            //DatabaseNotification notification = new DatabaseNotification(getContext().getString(R.string.notification_like_title), getContext().getString(R.string.notification_like_message, name), "like", currentUserId, name, avatar);
-            databaseNotification = new DatabaseNotification(NOTIFICATION_TYPE_MESSAGE, mCurrentUserId, mCurrentUser.getName(), mCurrentUser.getAvatar(), mChatId);
-            notificationValues = databaseNotification.toMap();
-            childUpdates.put(DATABASE_REF_NOTIFICATIONS +"/"+ DATABASE_REF_NOTIFICATIONS_ALERTS +"/"+ mChatUserId + "/" +notificationKey, notificationValues);
         }
+
+        // Update MESSAGE notifications
+        //notificationKey = mNotificationsRef.child(mChatUserId).push().getKey();
+        notificationKey = mCurrentUserId;
+        //DatabaseNotification notification = new DatabaseNotification(getContext().getString(R.string.notification_like_title), getContext().getString(R.string.notification_like_message, name), "like", currentUserId, name, avatar);
+        databaseNotification = new DatabaseNotification(NOTIFICATION_TYPE_MESSAGE, mCurrentUserId, mCurrentUser.getName(), mCurrentUser.getAvatar(), mChatId);
+        notificationValues = databaseNotification.toMap();
+        childUpdates.put(DATABASE_REF_NOTIFICATIONS +"/"+ DATABASE_REF_NOTIFICATIONS_MESSAGES  +"/"+ mChatUserId + "/" +notificationKey, notificationValues);
 
         /*Map<String, Object> chatValues = new HashMap<>();
         chatValues.put("lastMessage", messageText);
@@ -865,7 +856,6 @@ public class MessagesFragment extends Fragment {
         childUpdates.put("/messages/" + mChatId + "/" + messageKey, messageValues);
         childUpdates.put("/chats/" + mChatId + "/lastMessage/", messageText);
         childUpdates.put("/chats/" + mChatId + "/lastSent/", ServerValue.TIMESTAMP);*/
-
 
         childUpdates.put(DATABASE_REF_MESSAGES +"/"+ mChatId +"/"+ messageKey, messageValues);
         childUpdates.put(DATABASE_REF_CHATS +"/"+ mChatId ,chatValues);

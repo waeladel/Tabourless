@@ -24,6 +24,11 @@ public class DatabaseNotification {
     private boolean seen; // to reset notification counter when user see the notifications
     private boolean clicked; // to change item background when clicked
     private Object sent; // sent time
+    private String placeId;
+    private String queueId;
+    private String queueName;
+    private String counterName;
+    private int number;
 
     public DatabaseNotification() {
     }
@@ -72,7 +77,11 @@ public class DatabaseNotification {
         result.put("senderAvatar", senderAvatar);
         result.put("seen", seen);
         result.put("sent", sent);
-        result.put("clicked", clicked);
+        result.put("placeId", placeId);
+        result.put("queueId", queueId);
+        result.put("queueName", queueName);
+        result.put("counterName", counterName);
+        result.put("number", number);
 
         return result;
     }
@@ -169,6 +178,46 @@ public class DatabaseNotification {
 
     public void setClicked(boolean clicked) {
         this.clicked = clicked;
+    }
+
+    public String getPlaceId() {
+        return placeId;
+    }
+
+    public void setPlaceId(String placeId) {
+        this.placeId = placeId;
+    }
+
+    public String getQueueId() {
+        return queueId;
+    }
+
+    public void setQueueId(String queueId) {
+        this.queueId = queueId;
+    }
+
+    public String getQueueName() {
+        return queueName;
+    }
+
+    public void setQueueName(String queueName) {
+        this.queueName = queueName;
+    }
+
+    public String getCounterName() {
+        return counterName;
+    }
+
+    public void setCounterName(String counterName) {
+        this.counterName = counterName;
+    }
+
+    public int getNumber() {
+        return number;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
     }
 
     @Override

@@ -37,7 +37,11 @@
         android:id="@+id/notifications"
         android:name="com.tabourless.queue.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        tools:layout="@layout/fragment_notifications" >
+        <action
+            android:id="@+id/action_notifications_to_customers"
+            app:destination="@id/customers" />
+    </fragment>
     <fragment
         android:id="@+id/profile"
         android:name="com.tabourless.queue.ui.profile.ProfileFragment"

@@ -79,7 +79,7 @@ public class QueuesAdapter extends PagedListAdapter<UserQueue, QueuesAdapter.Vie
             // customer's number
             if (userQueue.getNumber() != 0) {
                 holder.mBinding.numberValue.setText(String.valueOf(userQueue.getNumber()));
-                holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_medium_trype);
+                holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_high_type);
             }else{
                 holder.mBinding.placeName.setText(null);
             }

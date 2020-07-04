@@ -112,14 +112,14 @@ public class QueuesFragment extends Fragment implements ItemClickListener {
                                                 //Keep looping as long as items size is 0
                                                 Thread.sleep(20);
                                                 Log.d(TAG, "queues onChanged. sleep 1000. size= "+items.size()+" sleepCounter="+sleepCounter++);
-                                                if(sleepCounter == 1000){
+                                                if(sleepCounter == 500){
                                                     break;
                                                 }
                                                 //handler.post(this);
                                             }
                                             //Now items size is greater than 0, let's submit the List
                                             Log.d(TAG, "ChatsFragment onChanged. after  sleep finished. size= "+items.size());
-                                            if(items.size() == 0 && sleepCounter == 1000){
+                                            if(items.size() == 0 && sleepCounter == 500){
                                                 // If we submit List after loop is finish with 0 results
                                                 // we may erase another results submitted via newer thread
 

@@ -142,6 +142,28 @@
     <!--Input text helper-->
     <string name="required_helper">*Required</string>
 
+    <!--Notifications-->
+    <string name="notification_queue_title">%1$s queue</string>
+    <string name="notification_default_queue_title">Queue\'s status</string>
+    <string name="notification_message_title">New message</string>
+
+    <string name="notification_queue_body_front">It\'s your turn now. Go to counter: %1$s.</string>
+    <string name="notification_message_body">%1$s sent you a new message.</string>
+
+    <string name="notification_default_queue_body_front">It\'s your turn now. Go to the front</string>
+    <string name="notification_default_queue_body_next">Get ready you are next. Get closer to the front.</string>
+    <string name="notification_default_message_body">You received a new message.</string>
+
+    <string name="notification_item_queue_body_front">It\'s your turn in %1$s queue. Go to %2$s counter.</string>
+    <string name="notification_item_queue_body_next">You are next in %1$s queue. Get closer to the front.</string>
+
+    <string name="queue_notification_channel_name">Queues</string>
+    <string name="messages_notification_channel_name">Messages</string>
+
+    <string name="queue_notification_channel_description">Get notifications about your position in a queue.</string>
+    <string name="messages_notification_channel_description">Get notifications when you receive a new message.</string>
+    <!--Notifications-->
+
     <!-- gender array -->
     <string name="male">Male</string>
     <string name="female">Female</string>

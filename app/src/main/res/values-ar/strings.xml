@@ -141,6 +141,28 @@
     <!--Input text helper-->
     <string name="required_helper">*إجباري</string>
 
+    <!--Notifications-->
+    <string name="notification_queue_title">طابور %1$s</string>
+    <string name="notification_default_queue_title">حالة الطابور</string>
+    <string name="notification_message_title">رسالة جديدة</string>
+
+    <string name="notification_queue_body_front">حان دورك الآن. الرجاء التوجه إلى شباك %1$s.</string>
+    <string name="notification_default_queue_body_next">استعد دورك التالي. الرجاء الاقتراب من المقدمة.</string>
+    <string name="notification_message_body">%1$s أرسل لك رسالة جديدة.</string>
+
+    <string name="notification_default_queue_body_front">حان دورك الآن. الرجاء التوجه إلى المقدمة.</string>
+    <string name="notification_default_message_body">لقد تسلمت رسالة جديدة.</string>
+
+    <string name="notification_item_queue_body_front">حان دورك في طابور %1$s. الرجاء التوجه فورا إلى شباك %2$s.</string>
+    <string name="notification_item_queue_body_next">استعد دورك التالي في طابور %1$. الرجاء الاقتراب من المقدمة.</string>
+
+    <string name="queue_notification_channel_name">الطوابير</string>
+    <string name="messages_notification_channel_name">الرسائل</string>
+
+    <string name="queue_notification_channel_description">تسلم تنبيهات عن ترتيبك الحالي في الطابور.</string>
+    <string name="messages_notification_channel_description">تسلم تنبيهات عندما تصلك رسائل جديدة.</string>
+    <!--Notifications-->
+
     <!-- gender array -->
     <string name="male">ذكر</string>
     <string name="female">أنثى</string>
