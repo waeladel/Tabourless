@@ -23,6 +23,7 @@ allprojects {
         google()
         jcenter()
         maven { url 'https://maven.fabric.io/public' } // To resolve the Twitter SDK and Crashlytics SDK
+        maven { url "https://jitpack.io" }
         
     }
 }

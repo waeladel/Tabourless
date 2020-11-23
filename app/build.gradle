@@ -86,7 +86,7 @@ dependencies {
     implementation 'com.zhihu.android:matisse:0.5.3-beta3' // matisse for gallery and camera.
     api 'com.theartofdev.edmodo:android-image-cropper:2.8.0' // to crop images
     implementation 'com.iceteck.silicompressorr:silicompressor:2.2.4' // for compressing original image
-    //implementation 'com.github.chrisbanes:PhotoView:2.0.0' // to zoom avatar and cover images
+    implementation 'com.github.chrisbanes:PhotoView:2.0.0' // to zoom avatar and cover images
     //implementation 'top.zibin:Luban:1.0.8' // for compressing original image
     implementation 'io.reactivex:rxandroid:1.2.1' // RxJava for compressing original image
     implementation "androidx.preference:preference:1.1.1" // For settings preference
