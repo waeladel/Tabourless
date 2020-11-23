@@ -28,7 +28,6 @@ import com.google.firebase.storage.StorageReference;
 import com.tabourless.queue.GlideApp;
 import com.tabourless.queue.R;
 import com.tabourless.queue.databinding.FragmentPhotoBinding;
-import com.yanzhenjie.album.widget.photoview.PhotoViewAttacher;
 
 import static com.tabourless.queue.App.DIRECTION_ARGUMENTS_KEY_IMAGE_NAME;
 import static com.tabourless.queue.App.DIRECTION_ARGUMENTS_KEY_USER_ID;
@@ -44,7 +43,6 @@ public class PhotoFragment extends Fragment {
     private String  mUserId, mImageName;
     private StorageReference mStorageRef,mImagesRef, mUserRef ;
     private Context mContext;
-    private PhotoViewAttacher mAttacher;
     private FragmentPhotoBinding mBinding;
     private RequestListener mRequestListener;
 
@@ -75,11 +73,11 @@ public class PhotoFragment extends Fragment {
             public boolean onResourceReady(Object resource, Object model, Target target, DataSource dataSource, boolean isFirstResource) {
                 //do Photo Attacher when picture is loaded successfully
                 mBinding.loadingAnimation.setVisibility(View.GONE);
-                if(mAttacher!=null){
+                /*if(mAttacher!=null){
                     mAttacher.update();
                 }else{
                     mAttacher = new PhotoViewAttacher(mBinding.zoomedImage);
-                }
+                }*/
                 return false;
             }
         };

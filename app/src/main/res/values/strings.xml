@@ -102,6 +102,8 @@
     <string name="chat_blocked_alert_dialog_title">Conversation Disabled</string>
     <string name="chat_blocked_dialog_message">Communication with this person is currently not allowed.</string>
 
+    <string name="storage_permission_dialog_title">Camera and storage permissions</string>
+    <string name="storage_permission_dialog_message">The app needs access to your storage to fitch photos from your gallery. Also, if you want to take a picture you must grant us access to your camera.</string>
     <string name="permission_denied">Permission to get your current location denied</string>
     <string name="location_access_required">Location access is required to fetch nearby places and queues.</string>
     <string name="access_location">Enable location access</string>

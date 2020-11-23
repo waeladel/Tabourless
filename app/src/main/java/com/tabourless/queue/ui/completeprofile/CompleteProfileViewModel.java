@@ -20,6 +20,7 @@ public class CompleteProfileViewModel extends ViewModel {
     private ArrayList<Integer> mBirthYears;
     private UserRepository mUserRepository;
     private User mUser;
+    private boolean isSelectAvatarClicked;
     private final static String TAG = CompleteProfileViewModel.class.getSimpleName();
 
 
@@ -30,6 +31,13 @@ public class CompleteProfileViewModel extends ViewModel {
         mUserRepository = new UserRepository();
     }
 
+    public boolean isSelectAvatarClicked() {
+        return isSelectAvatarClicked;
+    }
+
+    public void setSelectAvatarClicked(boolean avatar) {
+        isSelectAvatarClicked = avatar;
+    }
 
     public ArrayList<Integer> getYears() {
         // get this year

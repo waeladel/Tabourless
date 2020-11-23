@@ -100,6 +100,8 @@
     <string name="chat_blocked_alert_dialog_title">تم تعطيل المحادثة</string>
     <string name="chat_blocked_dialog_message">غير مسموح بالتحدث مع هذا الشخص في الوقت الراهن.</string>
 
+    <string name="storage_permission_dialog_title">أذونات الكاميرا والتخزين</string>
+    <string name="storage_permission_dialog_message">يحتاج التطبيق إذن الوصول إلى مساحة التخزين الخاصة بك لجلب الصور من المعرض، وإذا كنت تريد أن تلتقط صورة يجب أن ‏تمنحنا أيضا إذن الوصول إلى الكاميرا‎.‎</string>
     <string name="permission_denied">تم رفض إذن الحصول على موقعك الحالي.</string>
     <string name="location_access_required">مطلوب الوصول إلى موقعك لعرض الأماكن والطوابير القريبة.</string>
     <string name="access_location">تمكين الوصول إلى الموقع</string>

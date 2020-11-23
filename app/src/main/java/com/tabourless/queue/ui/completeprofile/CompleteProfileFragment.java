@@ -1,19 +1,26 @@
 package com.tabourless.queue.ui.completeprofile;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.ColorFilter;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.ImageViewCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
@@ -46,22 +53,25 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.iceteck.silicompressorr.SiliCompressor;
+import com.tabourless.queue.BuildConfig;
 import com.tabourless.queue.GlideApp;
 import com.tabourless.queue.R;
+import com.tabourless.queue.Utils.MyGlideEngine;
 import com.tabourless.queue.databinding.FragmentCompleteProfileBinding;
 import com.tabourless.queue.interfaces.FirebaseUserCallback;
+import com.tabourless.queue.interfaces.ItemClickListener;
 import com.tabourless.queue.models.User;
+import com.tabourless.queue.ui.CameraPermissionAlertFragment;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
-import com.yanzhenjie.album.Action;
-import com.yanzhenjie.album.Album;
-import com.yanzhenjie.album.AlbumFile;
+import com.zhihu.matisse.Matisse;
+import com.zhihu.matisse.MimeType;
+import com.zhihu.matisse.internal.entity.CaptureStrategy;
 
 import java.io.File;
 import java.util.ArrayList;
-
-import top.zibin.luban.Luban;
-import top.zibin.luban.OnCompressListener;
+import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 import static com.tabourless.queue.App.AVATAR_ORIGINAL_NAME;
@@ -75,13 +85,15 @@ import static com.tabourless.queue.App.STORAGE_REF_IMAGES;
 import static com.tabourless.queue.App.USER_SPINNER_GENDER_FEMALE;
 import static com.tabourless.queue.App.USER_SPINNER_GENDER_MALE;
 
-public class CompleteProfileFragment extends Fragment {
+public class CompleteProfileFragment extends Fragment implements ItemClickListener {
 
     private CompleteProfileViewModel mViewModel;
     private FragmentCompleteProfileBinding mBinding;
     private ArrayList<Integer> mBirthYears;
     private ArrayAdapter<Integer> spinnerAdapter;
     private Context mContext;
+    private Activity mActivity;
+    private FragmentManager mFragmentManager;
     private String currentUserId;
     private boolean isEdit;
     private FirebaseUser mFirebaseCurrentUser;
@@ -91,7 +103,6 @@ public class CompleteProfileFragment extends Fragment {
     private NavController navController ;
     private DatabaseReference mDatabaseRef;
     private DatabaseReference mUserRef;
-    private ArrayList<AlbumFile> mMediaFiles;
 
     // for image cropping and compressing
     private Uri mOriginalAvatarUri;
@@ -100,9 +111,14 @@ public class CompleteProfileFragment extends Fragment {
     private Uri mThumbnailCoverUri;
 
     // names of uploaded images
-    private static final int SELECT_IMAGE_REQUEST_CODE = 200;
-    private static final int CROP_IMAGE_AVATAR_REQUEST_CODE = 103;
-    private static final int CROP_IMAGE_COVER_REQUEST_CODE = 104;
+    private static final int SELECT_AVATAR_REQUEST_CODE = 102;
+    private static final int SELECT_COVER_REQUEST_CODE = 103;
+    private static final int CROP_IMAGE_REQUEST_CODE = 104;
+    private static final int REQUEST_STORAGE_PERMISSIONS_CODE = 124;
+
+    private  final static String IMAGE_HOLDER_POSITION = "position";
+    private static final String APP_AUTHORITY = BuildConfig.APPLICATION_ID +".fileprovider";
+    private  static final String PERMISSION_RATIONALE_FRAGMENT = "storagePermissionFragment";
 
     private final static String TAG = CompleteProfileFragment.class.getSimpleName();
 
@@ -110,6 +126,9 @@ public class CompleteProfileFragment extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         mContext = context;
+        if (context instanceof Activity){// check if fragmentContext is an activity
+            mActivity =(Activity) context;
+        }
     }
 
     // This method will only be called once when the retained
@@ -118,6 +137,7 @@ public class CompleteProfileFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mFragmentManager = getChildFragmentManager(); // Needed to open the rational dialog
         //Get current logged in user
         mFirebaseCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
         currentUserId = mFirebaseCurrentUser!= null ? mFirebaseCurrentUser.getUid() : null;
@@ -212,7 +232,12 @@ public class CompleteProfileFragment extends Fragment {
         mBinding.avatarImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                selectMedia(true);
+                mViewModel.setSelectAvatarClicked(true);
+                if (!isPermissionsGranted()) {
+                    requestPermission();
+                }else{
+                    selectMedia(0);
+                }
             }
         });
 
@@ -220,7 +245,12 @@ public class CompleteProfileFragment extends Fragment {
         mBinding.coverImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                selectMedia(false);
+                mViewModel.setSelectAvatarClicked(false);
+                if (!isPermissionsGranted()) {
+                    requestPermission();
+                }else{
+                    selectMedia(1);
+                }
             }
         });
 
@@ -232,39 +262,58 @@ public class CompleteProfileFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(TAG, "requestCode ="+ requestCode);
         if (data != null) {
+            int position = 0;
+            if(null != data.getExtras()){
+                position = data.getExtras().getInt(IMAGE_HOLDER_POSITION,0);
+            }
             switch (requestCode){
-                case CROP_IMAGE_AVATAR_REQUEST_CODE:
-                    Log.d(TAG, "AVATAR_CROP_PICTURE requestCode= "+ requestCode);
-                    CropImage.ActivityResult avatarResult = CropImage.getActivityResult(data);
+                case SELECT_AVATAR_REQUEST_CODE:
+                    // An avatar photo is selected
+                    Log.d(TAG, "SELECT_AVATAR requestCode= "+ requestCode);
+                    Log.d(TAG, "SELECT_AVATAR position= "+ position);
                     if (resultCode == RESULT_OK) {
-                        mOriginalAvatarUri = avatarResult.getOriginalUri();
-                        mThumbnailAvatarUri = avatarResult.getUri();
-                        compressImage(mOriginalAvatarUri,"original avatar");
-                        uploadImage(mThumbnailAvatarUri, "avatar");
-                        Log.d(TAG, "mAvatarOriginalUri = "+ mOriginalAvatarUri);
-                        Log.d(TAG, "mAvatarUri = "+ mThumbnailAvatarUri);
-
-                    } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                        Exception error = avatarResult.getError();
-                        Toast.makeText(mContext, error.toString(),
-                                Toast.LENGTH_LONG).show();
+                        List<Uri> selectedAvatars = Matisse.obtainResult(data);;
+                        cropImage(selectedAvatars.get(0), 0);
                     }
                     break;
-                case CROP_IMAGE_COVER_REQUEST_CODE:
-                    Log.d(TAG, "COVER CROP_PICTURE requestCode= "+ requestCode);
-                    CropImage.ActivityResult coverResult = CropImage.getActivityResult(data);
+                case SELECT_COVER_REQUEST_CODE:
+                    // A cover photo is selected
+                    Log.d(TAG, "SELECT_COVER requestCode= "+ requestCode);
+                    Log.d(TAG, "SELECT_COVER position= "+ position);
                     if (resultCode == RESULT_OK) {
-                        mOriginalCoverUri = coverResult.getOriginalUri();
-                        mThumbnailCoverUri = coverResult.getUri();
-                        Log.d(TAG, "mCoverOriginalUri = "+ mOriginalCoverUri);
-                        Log.d(TAG, "mCoverUri = "+ mThumbnailCoverUri);
-                        //uploadImage(mCoverUri, "coverImage", position);
-                        compressImage(mOriginalCoverUri,"original cover");
-                        uploadImage(mThumbnailCoverUri, "coverImage");
+                        List<Uri> selectedCovers = Matisse.obtainResult(data);
+                        cropImage(selectedCovers.get(0), 1);
+                    }
+                    break;
+                case CROP_IMAGE_REQUEST_CODE:
+                    // A cropped photo is saved
+                    Log.d(TAG, "CROP_PICTURE requestCode= "+ requestCode);
+                    Log.d(TAG, "CROP_PICTURE position= "+ position);
+                    CropImage.ActivityResult imageResult = CropImage.getActivityResult(data);
+                    if (resultCode == RESULT_OK) {
+                        if(position == 0){
+                            // it's avatar image
+                            mOriginalAvatarUri = imageResult.getOriginalUri();
+                            mThumbnailAvatarUri = imageResult.getUri();
+                            Log.d(TAG, "mOriginalAvatarUri = "+ mOriginalAvatarUri);
+                            Log.d(TAG, "mThumbnailAvatarUri = "+ mThumbnailAvatarUri);
+                            compressImage(mOriginalAvatarUri,"original avatar" ,position);
+                            uploadImage(mThumbnailAvatarUri, "avatar");
+                        }else{
+                            // it's cover image
+                            mOriginalCoverUri = imageResult.getOriginalUri();
+                            mThumbnailCoverUri = imageResult.getUri();
+                            Log.d(TAG, "mOriginalCoverUri = "+ mOriginalCoverUri);
+                            Log.d(TAG, "mThumbnailCoverUri = "+ mThumbnailCoverUri);
+                            //uploadImage(mCoverUri, "coverImage", position);
+                            compressImage(mOriginalCoverUri,"original cover" ,position);
+                            uploadImage(mThumbnailCoverUri, "coverImage");
+                        }
                     } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                        Exception error = coverResult.getError();
+                        Exception error = imageResult.getError();
                         Toast.makeText(mContext, error.toString(),
                                 Toast.LENGTH_LONG).show();
+                        Log.d(TAG, "mAvatarUri crop error= "+ error.toString());
                     }
                     break;
             }
@@ -344,8 +393,53 @@ public class CompleteProfileFragment extends Fragment {
         }
     }
 
-    private void selectMedia(final boolean isAvatar) {
-        Album.image(this) // Image and video mix options.
+    private void selectMedia(final int position) {
+        // Different ‎ request code for avatar than cover to know which is which in the onActivityResult
+        int selectMediaRequestCode;
+        if (position == 0) { // it's avatar
+            selectMediaRequestCode = SELECT_AVATAR_REQUEST_CODE;
+        } else {  // it's cover
+            selectMediaRequestCode = SELECT_COVER_REQUEST_CODE;
+        }
+
+        //Don't enable capturing photos by camera without the permission
+        if(ContextCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED){
+            // Enable camera
+            Matisse.from(this)
+                    .choose(MimeType.ofImage(), false)
+                    .theme(R.style.Matisse_Dracula)
+                    .countable(false)
+                    .maxSelectable(1)
+                    .capture(true)
+                    //.captureStrategy(new CaptureStrategy(true, BuildConfig.APPLICATION_ID +".fileprovider", "Basbes"))
+                    .captureStrategy(new CaptureStrategy(false, APP_AUTHORITY))
+                    .showSingleMediaType(true)
+                    //.addFilter(new GifSizeFilter(320, 320, 5 * Filter.K * Filter.K))
+                    //.gridExpectedSize(getResources().getDimensionPixelSize(R.dimen.album_item_height))
+                    .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+                    .thumbnailScale(0.85f)
+                    .imageEngine(new MyGlideEngine())
+                    .showPreview(true) // Default is `true`
+                    .autoHideToolbarOnSingleTap(true)
+                    .forResult(selectMediaRequestCode);
+        }else{
+            // Disable camera
+            Matisse.from(this)
+                    .choose(MimeType.ofImage(), false)
+                    .theme(R.style.Matisse_Dracula)
+                    .countable(false)
+                    .maxSelectable(1)
+                    .showSingleMediaType(true)
+                    //.addFilter(new GifSizeFilter(320, 320, 5 * Filter.K * Filter.K))
+                    //.gridExpectedSize(getResources().getDimensionPixelSize(R.dimen.album_item_height))
+                    .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+                    .thumbnailScale(0.85f)
+                    .imageEngine(new MyGlideEngine())
+                    .showPreview(true) // Default is `true`
+                    .autoHideToolbarOnSingleTap(true)
+                    .forResult(selectMediaRequestCode);
+        }
+        /*Album.image(this) // Image and video mix options.
                 .singleChoice() // Multi-Mode, Single-Mode: singleChoice().
                 .requestCode(SELECT_IMAGE_REQUEST_CODE) // The request code will be returned in the listener.
                 .columnCount(2) // The number of columns in the page list.
@@ -371,12 +465,15 @@ public class CompleteProfileFragment extends Fragment {
                         // The user canceled the operation.
                     }
                 })
-                .start();
+                .start();*/
     }
 
-    private void cropImage(Uri mediaUri, boolean isAvatar) {
-        if(isAvatar){
-            Intent intent = CropImage.activity(Uri.fromFile(new File(mediaUri.toString())))
+    private void cropImage(Uri mediaUri, int position) {
+        Intent intent;
+        if(position == 0){
+            // Let's crop an avatar
+            //Intent intent = CropImage.activity(Uri.fromFile(new File(mediaUri.toString())))
+            intent = CropImage.activity(mediaUri) // Matisse albums users content not file url
                     //.setGuidelines(CropImageView.Guidelines.ON)
                     .setAllowRotation(true)
                     .setAutoZoomEnabled(true)
@@ -389,12 +486,12 @@ public class CompleteProfileFragment extends Fragment {
                     .setMinCropResultSize(300,300)
                     .setRequestedSize(300,300)//resize
                     .getIntent(mContext);
-
-            this.startActivityForResult(intent, CROP_IMAGE_AVATAR_REQUEST_CODE );
+            //.start(mActivityContext, this);
 
         }else{
-
-            Intent intent = CropImage.activity(Uri.fromFile(new File(mediaUri.toString())))
+            // Let's crop a cover
+            //Intent intent = CropImage.activity(Uri.fromFile(new File(mediaUri.toString())))
+            intent = CropImage.activity(mediaUri) // Matisse albums users content not file url
                     //.setGuidelines(CropImageView.Guidelines.ON)
                     .setAllowRotation(true)
                     .setAutoZoomEnabled(true)
@@ -405,17 +502,36 @@ public class CompleteProfileFragment extends Fragment {
                     .setMinCropResultSize(300,300)
                     .setRequestedSize(600,300) //resize
                     .getIntent(mContext);
-
-            this.startActivityForResult(intent, CROP_IMAGE_COVER_REQUEST_CODE);
+            //.start(mActivityContext, this);
         }
 
         Log.d(TAG, "cropImage starts" +mediaUri);
+        //intent.putExtra(IMAGE_HOLDER_POSITION,position);
+        Bundle mBundle = new Bundle();
+        mBundle.putInt(IMAGE_HOLDER_POSITION,position);
+        intent.putExtras(mBundle);
+
+        this.startActivityForResult(intent, CROP_IMAGE_REQUEST_CODE);
     }
 
-    private void compressImage(final Uri imageUri, final String type) {
+    private void compressImage(final Uri imageUri, final String type, final int position) {
         if (null != imageUri && null != imageUri.getPath()) {
-            File imageFile = new File(imageUri.getPath());
-            Luban.get(getContext())
+            //File imageFile = new File(imageUri.getPath());
+            String filePath = SiliCompressor.with(mContext).compress(imageUri.toString(), mContext.getCacheDir());
+            //Uri compressedImageUri = FileProvider.getUriForFile(mActivityContext, APP_AUTHORITY, new File(filePath));
+            Log.d(TAG, "compress: filePath = " +  filePath);
+
+            if( filePath.startsWith("content://") || filePath.startsWith("file://") ) {
+                Log.d(TAG, "compress: filePath starts with content or file: " +  filePath);
+                uploadImage(Uri.parse(filePath), type);
+            }else{
+                Log.d(TAG, "compress: filePath doesn't starts with content or file" +  filePath);
+                Uri compressedImageUri = Uri.fromFile(new File(filePath));
+                Log.d(TAG, "compress: Uri.fromFile= " +  compressedImageUri);
+                uploadImage(compressedImageUri, type);
+            }
+
+            /*Luban.get(getContext())
                     .load(imageFile)                     // pass image to be compressed
                     .putGear(Luban.THIRD_GEAR)      // set compression level, defaults to 3
                     .setCompressListener(new OnCompressListener() { // Set up return
@@ -440,7 +556,7 @@ public class CompleteProfileFragment extends Fragment {
                             uploadImage(imageUri, type);
 
                         }
-                    }).launch();    // Start compression
+                    }).launch();    // Start compression*/
         }
     }
 
@@ -659,4 +775,113 @@ public class CompleteProfileFragment extends Fragment {
 
     }
 
+    // If Storage and camera permissions are granted return true so that we stop asking for permissions
+    private boolean isPermissionsGranted() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            Log.d(TAG, "is permission Granted= "+(ContextCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED));
+
+            return (ContextCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+        }else{
+            Log.d(TAG, "is permission Granted= "+(ContextCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED));
+
+            return (ContextCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+        }
+
+    }
+
+    private void requestPermission() {
+        // Permission is not granted
+        // Should we show an explanation?
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // API level 29 Android 10 and higher
+            if (ActivityCompat.shouldShowRequestPermissionRationale(mActivity, Manifest.permission.READ_EXTERNAL_STORAGE) ||
+                    ActivityCompat.shouldShowRequestPermissionRationale(mActivity, Manifest.permission.CAMERA)) {
+                Log.i(TAG, "requestPermission: permission should show Rationale");
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+                showPermissionRationaleDialog();
+            } else {
+                // No explanation needed; request the permission
+                Log.i(TAG, "requestPermission: No explanation needed; request the permission");
+                // using requestPermissions(new String[] instead of ActivityCompat.requestPermissions(this, new String[] to get onRequestPermissionsResult in the fragment
+                requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE ,
+                        Manifest.permission.CAMERA}, REQUEST_STORAGE_PERMISSIONS_CODE);
+            }
+        }else{
+            if (ActivityCompat.shouldShowRequestPermissionRationale(mActivity, Manifest.permission.READ_EXTERNAL_STORAGE) ||
+                    ActivityCompat.shouldShowRequestPermissionRationale(mActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) ||
+                    ActivityCompat.shouldShowRequestPermissionRationale(mActivity, Manifest.permission.CAMERA)) {
+                Log.i(TAG, "requestPermission: permission should show Rationale");
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+                showPermissionRationaleDialog();
+            } else {
+                // No explanation needed; request the permission
+                Log.i(TAG, "requestPermission: No explanation needed; request the permission");
+                // using requestPermissions(new String[] instead of ActivityCompat.requestPermissions(this, new String[] to get onRequestPermissionsResult in the fragment
+                requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE ,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.CAMERA}, REQUEST_STORAGE_PERMISSIONS_CODE);
+            }
+        }
+    }
+
+    private void showPermissionRationaleDialog() {
+        CameraPermissionAlertFragment permissionRationaleDialog = CameraPermissionAlertFragment.newInstance(mContext, this);
+        permissionRationaleDialog.show(mFragmentManager, PERMISSION_RATIONALE_FRAGMENT);
+        Log.i(TAG, "showPermissionRationaleDialog: permission AlertFragment show clicked ");
+    }
+
+    @Override
+    public void onClick(View view, int position, boolean isLongClick) {
+        Log.d(TAG, "item clicked position= " + position + " View= "+view);
+        if(view == null && position == 6){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                // API level 29 Android 10 and higher
+                // OK button of the permission dialog is clicked, lets ask for permissions
+                requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE ,
+                        Manifest.permission.CAMERA}, REQUEST_STORAGE_PERMISSIONS_CODE);
+            }else{
+                // OK button of the permission dialog is clicked, lets ask for permissions
+                requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE ,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.CAMERA}, REQUEST_STORAGE_PERMISSIONS_CODE);
+            }
+
+            return; // No need to check other clicks, it's the OK button of the permission dialog
+
+        }
+    }
+
+    // Get Request Permissions Result
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        Log.d(TAG, "onRequestPermissionsResult we got a permissions result");
+        if (requestCode == REQUEST_STORAGE_PERMISSIONS_CODE) {
+            // If request is cancelled, the result arrays are empty.
+            // Camera permission is not a must, we can proceed with reading photos from gallery
+            if (grantResults.length > 0 &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // permission was granted, yay! Do the task you need to do.
+                Log.i(TAG, "onRequestPermissionsResult permission was granted");
+                if(mViewModel.isSelectAvatarClicked()){
+                    selectMedia(0);
+                }else{
+                    selectMedia(1);
+                }
+            } else {
+                // permission denied, boo! Disable the
+                // functionality that depends on this permission.
+                Log.i(TAG, "onRequestPermissionsResult permission denied");
+            }
+        }
+    }
 }
