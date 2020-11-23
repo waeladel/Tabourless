@@ -235,7 +235,7 @@ public class App extends MultiDexApplication { // had to enable MultiDex after a
             // Create audioAttributes for notification's sound
             audioAttributes = new AudioAttributes.Builder()
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
                     .build();
 
             NotificationChannel QueuesChannel = new NotificationChannel(
