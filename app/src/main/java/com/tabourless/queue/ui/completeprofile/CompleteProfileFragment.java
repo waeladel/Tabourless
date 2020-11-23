@@ -48,6 +48,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageMetadata;
@@ -738,7 +739,8 @@ public class CompleteProfileFragment extends Fragment implements ItemClickListen
 
                 if (!isEdit) {
                     // Set user's notification tokens
-                    FirebaseInstanceId.getInstance().getInstanceId()
+                    // We have to use FirebaseInstallations because FirebaseInstanceId is deprecated
+                    /*FirebaseInstanceId.getInstance().getInstanceId()
                             .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
                                 @Override
                                 public void onComplete(@NonNull Task<InstanceIdResult> task) {
@@ -751,6 +753,23 @@ public class CompleteProfileFragment extends Fragment implements ItemClickListen
                                         // Get new Instance ID token
                                         String token = task.getResult().getToken();
                                         //mTokensRef.child(mUserId).child(token).setValue(true);
+                                        mUserRef.child(DATABASE_REF_USER_TOKENS).child(token).setValue(true);
+                                    }
+                                }
+                            });*/
+                    FirebaseMessaging.getInstance().getToken()
+                            .addOnCompleteListener(new OnCompleteListener<String>() {
+                                @Override
+                                public void onComplete(@NonNull Task<String> task) {
+                                    if (!task.isSuccessful()) {
+                                        Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                                        return;
+                                    }
+                                    // Get new FCM registration token
+                                    String token = task.getResult();
+                                    //mTokensRef.child(mUserId).child(token).setValue(true);
+                                    if (!TextUtils.isEmpty(token)) {
+                                        Log.d(TAG, "getToken ="+ token);
                                         mUserRef.child(DATABASE_REF_USER_TOKENS).child(token).setValue(true);
                                     }
                                 }
