@@ -156,7 +156,7 @@
     <string name="notification_default_message_body">لقد تسلمت رسالة جديدة.</string>
 
     <string name="notification_item_queue_body_front">حان دورك في طابور %1$s. الرجاء التوجه فورا إلى شباك %2$s.</string>
-    <string name="notification_item_queue_body_next">استعد دورك التالي في طابور %1$. الرجاء الاقتراب من المقدمة.</string>
+    <string name="notification_item_queue_body_next">استعد دورك التالي في طابور %1$s. الرجاء الاقتراب من المقدمة.</string>
 
     <string name="queue_notification_channel_name">الطوابير</string>
     <string name="messages_notification_channel_name">الرسائل</string>

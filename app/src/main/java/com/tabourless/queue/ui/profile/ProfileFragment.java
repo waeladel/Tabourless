@@ -270,7 +270,7 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
             // it's logged in user profile
             Log.d(TAG, "it's logged in user profile= " + mUserId);
             mBinding.blockEditButton.setImageResource(R.drawable.ic_user_edit_profile);
-            mBinding.blockEditText.setText(R.string.title_edit_profile);
+            mBinding.blockEditText.setText(R.string.edit_button_title);
 
             mBinding.messageButton.setEnabled(false);
             mBinding.messageButton.setClickable(false);
