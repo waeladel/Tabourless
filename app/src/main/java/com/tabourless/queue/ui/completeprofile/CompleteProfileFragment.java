@@ -111,7 +111,6 @@ public class CompleteProfileFragment extends Fragment implements ItemClickListen
     private Uri mThumbnailAvatarUri;
     private Uri mThumbnailCoverUri;
 
-    // names of uploaded images
     private static final int SELECT_AVATAR_REQUEST_CODE = 102;
     private static final int SELECT_COVER_REQUEST_CODE = 103;
     private static final int CROP_IMAGE_REQUEST_CODE = 104;

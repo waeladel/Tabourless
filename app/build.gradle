@@ -22,8 +22,8 @@ android {
         minSdkVersion 17
         targetSdkVersion 30
         multiDexEnabled true // Enabling multiDex support.
-        versionCode 4
-        versionName "0.0.4"
+        versionCode 6
+        versionName "0.0.6"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -53,9 +53,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
             //debuggable true
-            ndk {
-                debugSymbolLevel 'FULL' // debug symbols file for native code to make crashes and ANRs easier to analyze
-            }
         }
     }
 
