@@ -531,7 +531,7 @@ public class CustomersRepository {
     public void removeCustomer(Customer customer) {
         Map<String, Object> childUpdates = new HashMap<>();
 
-        // Update relations to null. To start fresh
+        // Update customer to null to remove it from the customers node
         childUpdates.put(DATABASE_REF_CUSTOMERS +"/" + mPlaceKey + "/" + mQueueKey + "/" + customer.getKey(), null);
         childUpdates.put(DATABASE_REF_USER_QUEUES +"/" + customer.getUserId() + "/" + mQueueKey+ "/"+ DATABASE_REF_QUEUE_JOINED , 0);
 

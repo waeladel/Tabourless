@@ -62,6 +62,7 @@
     <string name="add_place_queue_title">الخدمة</string>
     <string name="select_queue_title">اختر خدمة</string>
     <string name="book_button_title">احجز</string>
+    <string name="unbook_button_title">الغ الحجز</string>
     <string name="add_place_queue_hint">خدمة عملاء، إيداع، شراء تذاكر</string>
     <string name="add_place_queue_helper">لو المكان يقدم خدمات متعددة، أضف الخدمات كلها لإنشاء قائمة انتظار لكل خدمة.</string>
 
@@ -116,6 +117,7 @@
     <string name="select_service_error">يجب اختيار خدمة.</string>
     <string name="fetch_place_error">تعذر الحصول على بيانات المكان، حاول مرة أخرى لاحقًا.</string>
     <string name="book_queue_error">تعذر الانضمام إلى الطابور، حاول مرة أخرى لاحقًا.</string>
+    <string name="unbook_queue_error">تعذر إلغاء حجزك، حاول مرة أخرى لاحقًا.</string>
     <string name="fetch_profile_error">تعذر الحصول على بيانات ملفك الشخصي، حاول مرة أخرى لاحقًا.</string>
     <string name="save_place_error">فشل في حفظ المكان، حاول مرة أخرى لاحقًا.</string>
     <string name="alert_confirm_removing_customer">%1$s تم حذف</string>

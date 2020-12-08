@@ -209,24 +209,36 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                 // get selected service/queue
                 Log.d(TAG, "onClick: CheckedChipId = "+ mBinding.servicesChipGroup.getCheckedChipId());
                 //Chip selectedChip = mBinding.servicesChipGroup.getCheckedChipId();
-                final UserQueue selectedUserQueue = mViewModel.chipsQueuesMap.get(mBinding.servicesChipGroup.getCheckedChipId());
-                if(selectedUserQueue != null){
-                    Log.d(TAG, "onClick: selectedQueue key= "+ selectedUserQueue.getKey() + " name= "+ selectedUserQueue.getName()+ " Place Id " + selectedUserQueue.getPlaceId());
+                final UserQueue selectedQueue = mViewModel.chipsQueuesMap.get(mBinding.servicesChipGroup.getCheckedChipId());
+                if(selectedQueue != null){
+                    Log.d(TAG, "onClick: selectedQueue key= "+ selectedQueue.getKey() + " name= "+ selectedQueue.getName()+ " Place Id " + selectedQueue.getPlaceId());
                     // double check that user is not in this queue before
-                    mViewModel.getUserQueueOnce(mCurrentUserId, selectedUserQueue.getKey(), new FirebaseUserQueueCallback() {
+                    mViewModel.getUserQueueOnce(mCurrentUserId, selectedQueue.getKey(), new FirebaseUserQueueCallback() {
                         @Override
                         public void onCallback(UserQueue userQueue) {
                             if(userQueue != null){
                                 if(userQueue.getJoinedLong() != 0){
-                                    Log.d(TAG, "onCallback: current user already in the queue");
-                                    return;
+                                    Log.d(TAG, "onCallback: current user already in the queue, lets unbook");
+                                    // Remove the user from the queue instead of adding him//her when clicking on unbook button
+                                    mViewModel.removeCurrentCustomer(userQueue, new FirebaseOnCompleteCallback() {
+                                        @Override
+                                        public void onCallback(@NonNull Task<Void> task) {
+                                            if(task.isSuccessful()){
+                                                // Go to customers recycler
+                                                Log.d(TAG, "FirebaseOnCompleteCallback onCallback: "+task.isSuccessful());
+                                                mBinding.bookButton.setText(R.string.book_button_title);
+                                            }else{
+                                                Toast.makeText(mContext, R.string.unbook_queue_error, Toast.LENGTH_LONG).show();
+                                            }
+                                        }
+                                    });
                                 }else{
                                     Log.d(TAG, "onCallback: current user quited the queue");
-                                    bookQueue(selectedUserQueue);
+                                    bookQueue(selectedQueue);
                                 }
                             }else{
                                 Log.d(TAG, "onCallback: current user didn't join the queue");
-                                bookQueue(selectedUserQueue);
+                                bookQueue(selectedQueue);
                             }
                         }
                     });
@@ -549,23 +561,27 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                 UserQueue selectedUserQueue = mViewModel.chipsQueuesMap.get(checkedId);
                 if(selectedUserQueue != null){
                     Log.d(TAG, "onCheckedChanged: "+selectedUserQueue.getKey());
-                    // Disable book button if already booked
+                    // Allow user to unbook if if already booked
                     mViewModel.getUserQueueOnce(mCurrentUserId, selectedUserQueue.getKey(), new FirebaseUserQueueCallback() {
                         @Override
                         public void onCallback(UserQueue userQueue) {
                             if(userQueue == null){
                                 Log.d(TAG, "onCallback: current user didn't join the queue");
-                                mBinding.bookButton.setEnabled(true);
-                                mBinding.bookButton.setClickable(true);
+                                //mBinding.bookButton.setEnabled(true);
+                                //mBinding.bookButton.setClickable(true);
+                                mBinding.bookButton.setText(R.string.book_button_title);
                             }else{
                                 if(userQueue.getJoinedLong() != 0){
                                     Log.d(TAG, "onCallback: current user already in the queue");
-                                    mBinding.bookButton.setEnabled(false);
-                                    mBinding.bookButton.setClickable(false);
+                                    //mBinding.bookButton.setEnabled(false);
+                                    //mBinding.bookButton.setClickable(false);
+                                    mBinding.bookButton.setText(R.string.unbook_button_title);
+
                                 }else{
                                     Log.d(TAG, "onCallback: current user quited the queue");
-                                    mBinding.bookButton.setEnabled(true);
-                                    mBinding.bookButton.setClickable(true);
+                                    //mBinding.bookButton.setEnabled(true);
+                                    //mBinding.bookButton.setClickable(true);
+                                    mBinding.bookButton.setText(R.string.book_button_title);
                                 }
                             }
                         }
@@ -577,7 +593,7 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
     }
 
     // To add customer to queue
-    private void bookQueue(final UserQueue userQueue) {
+    private void bookQueue(final UserQueue selectedQueue) {
         // Get current user once, to get currentUser's name and avatar for notifications
         mViewModel.getUserOnce(mCurrentUserId, new FirebaseUserCallback() {
             @Override
@@ -591,7 +607,7 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                     int age = year- user.getBirthYear();
 
                     Customer customer = new Customer(user.getKey(), user.getAvatar(), user.getName(), user.getGender(), age, user.getDisabled(), CUSTOMER_STATUS_WAITING);
-                    mViewModel.addCustomer(userQueue, customer, new FirebaseOnCompleteCallback() {
+                    mViewModel.addCurrentCustomer(selectedQueue, customer, new FirebaseOnCompleteCallback() {
                         @Override
                         public void onCallback(@NonNull Task<Void> task) {
                             if(task.isSuccessful()){

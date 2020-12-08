@@ -63,6 +63,7 @@
     <string name="add_place_queue_title">Service</string>
     <string name="select_queue_title">Select service</string>
     <string name="book_button_title">Book</string>
+    <string name="unbook_button_title">Unbook</string>
     <string name="add_place_queue_hint">Customer service, Tickets booking</string>
     <string name="add_place_queue_helper">If this place provides multiple services, add them all to create separate waiting list for each service.</string>
 
@@ -118,6 +119,7 @@
     <string name="select_service_error">You must select a service.</string>
     <string name="fetch_place_error">Failed to get place\'s data, try again later.</string>
     <string name="book_queue_error">Failed to join the queue, try again later.</string>
+    <string name="unbook_queue_error">Failed to cancel your booking, try again later.</string>
     <string name="fetch_profile_error">Failed to fetch your profile data, try again later.</string>
     <string name="save_place_error">Failed to save the place, try again later.</string>
     <string name="alert_confirm_removing_customer">%1$s has been removed.</string>

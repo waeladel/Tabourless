@@ -73,8 +73,13 @@ public class SearchViewModel extends ViewModel {
         this.mAddPlaceMarker = marker;
     }
 
-    public void addCustomer(UserQueue userQueue, Customer customer, FirebaseOnCompleteCallback callback) {
-        mSearchRepository.addCustomer(userQueue, customer, callback);
+    // Add a user to the queue when clicking the book button
+    public void addCurrentCustomer(UserQueue selectedQueue, Customer customer, FirebaseOnCompleteCallback callback) {
+        mSearchRepository.addCurrentCustomer(selectedQueue, customer, callback);
+    }
+    // Remove the user from the queue instead of adding him//her when clicking on unbook button
+    public void removeCurrentCustomer(UserQueue selectedQueue, FirebaseOnCompleteCallback callback) {
+        mSearchRepository.removeCurrentCustomer(selectedQueue, callback);
     }
 
     public void moveToLocation(Location location, boolean animate) {

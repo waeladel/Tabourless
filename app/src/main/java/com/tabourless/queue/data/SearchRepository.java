@@ -19,6 +19,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.tabourless.queue.interfaces.FirebaseOnCompleteCallback;
 import com.tabourless.queue.interfaces.FirebasePlaceCallback;
@@ -37,7 +38,9 @@ import java.util.List;
 import java.util.Map;
 
 import static com.tabourless.queue.App.DATABASE_REF_CUSTOMERS;
+import static com.tabourless.queue.App.DATABASE_REF_CUSTOMER_USER_ID;
 import static com.tabourless.queue.App.DATABASE_REF_PLACES;
+import static com.tabourless.queue.App.DATABASE_REF_QUEUE_JOINED;
 import static com.tabourless.queue.App.DATABASE_REF_USERS;
 import static com.tabourless.queue.App.DATABASE_REF_USER_QUEUES;
 
@@ -283,15 +286,15 @@ public class SearchRepository {
     }
 
     // To add the user who booked the queue to customers column
-    public void addCustomer(UserQueue userQueue, Customer customer, final FirebaseOnCompleteCallback callback) {
+    public void addCurrentCustomer(UserQueue selectedQueue, Customer customer, final FirebaseOnCompleteCallback callback) {
 
-        String customerPushKey = mCustomersRef.child(userQueue.getKey()).push().getKey();
+        String customerPushKey = mCustomersRef.child(selectedQueue.getPlaceId()).child(selectedQueue.getKey()).push().getKey();
         Map<String, Object> childUpdates = new HashMap<>();// Map to update all
         Map<String, Object> customerValues = customer.toMap();
-        Map<String, Object> queueValues = userQueue.toMap();
+        Map<String, Object> queueValues = selectedQueue.toMap();
 
-        childUpdates.put(DATABASE_REF_CUSTOMERS +"/"+ userQueue.getPlaceId() +"/"+ userQueue.getKey() + "/" + customerPushKey, customerValues);
-        childUpdates.put( DATABASE_REF_USER_QUEUES +"/"+ mCurrentUserId+ "/" + userQueue.getKey() ,queueValues);
+        childUpdates.put(DATABASE_REF_CUSTOMERS +"/"+ selectedQueue.getPlaceId() +"/"+ selectedQueue.getKey() + "/" + customerPushKey, customerValues);
+        childUpdates.put( DATABASE_REF_USER_QUEUES +"/"+ mCurrentUserId+ "/" + selectedQueue.getKey() ,queueValues);
 
         mDatabaseRef.updateChildren(childUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
@@ -300,6 +303,51 @@ public class SearchRepository {
             }
         });
 
+    }
+
+    // To remove the user who from the queue he booked
+    public void removeCurrentCustomer(final UserQueue selectedQueue, final FirebaseOnCompleteCallback callback) {
+        // Get the current customer from customers node to remove it from queue
+        // Must call a query because the customer id is a pushed id not that is different than the user id
+        DatabaseReference currentCustomerRef = mCustomersRef.child(selectedQueue.getPlaceId()).child(selectedQueue.getKey());
+        Query query = currentCustomerRef.orderByChild(DATABASE_REF_CUSTOMER_USER_ID)
+                .equalTo(mCurrentUserId)
+                .limitToFirst(1);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // loop throw all found results. the result is only one customer anyway
+                    String customerKey = "";
+                    for (DataSnapshot snapshot: dataSnapshot.getChildren()){
+                        customerKey = snapshot.getKey();
+                    }
+                    Log.d(TAG, "current customer to be removed: "+ customerKey);
+                    // Update current customer to null to remove it from the customers node
+                    Map<String, Object> childUpdates = new HashMap<>();
+                    childUpdates.put(DATABASE_REF_CUSTOMERS +"/" + selectedQueue.getPlaceId() + "/" + selectedQueue.getKey() + "/" + customerKey, null);
+                    childUpdates.put(DATABASE_REF_USER_QUEUES +"/" + mCurrentUserId + "/" + selectedQueue.getKey()+ "/"+ DATABASE_REF_QUEUE_JOINED , 0);
+
+                    // update Data base
+                    mDatabaseRef.updateChildren(childUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            callback.onCallback(task);
+                        }
+                    });
+                } else {
+                    // Return a null user to view model to know when user doesn't exist,
+                    // So we don't create or update tokens and online presence
+                    callback.onCallback(null);
+                    Log.w(TAG, "getUserQueue is null, this user didn't join the queue before");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.w(TAG, "getUserOnce User onCancelled" +databaseError);
+            }
+        });
     }
 
     public void getUserOnce(String userId, final FirebaseUserCallback callback){
