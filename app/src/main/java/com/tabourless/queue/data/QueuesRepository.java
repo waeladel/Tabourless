@@ -535,32 +535,30 @@ public class QueuesRepository {
     public void removeQueue(final String userId, final UserQueue deletedQueue) {
 
         // Query to get customer key to delete his/her booking
+        // Must call a query because the customer key is a pushed id not the user id
         final DatabaseReference currentCustomerRef = mDatabaseRef.child(DATABASE_REF_CUSTOMERS).child(deletedQueue.getPlaceId()).child(deletedQueue.getKey());
-        Query query = currentCustomerRef.orderByChild(DATABASE_REF_CUSTOMER_USER_ID).equalTo(userId).limitToFirst(1);
+        Query query = currentCustomerRef.orderByChild(DATABASE_REF_CUSTOMER_USER_ID).equalTo(userId);//.limitToFirst(1);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Map<String, Object> childUpdates = new HashMap<>();
                 if(dataSnapshot.exists()){
-                    // loop throw all found results. We should only allow one booking per user anyway
-                    String customerKey = "";
+                    // loop throw all found results. the result is suppose to be only one customer anyway.
+                    // But in case there are more than one booking we will delete them all
                     for (DataSnapshot snapshot: dataSnapshot.getChildren()){
-                        customerKey = snapshot.getKey();
-                    }
+                        String customerKey = snapshot.getKey();
+                        Log.d(TAG, "current customer to be removed: "+ customerKey);
 
-                    if(!TextUtils.isEmpty(customerKey)){
-                        childUpdates.put(DATABASE_REF_CUSTOMERS +"/"+ deletedQueue.getPlaceId() + "/" + deletedQueue.getKey() + "/" + customerKey, null);
-                        childUpdates.put(DATABASE_REF_USER_QUEUES +"/"+  userId +"/"+ deletedQueue.getKey(), null);
-                        // update Data base
-                        mDatabaseRef.updateChildren(childUpdates);
+                        if(!TextUtils.isEmpty(customerKey)){
+                            childUpdates.put(DATABASE_REF_CUSTOMERS +"/"+ deletedQueue.getPlaceId() + "/" + deletedQueue.getKey() + "/" + customerKey, null);
+                        }
                     }
-                }else{
-                    // can't find the customer in this queue, probably it's an inactive queue and the booking was canceled already
-                    childUpdates.put(DATABASE_REF_USER_QUEUES+ "/" + userId + "/" + deletedQueue.getKey(), null);
-                    // update Data base
-                    mDatabaseRef.updateChildren(childUpdates);
 
                 }
+
+                // Delete the queue wither we found the customer on customers or not. if we can't find the customer, probably it's an inactive queue and the booking was canceled already
+                childUpdates.put(DATABASE_REF_USER_QUEUES +"/"+  userId +"/"+ deletedQueue.getKey(), null);
+                mDatabaseRef.updateChildren(childUpdates);
             }
 
             @Override

@@ -117,6 +117,7 @@
     <string name="add_place_counter_empty_error">You must add at least one counter for each service.</string>
     <string name="add_place_counter_error">Counter\'s name can\'t be empty.</string>
     <string name="select_service_error">You must select a service.</string>
+    <string name="counters_closed_error">There is no open counter for this service.</string>
     <string name="fetch_place_error">Failed to get place\'s data, try again later.</string>
     <string name="book_queue_error">Failed to join the queue, try again later.</string>
     <string name="unbook_queue_error">Failed to cancel your booking, try again later.</string>

@@ -1,5 +1,6 @@
 package com.tabourless.queue.data;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -307,25 +308,33 @@ public class SearchRepository {
 
     // To remove the user who from the queue he booked
     public void removeCurrentCustomer(final UserQueue selectedQueue, final FirebaseOnCompleteCallback callback) {
-        // Get the current customer from customers node to remove it from queue
-        // Must call a query because the customer id is a pushed id not that is different than the user id
+        // Get the current customer key from customers nod to remove it
+        // Must call a query because the customer key is a pushed id not the user id
+        Log.d(TAG, "removeCurrentCustomer placeId= "+ selectedQueue.getPlaceId()+ " QueueId= "+ selectedQueue.getKey() + " CurrentUserId= "+mCurrentUserId);
         DatabaseReference currentCustomerRef = mCustomersRef.child(selectedQueue.getPlaceId()).child(selectedQueue.getKey());
+        Log.d(TAG, "removeCurrentCustomer currentCustomerRef= "+ currentCustomerRef.getRef());
+
         Query query = currentCustomerRef.orderByChild(DATABASE_REF_CUSTOMER_USER_ID)
-                .equalTo(mCurrentUserId)
-                .limitToFirst(1);
+                .equalTo(mCurrentUserId);
+                //.limitToFirst(1);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.d(TAG, "dataSnapshot ChildrenCount= "+ dataSnapshot.getChildrenCount());
                 if (dataSnapshot.exists()) {
-                    // loop throw all found results. the result is only one customer anyway
-                    String customerKey = "";
+                    Map<String, Object> childUpdates = new HashMap<>(); // A HashMap to update the database
+                    // loop throw all found results. the result is suppose to be only one customer anyway.
+                    // But in case there are more than one booking we will delete them all
                     for (DataSnapshot snapshot: dataSnapshot.getChildren()){
-                        customerKey = snapshot.getKey();
+                        String customerKey = snapshot.getKey();
+                        Log.d(TAG, "current customer to be removed: "+ customerKey);
+
+                        if(!TextUtils.isEmpty(customerKey)){
+                            // Update current customer to null to remove it from the customers node
+                            childUpdates.put(DATABASE_REF_CUSTOMERS +"/" + selectedQueue.getPlaceId() + "/" + selectedQueue.getKey() + "/" + customerKey, null);
+                        }
                     }
-                    Log.d(TAG, "current customer to be removed: "+ customerKey);
-                    // Update current customer to null to remove it from the customers node
-                    Map<String, Object> childUpdates = new HashMap<>();
-                    childUpdates.put(DATABASE_REF_CUSTOMERS +"/" + selectedQueue.getPlaceId() + "/" + selectedQueue.getKey() + "/" + customerKey, null);
+
                     childUpdates.put(DATABASE_REF_USER_QUEUES +"/" + mCurrentUserId + "/" + selectedQueue.getKey()+ "/"+ DATABASE_REF_QUEUE_JOINED , 0);
 
                     // update Data base
@@ -336,10 +345,10 @@ public class SearchRepository {
                         }
                     });
                 } else {
-                    // Return a null user to view model to know when user doesn't exist,
+                    // Return a null customer to view model to know when customer doesn't exist in the customer nod,
                     // So we don't create or update tokens and online presence
                     callback.onCallback(null);
-                    Log.w(TAG, "getUserQueue is null, this user didn't join the queue before");
+                    Log.w(TAG, "removeCurrentCustomer is null, this user didn't join the queue before");
                 }
             }
 

@@ -61,6 +61,7 @@ import com.tabourless.queue.databinding.FragmentSearchBinding;
 import com.tabourless.queue.interfaces.FirebaseOnCompleteCallback;
 import com.tabourless.queue.interfaces.FirebaseUserCallback;
 import com.tabourless.queue.interfaces.FirebaseUserQueueCallback;
+import com.tabourless.queue.models.Counter;
 import com.tabourless.queue.models.Customer;
 import com.tabourless.queue.models.Place;
 import com.tabourless.queue.models.PlaceMarker;
@@ -152,7 +153,6 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                 mViewModel.moveToLocation(mViewModel.getCurrentLocation(), true);
             }
         };
-
     }
 
     @Override
@@ -163,6 +163,10 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
         //mChipBinding = ChipItemBinding.inflate(inflater, container, false);
 
         View view = mBinding.getRoot();
+
+        // Enable book button again as user may rotate the screen while the button is disabled due to booking or unbooking
+        mBinding.bookButton.setEnabled(true);
+        mBinding.bookButton.setClickable(true);
 
         // To get notified when the map is ready to be used.
         mBinding.map.onCreate(savedInstanceState);
@@ -206,6 +210,10 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                     Toast.makeText(mContext, R.string.select_service_error, Toast.LENGTH_SHORT).show();
                     return;
                 }
+
+                // Disable book button till we finish booking or unbooking so that user don't click it twice
+                mBinding.bookButton.setEnabled(false);
+                mBinding.bookButton.setClickable(false);
                 // get selected service/queue
                 Log.d(TAG, "onClick: CheckedChipId = "+ mBinding.servicesChipGroup.getCheckedChipId());
                 //Chip selectedChip = mBinding.servicesChipGroup.getCheckedChipId();
@@ -223,7 +231,11 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                                     mViewModel.removeCurrentCustomer(userQueue, new FirebaseOnCompleteCallback() {
                                         @Override
                                         public void onCallback(@NonNull Task<Void> task) {
-                                            if(task.isSuccessful()){
+                                            // enable book button again as we finished the process
+                                            mBinding.bookButton.setEnabled(true);
+                                            mBinding.bookButton.setClickable(true);
+
+                                            if(null != task && task.isSuccessful()){
                                                 // Go to customers recycler
                                                 Log.d(TAG, "FirebaseOnCompleteCallback onCallback: "+task.isSuccessful());
                                                 mBinding.bookButton.setText(R.string.book_button_title);
@@ -533,11 +545,11 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
 
         // Loop throw queues to display chips
         for (Object o : place.getQueues().entrySet()) {
-            Map.Entry pair = (Map.Entry) o;
-            Log.d(TAG, "showPlaceInfo place.getQueues() map key/val = " + pair.getKey() + " = " + pair.getValue());
-            Queue queue = place.getQueues().get(String.valueOf(pair.getKey()));
+            Map.Entry queuePair = (Map.Entry) o;
+            Log.d(TAG, "showPlaceInfo place.getQueues() map key/val = " + queuePair.getKey() + " = " + queuePair.getValue());
+            Queue queue = place.getQueues().get(String.valueOf(queuePair.getKey()));
             if(null != queue){
-                queue.setKey(String.valueOf(pair.getKey()));
+                queue.setKey(String.valueOf(queuePair.getKey()));
                 // set PlaceId inside userQueue object, it helps to access queues inside place node later
                 UserQueue userQueue = new UserQueue(queue.getKey(), queue.getName(), place.getKey(), place.getName());
                 // Don't display more than 30 character
@@ -547,6 +559,39 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                 ChipItemBinding mChipBinding = ChipItemBinding.inflate(getLayoutInflater(), mBinding.servicesChipGroup, false);
                 mChipBinding.chipItem.setText(shortenString);
                 mChipBinding.chipItem.setId(ViewCompat.generateViewId());
+
+                // Disable checking by default to only enable it if there is at least one counter open
+                mChipBinding.chipItem.setCheckable(false);
+                // Clicking is enabled by default to toast a message when the user selects a service that has no counter open
+                //mChipBinding.chipItem.setClickable(true);
+
+                // Enable checking the chipItem if at least on of the queue's counter is open
+                // Loop throw all counters to see if there is at least one of them is open
+                for (Object C : queue.getCounters().entrySet()) {
+                    Map.Entry CounterPair = (Map.Entry) C;
+                    Log.d(TAG, "showPlaceInfo queue.getCounters() map key/val = " + CounterPair.getKey() + " = " + CounterPair.getValue());
+                    Counter counter = queue.getCounters().get(String.valueOf(CounterPair.getKey()));
+                    if (null != counter) {
+                        counter.setKey(String.valueOf(CounterPair.getKey()));
+                        if(counter.isOpen()){
+                            Log.d(TAG, "Counter name= " + counter.getName() + " is Open= "+counter.isOpen());
+                            mChipBinding.chipItem.setCheckable(true);
+                        }
+
+                    }
+                } // End of looping throw all counters
+
+                if(!mChipBinding.chipItem.isCheckable()) {
+                    // ChipItem is not checkable because it has no open counter
+                    mChipBinding.chipItem.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            // Toast a message when the user selects a service that has no counter open
+                            Toast.makeText(mContext, R.string.counters_closed_error, Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+
                 //ChipDrawable chipDrawable = ChipDrawable.createFromAttributes(mContext, null, 0, R.style.Widget_MaterialComponents_Chip_Choice);
                 //chip.setChipDrawable(chipDrawable);
                 mBinding.servicesChipGroup.addView(mChipBinding.chipItem);
@@ -567,20 +612,20 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                         public void onCallback(UserQueue userQueue) {
                             if(userQueue == null){
                                 Log.d(TAG, "onCallback: current user didn't join the queue");
-                                //mBinding.bookButton.setEnabled(true);
-                                //mBinding.bookButton.setClickable(true);
+                                mBinding.bookButton.setEnabled(true);
+                                mBinding.bookButton.setClickable(true);
                                 mBinding.bookButton.setText(R.string.book_button_title);
                             }else{
                                 if(userQueue.getJoinedLong() != 0){
                                     Log.d(TAG, "onCallback: current user already in the queue");
-                                    //mBinding.bookButton.setEnabled(false);
-                                    //mBinding.bookButton.setClickable(false);
+                                    mBinding.bookButton.setEnabled(true);
+                                    mBinding.bookButton.setClickable(true);
                                     mBinding.bookButton.setText(R.string.unbook_button_title);
 
                                 }else{
                                     Log.d(TAG, "onCallback: current user quited the queue");
-                                    //mBinding.bookButton.setEnabled(true);
-                                    //mBinding.bookButton.setClickable(true);
+                                    mBinding.bookButton.setEnabled(true);
+                                    mBinding.bookButton.setClickable(true);
                                     mBinding.bookButton.setText(R.string.book_button_title);
                                 }
                             }
@@ -610,7 +655,11 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                     mViewModel.addCurrentCustomer(selectedQueue, customer, new FirebaseOnCompleteCallback() {
                         @Override
                         public void onCallback(@NonNull Task<Void> task) {
-                            if(task.isSuccessful()){
+                            // enable book button again as we finished the process
+                            mBinding.bookButton.setEnabled(true);
+                            mBinding.bookButton.setClickable(true);
+
+                            if(null != task && task.isSuccessful()){
                                 // Go to customers recycler
                                 Log.d(TAG, "FirebaseOnCompleteCallback onCallback: "+task.isSuccessful());
                                 /*NavDirections direction = SearchFragmentDirections.actionSearchToCustomers(userQueue.getPlaceId(), userQueue.getKey());
@@ -623,6 +672,10 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                     });
 
                 }else{
+                    // enable book button again as we finished the process
+                    mBinding.bookButton.setEnabled(true);
+                    mBinding.bookButton.setClickable(true);
+
                     Toast.makeText(mContext, R.string.fetch_profile_error, Toast.LENGTH_LONG).show();
                 }
             }
