@@ -289,6 +289,10 @@ public class SearchRepository {
     // To add the user who booked the queue to customers column
     public void addCurrentCustomer(UserQueue selectedQueue, Customer customer, final FirebaseOnCompleteCallback callback) {
 
+        // Remove counters from the UserQueue, we don't need counters in userQueue nod
+        // We only added counters to selectedQueue to check suitable counters for user (customer) before agree to add him
+        selectedQueue.getCounters().clear();
+
         String customerPushKey = mCustomersRef.child(selectedQueue.getPlaceId()).child(selectedQueue.getKey()).push().getKey();
         Map<String, Object> childUpdates = new HashMap<>();// Map to update all
         Map<String, Object> customerValues = customer.toMap();

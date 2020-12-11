@@ -18,6 +18,7 @@ public class UserQueue {
     private String name;
     private String placeId;
     private String placeName;
+    private Map<String, Counter> counters = new LinkedHashMap<>(); // To get the suitable counters (for current user) of the the selected chip item
     private int number;
     private Object joined;
 
@@ -31,6 +32,14 @@ public class UserQueue {
         this.placeName = placeName;
     }
 
+    public UserQueue(String key, String name, String placeId, String placeName, Map<String, Counter> counters) {
+        this.key = key;
+        this.name = name;
+        this.placeId = placeId;
+        this.placeName = placeName;
+        this.counters = counters;
+    }
+
     // [START post_to_map]
     @Exclude
     public Map<String, Object> toMap() {
@@ -39,6 +48,7 @@ public class UserQueue {
         result.put("joined", ServerValue.TIMESTAMP);
         result.put("placeId", placeId);
         result.put("placeName", placeName);
+        result.put("counters", counters);
         result.put("number", number);
 
         return result;
@@ -72,6 +82,14 @@ public class UserQueue {
 
     public void setPlaceName(String placeName) {
         this.placeName = placeName;
+    }
+
+    public Map<String, Counter> getCounters() {
+        return counters;
+    }
+
+    public void setCounters(Map<String, Counter> counters) {
+        this.counters = counters;
     }
 
     public int getNumber() {
