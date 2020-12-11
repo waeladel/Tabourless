@@ -78,5 +78,10 @@
                 android:resource="@xml/provider_paths" />
         </provider>
     </application>
-
+<!-- Allow the camera to capture images in Android 11 -->
+    <queries>
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE" />
+        </intent>
+    </queries>
 </manifest>
