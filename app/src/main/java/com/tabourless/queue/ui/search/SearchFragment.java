@@ -721,7 +721,7 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                     // user is female, Counter is not for males only, lets check age and disability
                     Log.d(TAG, "Matching. is customer gender= "+ customer.getGender() + ". counter is not for gender "+ counter.getGender());
                     if ((customer.getAge() <60 && !TextUtils.equals(counter.getAge(), COUNTER_SPINNER_AGE_OLD))
-                        || (customer.getAge() >60 && !TextUtils.equals(counter.getAge(), COUNTER_SPINNER_AGE_YOUNG))){
+                        || (customer.getAge() >=60 && !TextUtils.equals(counter.getAge(), COUNTER_SPINNER_AGE_YOUNG))){
                         // user is young, Counter is not for old only, lets check disability
                         // user is old, Counter is not for young only, lets check disability
                         Log.d(TAG, "Matching. is customer age = "+ customer.getAge() + ". Counter is not for age "+ counter.getAge());

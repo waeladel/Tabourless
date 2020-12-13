@@ -306,8 +306,8 @@ public class CountersDialogFragment extends DialogFragment  {
         // Get existing layout params for the window
         ViewGroup.LayoutParams params = getDialog().getWindow().getAttributes();
         // Assign window properties to fill the parent
-        params.width = ViewGroup.LayoutParams.MATCH_PARENT;
-        params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+        params.height = ViewGroup.LayoutParams.MATCH_PARENT;
         getDialog().getWindow().setAttributes((android.view.WindowManager.LayoutParams) params);
         // Call super onResume after sizing
         super.onResume();
