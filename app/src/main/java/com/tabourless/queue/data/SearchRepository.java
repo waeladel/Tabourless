@@ -95,7 +95,7 @@ public class SearchRepository {
         @Override
         public void onDataEntered(DataSnapshot dataSnapshot, GeoLocation location) {
             // The location of a dataSnapshot now matches the query criteria.
-            Log.d(TAG, "onDataEntered: dataSnapshot key = "+dataSnapshot.getKey());
+            Log.d(TAG, "GeoFire onDataEntered: dataSnapshot key = "+dataSnapshot.getKey());
             final Place place = dataSnapshot.getValue(Place.class);
             if(place != null){
                 place.setKey(dataSnapshot.getKey());
@@ -112,7 +112,7 @@ public class SearchRepository {
                 place.setKey(dataSnapshot.getKey());
                 mPlacesMap.remove(place.getKey());
                 mNearbyPlaces.postValue(mPlacesMap);
-                Log.d(TAG, "onDataExited: dataSnapshot key = "+dataSnapshot.getKey()+ " mPlacesArrayList size= "+place.getName());
+                Log.d(TAG, "GeoFire onDataExited: dataSnapshot key = "+dataSnapshot.getKey()+ " mPlacesArrayList size= "+place.getName());
             }
         }
 
@@ -124,12 +124,13 @@ public class SearchRepository {
         @Override
         public void onDataChanged(DataSnapshot dataSnapshot, GeoLocation location) {
             // The dataSnapshot is changed
-            /*Place place = dataSnapshot.getValue(Place.class);
+            Place place = dataSnapshot.getValue(Place.class);
             if(place != null){
                 place.setKey(dataSnapshot.getKey());
-                mNearbyPlace.postValue(place);
-                Log.d(TAG, "onDataChanged: dataSnapshot key = "+dataSnapshot.getKey()+ " mPlacesArrayList size= "+place.getName());
-            }*/
+                mPlacesMap.put(place.getKey(), place);
+                mNearbyPlaces.postValue(mPlacesMap);
+                Log.d(TAG, "GeoFire onDataChanged: dataSnapshot key = "+dataSnapshot.getKey()+ " changed place name= "+ place.getName() + " queues size= "+place.getQueues().size());
+            }
         }
 
         @Override

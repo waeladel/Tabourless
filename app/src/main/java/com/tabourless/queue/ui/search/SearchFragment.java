@@ -420,7 +420,7 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                         Place place = placeMap.get(String.valueOf(pair.getKey()));
                         if (place != null) {
                             place.setKey(String.valueOf(pair.getKey()));
-                            Log.d(TAG, "place name=" + place.getName());
+                            Log.d(TAG, "place name= " + place.getName()+ " queues' numbers = "+ place.getQueues().size());
                             // Create new marker
                             MarkerOptions markerOptions = new MarkerOptions();
                             markerOptions.position(new LatLng(place.getLatitude(), place.getLongitude()))
@@ -431,12 +431,25 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                                     //.snippet(place.getQueues().size());
                             // Only add place's marker if it wasn't added before
                             if(null == mViewModel.placesMarkersMap.get(place.getKey())){
+                                // Let's add a new marker
                                 Marker marker = mViewModel.getMap().addMarker(markerOptions);
                                 //mViewModel.displayedMarkers.put(place.getKey(), marker);
                                 //mViewModel.displayedPlaces.put(marker, place);
                                 PlaceMarker placeMarker = new PlaceMarker(place.getKey(), place, marker);
                                 mViewModel.placesMarkersMap.put(place.getKey(), placeMarker);
                                 Log.d(TAG, "onChanged: marker id= "+ marker.getId());
+                            }else{
+                                // Marker exist, we only need to update it
+                                PlaceMarker placeMarker = mViewModel.placesMarkersMap.get(place.getKey());
+                                // Update the place
+                                placeMarker.setPlace(place);
+
+                                // Update the marker
+                                placeMarker.getMarker().setTitle(place.getName());
+                                placeMarker.getMarker().setPosition(new LatLng(place.getLatitude(), place.getLongitude()));
+
+                                // Update the placesMarkersMap with the new place and marker
+                                mViewModel.placesMarkersMap.put(place.getKey(), placeMarker);
                             }
                         }
                     }
