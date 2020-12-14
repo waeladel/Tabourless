@@ -201,8 +201,8 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                     addPlaceMarker(currentLocationLatLng);
                 }else{
                     // if there is a place marker go to save place
-                    goToAddPlace(mViewModel.getAddPlaceMarker().getPosition());
                     Log.d(TAG, "marker getPosition: "+mViewModel.getAddPlaceMarker().getPosition());
+                    goToAddPlace(mViewModel.getAddPlaceMarker().getPosition());
                 }
 
             }
@@ -532,6 +532,12 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
 
     private void goToAddPlace(LatLng latLng) {
         NavDirections direction = SearchFragmentDirections.actionSearchToAddPlace(latLng, null);
+        if (null != mViewModel.getAddPlaceMarker()){
+            // Remove the existing add place marker, so that when we save the place oe cancel in addPlaceFragment
+            // We return to a clean map without the previous add place marker
+            mViewModel.getAddPlaceMarker().remove();
+            mViewModel.setAddPlaceMarker(null); // should be null so that it doesn't appear again when recreating the fragment due to rotating the device
+        }
         navController.navigate(direction);
     }
 
@@ -937,7 +943,7 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
         }
     }
 
-    // listen if user enabled location or kept it desabled
+    // listen if user enabled location or kept it disabled
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
