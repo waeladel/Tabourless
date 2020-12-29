@@ -28,8 +28,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -65,6 +63,7 @@ import static com.tabourless.queue.App.DATABASE_REF_USERS;
 import static com.tabourless.queue.App.DATABASE_REF_USER_LAST_ONLINE;
 import static com.tabourless.queue.App.DATABASE_REF_USER_TOKENS;
 import static com.tabourless.queue.App.STORAGE_REF_IMAGES;
+import static com.tabourless.queue.App.isUserOnline;
 import static com.tabourless.queue.Utils.MenuHelper.menuIconWithText;
 
 public class MainActivity extends AppCompatActivity {
@@ -162,8 +161,12 @@ public class MainActivity extends AppCompatActivity {
 
                     // When I disconnect, update the last time I was seen online
                     lastOnlineRef.onDisconnect().setValue(ServerValue.TIMESTAMP );
+
+                    isUserOnline = true; // To easily know if the user is online or not at anytime.
                 }else{
                     Log.i(TAG, "not connected");
+                    isUserOnline = false ; // To easily know if the user is not online or not at anytime.
+                    //Toast.makeText(MainActivity.this, R.string.no_internet_connection, Toast.LENGTH_LONG).show();
                 }
             }else{
                 Log.i(TAG, "snapshot don't exist");

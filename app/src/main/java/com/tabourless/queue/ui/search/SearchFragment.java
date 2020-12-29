@@ -85,6 +85,7 @@ import static com.tabourless.queue.App.COUNTER_SPINNER_DISABILITY_DISABLED;
 import static com.tabourless.queue.App.COUNTER_SPINNER_GENDER_FEMALE;
 import static com.tabourless.queue.App.COUNTER_SPINNER_GENDER_MALE;
 import static com.tabourless.queue.App.CUSTOMER_STATUS_WAITING;
+import static com.tabourless.queue.App.isUserOnline;
 
 
 /**
@@ -251,8 +252,18 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                                             }
                                         }
                                     });
+
+                                    // If user not connected we will never receive the write callback, we must toggle the UI like if the write is successful
+                                    if(!isUserOnline){
+                                        // enable book button again as we finished the process
+                                        mBinding.bookButton.setEnabled(true);
+                                        mBinding.bookButton.setClickable(true);
+
+                                        mBinding.bookButton.setText(R.string.book_button_title);
+                                    }
+
                                 }else{
-                                    Log.d(TAG, "onCallback: current user quited the queue");
+                                    Log.d(TAG, "onCallback: current user had ended the queue");
                                     bookQueue(selectedQueue);
                                 }
                             }else{
@@ -676,8 +687,7 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                     Calendar c = Calendar.getInstance();
                     int year = c.get(Calendar.YEAR);
                     int age = year- user.getBirthYear();
-
-                    Customer customer = new Customer(user.getKey(), user.getAvatar(), user.getName(), user.getGender(), age, user.getDisabled(), CUSTOMER_STATUS_WAITING);
+                    Customer customer = new Customer(user.getAvatar(), user.getName(), user.getGender(), age, user.getDisabled(), 0, CUSTOMER_STATUS_WAITING);
 
                     // Check if there is the open counter suitable for the current user
                     // Get a map of all suitable counters. We can add suitable counters clint side if we want but we added it server side already
@@ -693,31 +703,38 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                     mViewModel.addCurrentCustomer(selectedQueue, customer, new FirebaseOnCompleteCallback() {
                         @Override
                         public void onCallback(@NonNull Task<Void> task) {
-                            // enable book button again as we finished the process
-                            mBinding.bookButton.setEnabled(true);
-                            mBinding.bookButton.setClickable(true);
 
                             if(null != task && task.isSuccessful()){
                                 // Go to customers recycler
                                 Log.d(TAG, "FirebaseOnCompleteCallback onCallback: "+task.isSuccessful());
                                 /*NavDirections direction = SearchFragmentDirections.actionSearchToCustomers(userQueue.getPlaceId(), userQueue.getKey());
-                                navController.navigate(direction);*/
-                                navController.navigate(R.id.queues);
+                                navController.navigate(direction);
+                                navController.navigate(R.id.queues); */
                             }else{
                                 Toast.makeText(mContext, R.string.book_queue_error, Toast.LENGTH_LONG).show();
                             }
                         }
                     });
 
-                }else{
-                    // enable book button again as we finished the process
-                    mBinding.bookButton.setEnabled(true);
-                    mBinding.bookButton.setClickable(true);
+                    // If user not connected we will never receive the write callback, we must toggle the UI like if the write is successful
+                    if(!isUserOnline){
+                        // If user is not online we need to alert him that he will receive a token when re-connect
+                        Toast.makeText(mContext, R.string.book_queue_no_connection_alert, Toast.LENGTH_LONG).show();
+                    }
 
+                    // Use navigateUp instead of recreate queues fragment again so that we use the same query's listeners
+                    // Recreating the fragment sometimes make two observers and call onResult twice which cause the app to crash
+                    //navController.navigate(R.id.queues);
+                    navController.navigateUp();
+                }else{
                     Toast.makeText(mContext, R.string.fetch_profile_error, Toast.LENGTH_LONG).show();
                 }
             }
         });
+
+        // enable book button again as we finished the process
+        mBinding.bookButton.setEnabled(true);
+        mBinding.bookButton.setClickable(true);
 
     }
 

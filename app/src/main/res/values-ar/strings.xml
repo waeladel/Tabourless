@@ -119,6 +119,7 @@
     <string name="fetch_place_error">تعذر الحصول على بيانات المكان، حاول مرة أخرى لاحقًا.</string>
     <string name="book_queue_error">تعذر الانضمام إلى الطابور، حاول مرة أخرى لاحقًا.</string>
     <string name="unbook_queue_error">تعذر إلغاء حجزك، حاول مرة أخرى لاحقًا.</string>
+    <string name="book_queue_no_connection_alert">لا يوجد اتصال بشبكة الإنترنت، ستتلقى رقمك عند عودة الاتصال.</string>
     <string name="book_queue_suitable_counters_error">الخدمة ليس لها شباك مخصص لك.</string>
     <string name="fetch_profile_error">تعذر الحصول على بيانات ملفك الشخصي، حاول مرة أخرى لاحقًا.</string>
     <string name="save_place_error">فشل في حفظ المكان، حاول مرة أخرى لاحقًا.</string>

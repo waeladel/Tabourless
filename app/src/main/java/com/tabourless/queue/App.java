@@ -39,6 +39,7 @@ public class App extends MultiDexApplication { // had to enable MultiDex after a
 
     private final static String TAG = App.class.getSimpleName();
     private static Context sApplicationContext;
+    public static boolean isUserOnline;
 
     // Since I can connect from multiple devices, we store each connection instance separately
     // any time that connectionsRef's value is null (i.e. has no children) I am offline
@@ -80,7 +81,8 @@ public class App extends MultiDexApplication { // had to enable MultiDex after a
     public static final String DATABASE_REF_MESSAGES = "messages";
     public static final String DATABASE_REF_MESSAGE_STATUS = "status";
     public static final String DATABASE_REF_CUSTOMERS = "customers";
-    public static final String DATABASE_REF_CUSTOMER_USER_ID = "userId";
+    //public static final String DATABASE_REF_CUSTOMER_USER_ID = "userId";
+    public static final String DATABASE_REF_CUSTOMER_NUMBER = "number";
     public static final String DATABASE_REF_QUEUE_JOINED = "joined";
     public static final String DATABASE_REF_CHATS = "chats";
     public static final String DATABASE_REF_CHAT_ACTIVE = "active";

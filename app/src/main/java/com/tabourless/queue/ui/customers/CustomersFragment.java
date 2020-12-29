@@ -234,7 +234,7 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
             @Override
             public void onChanged(Customer customer) {
                 if (customer != null){
-                    Log.d(TAG, "mama getCurrentCustomer onChanged: customer number= "+ customer.getNumber()+ " userId= "+ customer.getUserId());
+                    Log.d(TAG, "mama getCurrentCustomer onChanged: customer number= "+ customer.getNumber()+ " customerId= "+ customer.getKey());
                     mCurrentCustomer = customer;
                     liveDataMerger.setValue(customer);
                 }
@@ -285,7 +285,7 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
                                     shortestWaitingTime = counter.getWaitingTime();
                                 }
 
-                                // get the shortest Waiting Time
+                                // get the shortest Service Time
                                 if (shortestServiceTime == 0 || counter.getServiceTime() <= shortestServiceTime) {
                                     shortestServiceTime = counter.getServiceTime();
                                 }
@@ -418,7 +418,7 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
                     if(deletedCustomer != null) {
                         // Check if we suppose to remove this user or he is not served yet
                         if(TextUtils.equals(deletedCustomer.getStatus(), CUSTOMER_STATUS_FRONT)
-                                || TextUtils.equals(deletedCustomer.getUserId(), mCurrentUserId)){
+                                || TextUtils.equals(deletedCustomer.getKey(), mCurrentUserId)){
                             // proceed with removing the customer
                             if(!TextUtils.isEmpty(deletedCustomer.getName())){
                                 shortenName = getFirstWord(deletedCustomer.getName());
@@ -427,7 +427,7 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
                             }
                             // If current user deleting himself we must change Snackbar message
                             String SnackMessage;
-                            if(TextUtils.equals(deletedCustomer.getUserId(), mCurrentUserId)){
+                            if(TextUtils.equals(deletedCustomer.getKey(), mCurrentUserId)){
                                 SnackMessage = getString(R.string.alert_confirm_removing_booking);
                             }else{
                                 SnackMessage = getString(R.string.alert_confirm_removing_customer, shortenName);
@@ -481,7 +481,7 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
                     float translationX = 0;
                     // Check if we suppose to remove this user or he is not served yet
                     if(deletedCustomer != null && TextUtils.equals(deletedCustomer.getStatus(), CUSTOMER_STATUS_FRONT)
-                        || deletedCustomer != null &&  TextUtils.equals(deletedCustomer.getUserId(), mCurrentUserId)) {
+                        || deletedCustomer != null &&  TextUtils.equals(deletedCustomer.getKey(), mCurrentUserId)) {
                         // proceed with removing the customer
                         // Decorate swipe background
                         new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
@@ -550,11 +550,11 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
         if(customer != null){
             if (view.getId() == R.id.customer_image) {
                 // only avatar is clicked, go to profile
-                NavDirections direction = CustomersFragmentDirections.actionCustomersToProfile(customer.getUserId());
+                NavDirections direction = CustomersFragmentDirections.actionCustomersToProfile(customer.getKey());
                 navController.navigate(direction);
             } else {
                 // entire row is clicked, chat with user
-                NavDirections direction = CustomersFragmentDirections.actionCustomersToMessages(null, customer.getUserId(), false);
+                NavDirections direction = CustomersFragmentDirections.actionCustomersToMessages(null, customer.getKey(), false);
                 navController.navigate(direction);
             }
         }

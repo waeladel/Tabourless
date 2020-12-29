@@ -83,7 +83,7 @@
 
     <!--toast and error messages -->
     <string name="sign_in_cancelled">Sign in has been cancelled</string>
-    <string name="no_internet_connection">No internet connection</string>
+    <string name="no_internet_connection">No internet connection.</string>
     <string name="unknown_error">Unknown error occurred</string>
     <string name="upload_image_error">Sorry, couldn\'t upload your image.</string>
     <string name="download_image_error">Sorry, couldn\'t download your image.</string>
@@ -121,6 +121,7 @@
     <string name="fetch_place_error">Failed to get place\'s data, try again later.</string>
     <string name="book_queue_error">Failed to join the queue, try again later.</string>
     <string name="unbook_queue_error">Failed to cancel your booking, try again later.</string>
+    <string name="book_queue_no_connection_alert">No internet connection, you will receive your token once you reconnect.</string>
     <string name="book_queue_suitable_counters_error">The service has no designated counter for you.</string>
     <string name="fetch_profile_error">Failed to fetch your profile data, try again later.</string>
     <string name="save_place_error">Failed to save the place, try again later.</string>

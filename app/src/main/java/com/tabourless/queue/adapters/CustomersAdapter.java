@@ -95,7 +95,7 @@ public class CustomersAdapter extends PagedListAdapter<Customer, CustomersAdapte
 
             // Lets get avatar
             if(!TextUtils.isEmpty(customer.getAvatar())){
-                StorageReference userAvatarStorageRef = mStorageRef.child(STORAGE_REF_IMAGES+ "/"+ customer.getUserId() +"/"+ AVATAR_THUMBNAIL_NAME);
+                StorageReference userAvatarStorageRef = mStorageRef.child(STORAGE_REF_IMAGES+ "/"+ customer.getKey() +"/"+ AVATAR_THUMBNAIL_NAME);
                 // Download directly from StorageReference using Glide
                 GlideApp.with(mContext)
                         .load(userAvatarStorageRef)
@@ -108,7 +108,7 @@ public class CustomersAdapter extends PagedListAdapter<Customer, CustomersAdapte
             }// end of user avatar
 
             // Ticket number
-            if (customer.getNumber() != 0) {
+            if (null != customer.getNumber() && customer.getNumber() != 0) {
                 holder.mBinding.numberValue.setText(String.valueOf(customer.getNumber()));
             }else{
                 holder.mBinding.numberValue.setText(null);
@@ -182,12 +182,11 @@ public class CustomersAdapter extends PagedListAdapter<Customer, CustomersAdapte
             if(customer.getAge()<60){
                 // customer is young
                 holder.mBinding.ageIcon.setImageResource(R.drawable.ic_not_old_man_with_cane);
-                holder.mBinding.ageIcon.setVisibility(View.VISIBLE);
             }else{
                 // customer is old
                 holder.mBinding.ageIcon.setImageResource(R.drawable.ic_old_man_with_cane);
-                holder.mBinding.ageIcon.setVisibility(View.VISIBLE);
             }
+            holder.mBinding.ageIcon.setVisibility(View.VISIBLE);
 
             // Disability icon
             if (customer.isDisabled()) {

@@ -3,16 +3,11 @@ package com.tabourless.queue.data;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.LiveData;
 import androidx.paging.ItemKeyedDataSource;
 
-import com.tabourless.queue.interfaces.FirebaseOnCompleteCallback;
 import com.tabourless.queue.models.Customer;
-import com.tabourless.queue.models.Queue;
 
-import java.util.List;
-
-public class CustomersDataSource extends ItemKeyedDataSource<String, Customer> {
+public class CustomersDataSource extends ItemKeyedDataSource<Integer, Customer> {
 
     private final static String TAG = CustomersDataSource.class.getSimpleName();
     private String mPlaceKey, mQueueKey;
@@ -67,7 +62,7 @@ public class CustomersDataSource extends ItemKeyedDataSource<String, Customer> {
 
     // load the initial data based on page size and key (key in null on the first load)
     @Override
-    public void loadInitial(@NonNull LoadInitialParams<String> params, @NonNull LoadInitialCallback<Customer> callback) {
+    public void loadInitial(@NonNull LoadInitialParams<Integer> params, @NonNull LoadInitialCallback<Customer> callback) {
         /*List<User> items = usersRepository.getMessages(params.requestedInitialKey, params.requestedLoadSize);
         callback.onResult(items);*/
         //messagesRepository.setLoadInitialCallback(callback);
@@ -79,7 +74,7 @@ public class CustomersDataSource extends ItemKeyedDataSource<String, Customer> {
 
     // load next page
     @Override
-    public void loadAfter(@NonNull LoadParams<String> params, @NonNull LoadCallback<Customer> callback) {
+    public void loadAfter(@NonNull LoadParams<Integer> params, @NonNull LoadCallback<Customer> callback) {
         /*List<User> items = usersRepository.getMessages(params.key, params.requestedLoadSize);
         callback.onResult(items);*/
         mCustomersRepository.setLoadAfterCallback(params.key, callback);
@@ -89,7 +84,7 @@ public class CustomersDataSource extends ItemKeyedDataSource<String, Customer> {
 
     // load previous page
     @Override
-    public void loadBefore(@NonNull LoadParams<String> params, @NonNull LoadCallback<Customer> callback) {
+    public void loadBefore(@NonNull LoadParams<Integer> params, @NonNull LoadCallback<Customer> callback) {
         /*List<User> items = fetchItemsBefore(params.key, params.requestedLoadSize);
         callback.onResult(items);*/
         mCustomersRepository.setLoadBeforeCallback(params.key, callback);
@@ -99,8 +94,8 @@ public class CustomersDataSource extends ItemKeyedDataSource<String, Customer> {
 
     @NonNull
     @Override
-    public String getKey(@NonNull Customer customer) {
-        return  customer.getKey();
+    public Integer getKey(@NonNull Customer customer) {
+        return  customer.getNumber();
     }
 
     public void setScrollDirection(int scrollDirection, int lastVisibleItem) {

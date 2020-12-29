@@ -7,6 +7,8 @@ import androidx.annotation.NonNull;
 import androidx.paging.DataSource;
 import androidx.paging.ItemKeyedDataSource;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -23,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.tabourless.queue.App.DATABASE_REF_CUSTOMERS;
-import static com.tabourless.queue.App.DATABASE_REF_CUSTOMER_USER_ID;
 import static com.tabourless.queue.App.DATABASE_REF_PLACES;
 import static com.tabourless.queue.App.DATABASE_REF_QUEUES;
 import static com.tabourless.queue.App.DATABASE_REF_QUEUE_JOINED;
@@ -95,7 +96,7 @@ public class QueuesRepository {
                     UserQueue userqueue = snapshot.getValue(UserQueue.class);
                     if (userqueue != null) {
                         userqueue.setKey(snapshot.getKey());
-                        if(getLoadAfterKey()!= userqueue.getJoinedLong()) { // if snapshot key = startAt key? don't add it again
+                        if(null != getLoadAfterKey() && userqueue.getJoinedLong() != getLoadAfterKey()) { // if snapshot key = startAt key? don't add it again
                             resultList.add(userqueue);
                         }
                     }
@@ -162,7 +163,7 @@ public class QueuesRepository {
                     UserQueue userQueue = snapshot.getValue(UserQueue.class);
                     if (userQueue != null) {
                         userQueue.setKey(snapshot.getKey());
-                        if(getLoadBeforeKey()!= userQueue.getJoinedLong()) { // if snapshot key = startAt key? don't add it again
+                        if(null != getLoadBeforeKey() && userQueue.getJoinedLong() != getLoadBeforeKey()) { // if snapshot key = startAt key? don't add it again
                             resultList.add(userQueue);
                         }
                     }
@@ -533,8 +534,18 @@ public class QueuesRepository {
     }*/
 
     public void removeQueue(final String userId, final UserQueue deletedQueue) {
+        Map<String, Object> childUpdates = new HashMap<>(); // A HashMap to update the database
 
-        // Query to get customer key to delete his/her booking
+        // Update customer to null to remove it from the customers node
+        childUpdates.put(DATABASE_REF_CUSTOMERS +"/" + deletedQueue.getPlaceId() + "/" + deletedQueue.getKey() + "/" + userId, null);
+
+        // Delete the queue wither we found the customer on customers or not. if we can't find the customer, probably it's an inactive queue and the booking was canceled already
+        childUpdates.put(DATABASE_REF_USER_QUEUES +"/"+  userId +"/"+ deletedQueue.getKey(), null);
+
+        // update Data base
+        mDatabaseRef.updateChildren(childUpdates);
+
+        /*// Query to get customer key to delete his/her booking
         // Must call a query because the customer key is a pushed id not the user id
         final DatabaseReference currentCustomerRef = mDatabaseRef.child(DATABASE_REF_CUSTOMERS).child(deletedQueue.getPlaceId()).child(deletedQueue.getKey());
         Query query = currentCustomerRef.orderByChild(DATABASE_REF_CUSTOMER_USER_ID).equalTo(userId);//.limitToFirst(1);
@@ -564,7 +575,7 @@ public class QueuesRepository {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
-        });
+        });*/
     }
 
     //removeListeners is static so it can be triggered when ViewModel is onCleared

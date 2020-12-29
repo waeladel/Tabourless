@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.tabourless.queue.App.DATABASE_REF_CUSTOMERS;
-import static com.tabourless.queue.App.DATABASE_REF_CUSTOMER_USER_ID;
 import static com.tabourless.queue.App.DATABASE_REF_PLACES;
 import static com.tabourless.queue.App.DATABASE_REF_QUEUES;
 import static com.tabourless.queue.App.DATABASE_REF_USER_QUEUES;
@@ -43,7 +42,7 @@ public class QueueRepository {
     private MutableLiveData<Queue> mQueue;
     private MutableLiveData<Customer> mCurrentCustomer;
 
-    // a listener for chat  changes
+    // a listener for Queue changes
     private ValueEventListener QueueListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -76,14 +75,11 @@ public class QueueRepository {
             // Get Post object and use the values to update the UI
             if (dataSnapshot.exists()) {
                 // Get user value
-                Log.d(TAG, "chat dataSnapshot key: "
-                        + dataSnapshot.getKey()+" Listener = "+QueueListener);
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Customer customer = snapshot.getValue(Customer.class);
-                    if (customer != null) {
-                        customer.setKey(snapshot.getKey());
-                        mCurrentCustomer.postValue(customer);
-                    }
+                Log.d(TAG, "chat dataSnapshot key: " + dataSnapshot.getKey()+" Listener = "+QueueListener);
+                Customer customer = dataSnapshot.getValue(Customer.class);
+                if (customer != null) {
+                    customer.setKey(dataSnapshot.getKey());
+                    mCurrentCustomer.postValue(customer);
                 }
 
 
@@ -124,39 +120,39 @@ public class QueueRepository {
     public LiveData<Customer> getCurrentCustomer(String placeKey, String queueKey, String currentUserId) {
         Log.d(TAG, "QueueRepository: queueId= "+ queueKey);
         // use received placeKey and queueKey to create a database ref
-        mCurrentCustomerRef = mDatabaseRef.child(DATABASE_REF_CUSTOMERS).child(placeKey).child(queueKey);
-        Query query = mCurrentCustomerRef.orderByChild(DATABASE_REF_CUSTOMER_USER_ID)
+        mCurrentCustomerRef = mDatabaseRef.child(DATABASE_REF_CUSTOMERS).child(placeKey).child(queueKey).child(currentUserId);
+        /*Query query = mCurrentCustomerRef.orderByChild(DATABASE_REF_CUSTOMER_USER_ID)
                 .equalTo(currentUserId)
-                .limitToFirst(1);
+                .limitToFirst(1);*/
 
         Log.d(TAG, "getQueue mListenersList size= "+ mListenersList.size());
         if(mListenersList.size()== 0){
             // Need to add a new Listener
             Log.d(TAG, "getQueue adding new Listener= "+ mListenersList);
             //mListenersMap.put(postSnapshot.getRef(), mPickUpCounterListener);
-            query.addValueEventListener(CustomerListener);
-            mListenersList.add(new FirebaseListeners(query, CustomerListener));
+            mCurrentCustomerRef.addValueEventListener(CustomerListener);
+            mListenersList.add(new FirebaseListeners(mCurrentCustomerRef, CustomerListener));
         }else{
             Log.d(TAG, "postSnapshot Listeners size is not 0= "+ mListenersList.size());
             //there is an old Listener, need to check if it's on this ref
             for (int i = 0; i < mListenersList.size(); i++) {
                 //Log.d(TAG, "getUser Listeners ref= "+ mListenersList.get(i).getQueryOrRef()+ " Listener= "+ mListenersList.get(i).getListener());
                 if(mListenersList.get(i).getListener().equals(CustomerListener) &&
-                        !mListenersList.get(i).getQueryOrRef().equals(query)){
+                        !mListenersList.get(i).getQueryOrRef().equals(mCurrentCustomerRef)){
                     // We used this listener before, but on another Ref
                     Log.d(TAG, "We used this listener before, is it on the same ref?");
                     Log.d(TAG, "getQueue adding new Listener= "+ CustomerListener);
-                    query.addValueEventListener(CustomerListener);
-                    mListenersList.add(new FirebaseListeners(query, CustomerListener));
+                    mCurrentCustomerRef.addValueEventListener(CustomerListener);
+                    mListenersList.add(new FirebaseListeners(mCurrentCustomerRef, CustomerListener));
                 }else if((mListenersList.get(i).getListener().equals(CustomerListener) &&
-                        mListenersList.get(i).getQueryOrRef().equals(query))){
+                        mListenersList.get(i).getQueryOrRef().equals(mCurrentCustomerRef))){
                     //there is old Listener on the ref
                     Log.d(TAG, "getQueue Listeners= there is old Listener on the ref= "+mListenersList.get(i).getQueryOrRef()+ " Listener= " + mListenersList.get(i).getListener());
                 }else{
                     //CustomerListener is never used
                     Log.d(TAG, "Listener is never created");
-                    query.addValueEventListener(CustomerListener);
-                    mListenersList.add(new FirebaseListeners(query, CustomerListener));
+                    mCurrentCustomerRef.addValueEventListener(CustomerListener);
+                    mListenersList.add(new FirebaseListeners(mCurrentCustomerRef, CustomerListener));
                 }
             }
         }

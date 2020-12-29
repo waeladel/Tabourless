@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.tabourless.queue.App.DATABASE_REF_CUSTOMERS;
-import static com.tabourless.queue.App.DATABASE_REF_CUSTOMER_USER_ID;
 import static com.tabourless.queue.App.DATABASE_REF_PLACES;
 import static com.tabourless.queue.App.DATABASE_REF_QUEUE_JOINED;
 import static com.tabourless.queue.App.DATABASE_REF_USERS;
@@ -294,12 +293,13 @@ public class SearchRepository {
         // We only added counters to selectedQueue to check suitable counters for user (customer) before agree to add him
         selectedQueue.getCounters().clear();
 
-        String customerPushKey = mCustomersRef.child(selectedQueue.getPlaceId()).child(selectedQueue.getKey()).push().getKey();
+        //mCustomersRef.child(selectedQueue.getPlaceId()).child(selectedQueue.getKey()).child(mCurrentUserId).keepSynced(true);
+
         Map<String, Object> childUpdates = new HashMap<>();// Map to update all
         Map<String, Object> customerValues = customer.toMap();
         Map<String, Object> queueValues = selectedQueue.toMap();
 
-        childUpdates.put(DATABASE_REF_CUSTOMERS +"/"+ selectedQueue.getPlaceId() +"/"+ selectedQueue.getKey() + "/" + customerPushKey, customerValues);
+        childUpdates.put(DATABASE_REF_CUSTOMERS +"/"+ selectedQueue.getPlaceId() +"/"+ selectedQueue.getKey() + "/" + mCurrentUserId, customerValues);
         childUpdates.put( DATABASE_REF_USER_QUEUES +"/"+ mCurrentUserId+ "/" + selectedQueue.getKey() ,queueValues);
 
         mDatabaseRef.updateChildren(childUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -312,8 +312,22 @@ public class SearchRepository {
     }
 
     // To remove the user who from the queue he booked
-    public void removeCurrentCustomer(final UserQueue selectedQueue, final FirebaseOnCompleteCallback callback) {
-        // Get the current customer key from customers nod to remove it
+    public void removeCurrentCustomer(UserQueue selectedQueue, FirebaseOnCompleteCallback callback) {
+        Map<String, Object> childUpdates = new HashMap<>(); // A HashMap to update the database
+
+        // Update customer to null to remove it from the customers node
+        childUpdates.put(DATABASE_REF_CUSTOMERS +"/" + selectedQueue.getPlaceId() + "/" + selectedQueue.getKey() + "/" + mCurrentUserId, null);
+        childUpdates.put(DATABASE_REF_USER_QUEUES +"/" + mCurrentUserId + "/" + selectedQueue.getKey()+ "/"+ DATABASE_REF_QUEUE_JOINED , 0);
+
+        // update Data base
+        mDatabaseRef.updateChildren(childUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                callback.onCallback(task);
+            }
+        });
+
+        /*// Get the current customer key from customers nod to remove it
         // Must call a query because the customer key is a pushed id not the user id
         Log.d(TAG, "removeCurrentCustomer placeId= "+ selectedQueue.getPlaceId()+ " QueueId= "+ selectedQueue.getKey() + " CurrentUserId= "+mCurrentUserId);
         DatabaseReference currentCustomerRef = mCustomersRef.child(selectedQueue.getPlaceId()).child(selectedQueue.getKey());
@@ -322,12 +336,13 @@ public class SearchRepository {
         Query query = currentCustomerRef.orderByChild(DATABASE_REF_CUSTOMER_USER_ID)
                 .equalTo(mCurrentUserId);
                 //.limitToFirst(1);
+        query.keepSynced(true);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Log.d(TAG, "dataSnapshot ChildrenCount= "+ dataSnapshot.getChildrenCount());
                 if (dataSnapshot.exists()) {
-                    Map<String, Object> childUpdates = new HashMap<>(); // A HashMap to update the database
+
                     // loop throw all found results. the result is suppose to be only one customer anyway.
                     // But in case there are more than one booking we will delete them all
                     for (DataSnapshot snapshot: dataSnapshot.getChildren()){
@@ -361,7 +376,7 @@ public class SearchRepository {
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.w(TAG, "getUserOnce User onCancelled" +databaseError);
             }
-        });
+        });*/
     }
 
     public void getUserOnce(String userId, final FirebaseUserCallback callback){

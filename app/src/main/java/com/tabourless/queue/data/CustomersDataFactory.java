@@ -6,7 +6,7 @@ import androidx.paging.DataSource;
 import com.tabourless.queue.models.Customer;
 import com.tabourless.queue.models.Queue;
 
-public class CustomersDataFactory extends DataSource.Factory<String, Customer>{
+public class CustomersDataFactory extends DataSource.Factory<Integer, Customer>{
 
     private String mPlaceKey, mQueueKey;
     private CustomersDataSource mCustomersDataSource;
@@ -31,7 +31,7 @@ public class CustomersDataFactory extends DataSource.Factory<String, Customer>{
     }
 
     @Override
-    public DataSource<String, Customer> create() {
+    public DataSource<Integer, Customer> create() {
         return mCustomersDataSource;
     }
 

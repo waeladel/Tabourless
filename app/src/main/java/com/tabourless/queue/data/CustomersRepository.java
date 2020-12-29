@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.tabourless.queue.App.DATABASE_REF_CUSTOMERS;
+import static com.tabourless.queue.App.DATABASE_REF_CUSTOMER_NUMBER;
 import static com.tabourless.queue.App.DATABASE_REF_PLACES;
 import static com.tabourless.queue.App.DATABASE_REF_QUEUES;
 import static com.tabourless.queue.App.DATABASE_REF_QUEUE_JOINED;
@@ -52,9 +53,9 @@ public class CustomersRepository {
     private static volatile Boolean isAfterFirstLoaded;// = true;
     private static volatile Boolean isBeforeFirstLoaded;// = true;
 
-    private String initialKey;
-    private String afterKey;
-    private String beforeKey;
+    private Integer initialKey;
+    private Integer afterKey;
+    private Integer beforeKey;
     private String mPlaceKey, mQueueKey;
 
 
@@ -106,12 +107,17 @@ public class CustomersRepository {
 
                 // loop throw results value
                 for (DataSnapshot snapshot: dataSnapshot.getChildren()){
-                    if(!getLoadAfterKey().equals(snapshot.getKey())) { // if snapshot key = startAt key? don't add it again
-                        Customer customer = snapshot.getValue(Customer.class);
-                        if (customer != null) {
-                            customer.setKey(snapshot.getKey());
+                    Customer customer = snapshot.getValue(Customer.class);
+                    if (customer != null) {
+                        customer.setKey(snapshot.getKey());
+                        if(getLoadAfterKey() != customer.getNumber() || (null != getLoadAfterKey() && !getLoadAfterKey().equals(customer.getNumber()))) { // if snapshot key = startAt key? don't add it again
+                            if(TextUtils.equals(customer.getKey(), currentUserId) || (null != customer.getNumber() && customer.getNumber() != 0)){
+                                // Only add users that have received a number from the server, don't add users with the default 0 number
+                                // If the user is the current user add him even if number is 0, so user see himself waiting for receiving token when reconnect
+                                resultList.add(customer);
+                            }
                         }
-                        resultList.add(customer);
+
                         // Add messages to totalItemsList ArrayList to be used to get the initial key position
                         totalItemsList.add(customer);
 
@@ -165,12 +171,16 @@ public class CustomersRepository {
 
                 // loop throw users value
                 for (DataSnapshot snapshot: dataSnapshot.getChildren()){
-                    if(!getLoadBeforeKey().equals(snapshot.getKey())) { // if snapshot key = startAt key? don't add it again
-                        Customer customer = snapshot.getValue(Customer.class);
-                        if (customer != null) {
-                            customer.setKey(snapshot.getKey());
+                    Customer customer = snapshot.getValue(Customer.class);
+                    if (customer != null) {
+                        customer.setKey(snapshot.getKey());
+                        if(getLoadBeforeKey() != customer.getNumber() || (null != getLoadBeforeKey() && !getLoadBeforeKey().equals(customer.getNumber()))) { // if snapshot key = startAt key? don't add it again
+                            if(TextUtils.equals(customer.getKey(), currentUserId) || (null != customer.getNumber() && customer.getNumber() != 0)){
+                                // Only add users that have received a number from the server, don't add users with the default 0 number
+                                // If the user is the current user add him even if number is 0, so user see himself waiting for receiving token when reconnect
+                                resultList.add(customer);
+                            }
                         }
-                        resultList.add(customer);
                         //Log.d(TAG, "mama getMessage = "+ message.getMessage()+" getSnapshotKey= " +  snapshot.getKey());
                     }
                 }
@@ -263,7 +273,6 @@ public class CustomersRepository {
             }
         }*/
 
-
     }
 
     // Set the scrolling direction and get the last visible item
@@ -299,8 +308,8 @@ public class CustomersRepository {
     }*/
 
     // get initial data
-    public void getInitial(String initialKey, final int size,
-                            @NonNull final ItemKeyedDataSource.LoadInitialCallback<Customer> callback) {
+    public void getInitial(Integer initialKey, final int size,
+                           @NonNull final ItemKeyedDataSource.LoadInitialCallback<Customer> callback) {
 
         Log.i(TAG, "getInitial initiated. initialKey= " +  initialKey);
         this.initialKey = initialKey;
@@ -332,11 +341,17 @@ public class CustomersRepository {
                         Customer customer = snapshot.getValue(Customer.class);
                         if (customer != null) {
                             customer.setKey(snapshot.getKey());
+
+                            if(TextUtils.equals(customer.getKey(), currentUserId) || (null != customer.getNumber() && customer.getNumber() != 0)){
+                                // Only add users that have received a number from the server, don't add users with the default 0 number
+                                // If the user is the current user add him even if number is 0, so user see himself waiting for receiving token when reconnect
+
+                                resultList.add(customer);
+                                // Add results to totalItemsList ArrayList to be used to get the initial key position
+                                totalItemsList.add(customer);
+                                //Log.d(TAG, "mama getMessage = "+ message.getMessage()+" getSnapshotKey= " +  snapshot.getKey());
+                            }
                         }
-                        resultList.add(customer);
-                        // Add results to totalItemsList ArrayList to be used to get the initial key position
-                        totalItemsList.add(customer);
-                        //Log.d(TAG, "mama getMessage = "+ message.getMessage()+" getSnapshotKey= " +  snapshot.getKey());
                     }
 
                     printTotalItems();
@@ -364,7 +379,7 @@ public class CustomersRepository {
 
         if (initialKey == null) {// if it's loaded for the first time. Key is null
             Log.d(TAG, "getInitial() initialKey is null");
-            query = mCustomersRef.orderByKey()//limitToFist to start from the fist (page size) items
+            query = mCustomersRef.orderByChild(DATABASE_REF_CUSTOMER_NUMBER)//limitToFist to start from the fist (page size) items
                     .limitToFirst(size);
 
         } else {// not the first load. Key is the last seen key
@@ -372,21 +387,21 @@ public class CustomersRepository {
             switch (mScrollDirection){
                 case REACHED_THE_BOTTOM:
                     Log.d(TAG, "query = REACHED_THE_BOTTOM");
-                    query = mCustomersRef.orderByKey()
+                    query = mCustomersRef.orderByChild(DATABASE_REF_CUSTOMER_NUMBER)
                             .limitToLast(size);
                     break;
                 case REACHED_THE_TOP:
                     Log.d(TAG, "query = REACHED_THE_TOP");
-                    query = mCustomersRef.orderByKey()
+                    query = mCustomersRef.orderByChild(DATABASE_REF_CUSTOMER_NUMBER)
                             .limitToFirst(size);
                     break;
                 /*case SCROLLING_UP:
-                    messagesQuery = mMessagesRef.orderByKey()
+                    messagesQuery = mMessagesRef.orderByChild(DATABASE_REF_CUSTOMER_NUMBER)
                             .startAt(initialKey)
                             .limitToFirst(size);
                     break;
                 case SCROLLING_DOWN:
-                    messagesQuery = mMessagesRef.orderByKey()
+                    messagesQuery = mMessagesRef.orderByChild(DATABASE_REF_CUSTOMER_NUMBER)
                             .endAt(initialKey)
                             .limitToLast(size);
                     break;*/
@@ -394,14 +409,14 @@ public class CustomersRepository {
                     if(getInitialKeyPosition() >= mLastVisibleItem){
                         // InitialKey is in the bottom, must load data from bottom to top
                         Log.d(TAG, "query = Load data from bottom to top");
-                        query = mCustomersRef.orderByKey()
+                        query = mCustomersRef.orderByChild(DATABASE_REF_CUSTOMER_NUMBER)
                                 .endAt(initialKey)
                                 .limitToLast(size);
 
                     }else{
                         // InitialKey is in the top, must load data from top to bottom
                         Log.d(TAG, "query = Load data from top to bottom");
-                        query = mCustomersRef.orderByKey()
+                        query = mCustomersRef.orderByChild(DATABASE_REF_CUSTOMER_NUMBER)
                                 .startAt(initialKey)
                                 .limitToFirst(size);
                     }
@@ -419,7 +434,7 @@ public class CustomersRepository {
     }
 
     // to get next data
-    public void getAfter(final String key, final int size,
+    public void getAfter(final Integer key, final int size,
                          @NonNull final ItemKeyedDataSource.LoadCallback<Customer> callback){
 
         Log.i(TAG, "getAfter initiated. AfterKey= " +  key);
@@ -428,7 +443,7 @@ public class CustomersRepository {
         Query afterQuery;
 
         Log.d(TAG, "getAfter. AfterKey= " + key);
-        afterQuery = mCustomersRef.orderByKey()
+        afterQuery = mCustomersRef.orderByChild(DATABASE_REF_CUSTOMER_NUMBER)
                             .startAt(key)
                             .limitToFirst(size);
 
@@ -438,8 +453,8 @@ public class CustomersRepository {
     }
 
     // to get previous data
-    public void getBefore(final String key, final int size,
-                              @NonNull final ItemKeyedDataSource.LoadCallback<Customer> callback){
+    public void getBefore(final Integer key, final int size,
+                          @NonNull final ItemKeyedDataSource.LoadCallback<Customer> callback){
 
         Log.i(TAG, "getBefore initiated. BeforeKey= " +  key);
 
@@ -447,7 +462,7 @@ public class CustomersRepository {
         //this.beforeKey = key;
         Query beforeQuery;
 
-        beforeQuery = mCustomersRef.orderByKey()
+        beforeQuery = mCustomersRef.orderByChild(DATABASE_REF_CUSTOMER_NUMBER)
                                 .endAt(key)
                                 .limitToLast(size);
 
@@ -463,7 +478,7 @@ public class CustomersRepository {
     // to invalidate the data whenever a change happen
    /* public void MessagesChanged(final DataSource.InvalidatedCallback InvalidatedCallback) {
 
-        final Query query = mMessagesRef.orderByKey();
+        final Query query = mMessagesRef.orderByChild(DATABASE_REF_CUSTOMER_NUMBER)
 
         MessagesChangesListener = new ValueEventListener() {
 
@@ -520,7 +535,7 @@ public class CustomersRepository {
     }
 
     public Single<List<User>> getAnimals(int count){
-        return RxFirebaseDatabase.data(mUsersRef.orderByKey().limitToFirst(count)).ma
+        return RxFirebaseDatabase.data(mUsersRef.orderByChild(DATABASE_REF_CUSTOMER_NUMBER).limitToFirst(count)).ma
 
                 .map {
             for ArrayValue
@@ -533,7 +548,7 @@ public class CustomersRepository {
 
         // Update customer to null to remove it from the customers node
         childUpdates.put(DATABASE_REF_CUSTOMERS +"/" + mPlaceKey + "/" + mQueueKey + "/" + customer.getKey(), null);
-        childUpdates.put(DATABASE_REF_USER_QUEUES +"/" + customer.getUserId() + "/" + mQueueKey+ "/"+ DATABASE_REF_QUEUE_JOINED , 0);
+        childUpdates.put(DATABASE_REF_USER_QUEUES +"/" + customer.getKey() + "/" + mQueueKey+ "/"+ DATABASE_REF_QUEUE_JOINED , 0);
 
         // update Data base
         mDatabaseRef.updateChildren(childUpdates);
@@ -632,7 +647,7 @@ public class CustomersRepository {
         return loadAfterCallback;
     }
 
-    public void setLoadAfterCallback(String key, ItemKeyedDataSource.LoadCallback loadAfterCallback) {
+    public void setLoadAfterCallback(Integer key, ItemKeyedDataSource.LoadCallback loadAfterCallback) {
         this.loadAfterCallback = loadAfterCallback;
         this.afterKey = key;
     }
@@ -641,20 +656,20 @@ public class CustomersRepository {
         return loadBeforeCallback;
     }
 
-    public void setLoadBeforeCallback(String key, ItemKeyedDataSource.LoadCallback loadBeforeCallback) {
+    public void setLoadBeforeCallback(Integer key, ItemKeyedDataSource.LoadCallback loadBeforeCallback) {
         this.loadBeforeCallback = loadBeforeCallback;
         this.beforeKey = key;
     }
 
-    public String getLoadAfterKey() {
+    public Integer getLoadAfterKey() {
         return afterKey;
     }
 
-    public String getLoadBeforeKey() {
+    public Integer getLoadBeforeKey() {
         return beforeKey;
     }
 
-    public String getInitialKey() {
+    public Integer getInitialKey() {
         return initialKey;
     }
 

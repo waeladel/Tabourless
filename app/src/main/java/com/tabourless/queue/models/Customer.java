@@ -15,14 +15,13 @@ public class Customer {
 
     // This is a customer object which is added to customers column that holds all customers waiting in a queue
     private String key;
-    private String userId;
     private Object joined;
     private Long lastHere;
     private Long started;
     private String status;
     private String counter;
-    private Map<String, Boolean> counters = new LinkedHashMap<>();
-    private int number;
+    private Map<String, Integer> counters = new LinkedHashMap<>();
+    private Integer number;
 
     private String avatar;
     private String name;
@@ -38,14 +37,14 @@ public class Customer {
         this.joined = ServerValue.TIMESTAMP;
     }
 
-    public Customer(String userId, String avatar, String name, String gender, int age, boolean disabled, String status) {
+    public Customer(String avatar, String name, String gender, int age, boolean disabled, Integer number, String status) {
         this.joined = ServerValue.TIMESTAMP;
-        this.userId = userId;
         this.avatar = avatar;
         this.name = name;
         this.gender = gender;
         this.age = age;
         this.disabled = disabled;
+        this.number = number;
         this.status = status;
         /*this.lastHere;
         this.counter;
@@ -57,7 +56,6 @@ public class Customer {
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
-        result.put("userId", userId);
         result.put("joined", ServerValue.TIMESTAMP);
         result.put("lastHere", lastHere);
         result.put("started", started);
@@ -79,14 +77,6 @@ public class Customer {
     public String getKey() { return key; }
     @Exclude
     public void setKey(String key) { this.key = key; }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
 
     public Object getJoined() {
         return joined;
@@ -117,11 +107,11 @@ public class Customer {
         this.started = started;
     }
 
-    public int getNumber() {
+    public Integer getNumber() {
         return number;
     }
 
-    public void setNumber(int number) {
+    public void setNumber(Integer number) {
         this.number = number;
     }
 
@@ -141,11 +131,11 @@ public class Customer {
         this.counter = counter;
     }
 
-    public Map<String, Boolean> getCounters() {
+    public Map<String, Integer> getCounters() {
         return counters;
     }
 
-    public void setCounters(Map<String, Boolean> counters) {
+    public void setCounters(Map<String, Integer> counters) {
         this.counters = counters;
     }
 
@@ -196,9 +186,8 @@ public class Customer {
         Customer customer = (Customer) o;
         return
                 disabled == customer.disabled &&
-                number == customer.number &&
+                (number == customer.number || (number !=null && number.equals(customer.number))) &&
                 age == customer.age &&
-                //TextUtils.equals(userId, customer.userId) &&
                 TextUtils.equals(status, customer.status) &&
                 TextUtils.equals(counter, customer.counter) &&
                 TextUtils.equals(avatar, customer.avatar) &&
@@ -213,9 +202,8 @@ public class Customer {
         //return Objects.hash(created, avatar, name, biography, relationship, interestedIn, gender, birthDate, horoscope);
         int result = 1;
         result = 31 * result + (disabled ? 1 : 0);
-        result = 31 * result + (number == 0 ? 0 : 1);
+        result = 31 * result + (number == null ? 0 : number.hashCode());
         result = 31 * result + (age == 0 ? 0 : 1);
-        //result = 31 * result + (userId == null ? 0 : userId.hashCode());
         result = 31 * result + (status == null ? 0 : status.hashCode());
         result = 31 * result + (counter == null ? 0 : counter.hashCode());
         result = 31 * result + (avatar == null ? 0 : avatar.hashCode());
