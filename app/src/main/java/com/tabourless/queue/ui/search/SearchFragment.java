@@ -588,7 +588,7 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
             if(null != queue){
                 queue.setKey(String.valueOf(queuePair.getKey()));
                 // set PlaceId inside userQueue object, it helps to access queues inside place nod later
-                UserQueue userQueue = new UserQueue(queue.getKey(), queue.getName(), place.getKey(), place.getName(), queue.getCounters());
+                UserQueue userQueue = new UserQueue(queue.getKey(), queue.getName(), place.getKey(), place.getName(), CUSTOMER_STATUS_WAITING, queue.getCounters());
                 // Don't display more than 30 character
                 String shortenString = queue.getName().substring(0, Math.min(queue.getName().length(), 30));
                 //Chip mChipBinding = new Chip(mContext);

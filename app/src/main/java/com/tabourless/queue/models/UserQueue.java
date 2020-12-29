@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static com.tabourless.queue.App.CUSTOMER_STATUS_WAITING;
+
 @IgnoreExtraProperties
 public class UserQueue {
 
@@ -18,6 +20,7 @@ public class UserQueue {
     private String name;
     private String placeId;
     private String placeName;
+    private String status;
     private Map<String, Counter> counters = new LinkedHashMap<>(); // To get the suitable counters (for current user) of the the selected chip item
     private int number;
     private Object joined;
@@ -32,11 +35,12 @@ public class UserQueue {
         this.placeName = placeName;
     }
 
-    public UserQueue(String key, String name, String placeId, String placeName, Map<String, Counter> counters) {
+    public UserQueue(String key, String name, String placeId, String placeName, String status, Map<String, Counter> counters) {
         this.key = key;
         this.name = name;
         this.placeId = placeId;
         this.placeName = placeName;
+        this.status = status;
         this.counters = counters;
     }
 
@@ -48,6 +52,7 @@ public class UserQueue {
         result.put("joined", ServerValue.TIMESTAMP);
         result.put("placeId", placeId);
         result.put("placeName", placeName);
+        result.put("status", status);
         result.put("counters", counters);
         result.put("number", number);
 
@@ -82,6 +87,14 @@ public class UserQueue {
 
     public void setPlaceName(String placeName) {
         this.placeName = placeName;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public Map<String, Counter> getCounters() {
@@ -122,6 +135,7 @@ public class UserQueue {
                 TextUtils.equals(name, queue1.name)&&
                 TextUtils.equals(placeId, queue1.placeId)&&
                 TextUtils.equals(placeName, queue1.placeName)&&
+                TextUtils.equals(status, queue1.status) &&
                 number == queue1.number &&
                 (joined == queue1.joined || (joined!=null && joined.equals(queue1.joined)));
     }
@@ -133,6 +147,7 @@ public class UserQueue {
         result = 31 * result + (name == null ? 0 : name.hashCode());
         result = 31 * result + (placeId == null ? 0 : placeId.hashCode());
         result = 31 * result + (placeName == null ? 0 : placeName.hashCode());
+        result = 31 * result + (status == null ? 0 : status.hashCode());
         result = 31 * result + (number == 0 ? 0 : 1);
         result = 31 * result + (joined == null ? 0 : joined.hashCode());
         return result;

@@ -25,6 +25,10 @@ import com.tabourless.queue.models.UserQueue;
 import java.text.DateFormat;
 import java.util.Calendar;
 
+import static com.tabourless.queue.App.CUSTOMER_STATUS_AWAY;
+import static com.tabourless.queue.App.CUSTOMER_STATUS_FRONT;
+import static com.tabourless.queue.App.CUSTOMER_STATUS_NEXT;
+
 public class QueuesAdapter extends PagedListAdapter<UserQueue, QueuesAdapter.ViewHolder> {
 
     private final static String TAG = QueuesAdapter.class.getSimpleName();
@@ -93,9 +97,34 @@ public class QueuesAdapter extends PagedListAdapter<UserQueue, QueuesAdapter.Vie
                     c.setTimeInMillis(userQueue.getJoinedLong());
                     String joinedTime = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(c.getTime());
                     holder.mBinding.joinedTimeValue.setText(joinedTime);
+                    // check the user statues in the queue
+
+                    switch (userQueue.getStatus()){
+                        case CUSTOMER_STATUS_NEXT:
+                            holder.mBinding.numberValue.setBackgroundResource(R.drawable.text_rounded_background_next);
+                            //holder.mBinding.numberValue.setTextColor(ContextCompat.getColor(mContext, R.color.color_on_surface_emphasis_medium));
+                            holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_medium_trype);
+                            break;
+                        case CUSTOMER_STATUS_FRONT:
+                            holder.mBinding.numberValue.setBackgroundResource(R.drawable.text_rounded_background_front);
+                            holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_medium_trype);
+                            break;
+                        case CUSTOMER_STATUS_AWAY:
+                            holder.mBinding.numberValue.setBackgroundResource(R.drawable.text_rounded_background_away);
+                            holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_disabled_trype);
+                            break;
+                        default:
+                            // default is waiting
+                            holder.mBinding.numberValue.setBackgroundResource(R.drawable.text_rounded_background_waiting);
+                            holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_high_type);
+                            break;
+                    }
+
                 }else{
                     // booking ended
                     holder.mBinding.joinedTimeValue.setText(R.string.joined_time_ended);
+                    holder.mBinding.numberValue.setBackgroundResource(R.drawable.text_rounded_background_away);
+                    holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_disabled_trype);
                 }
             }else{
                 holder.mBinding.joinedTimeValue.setText(null);
