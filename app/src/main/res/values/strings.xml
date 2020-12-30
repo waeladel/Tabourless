@@ -75,6 +75,7 @@
     <string name="customer_number_title" translatable="false">#:</string>
     <string name="queue_info_current_number">Serving token: %1$d</string>
     <string name="queue_info_your_number">Your token: %1$d</string>
+    <string name="queue_info_ahead_customers_more_less">Customers Ahead: %1$d or less</string>
     <string name="queue_info_ahead_customers">Customers Ahead: %1$d</string>
     <string name="queue_info_total_customers">Total customers: %1$d</string>
     <string name="queue_info_expected_waiting">Expected waiting: %1$s</string>

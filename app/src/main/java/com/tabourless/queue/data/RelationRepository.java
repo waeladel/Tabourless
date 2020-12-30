@@ -1,6 +1,5 @@
 package com.tabourless.queue.data;
 
-import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
@@ -25,7 +24,7 @@ import static com.tabourless.queue.App.DATABASE_REF_RELATION_STATUS;
 import static com.tabourless.queue.App.DATABASE_REF_USER_CHATS;
 import static com.tabourless.queue.App.RELATION_STATUS_BLOCKED;
 import static com.tabourless.queue.App.RELATION_STATUS_BLOCKING;
-import static com.tabourless.queue.Utils.DatabaseKeys.getJoinedKeys;
+import static com.tabourless.queue.Utils.DatabaseHelper.getJoinedKeys;
 
 public class RelationRepository {
 

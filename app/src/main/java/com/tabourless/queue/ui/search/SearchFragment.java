@@ -86,6 +86,8 @@ import static com.tabourless.queue.App.COUNTER_SPINNER_GENDER_FEMALE;
 import static com.tabourless.queue.App.COUNTER_SPINNER_GENDER_MALE;
 import static com.tabourless.queue.App.CUSTOMER_STATUS_WAITING;
 import static com.tabourless.queue.App.isUserOnline;
+import static com.tabourless.queue.Utils.DatabaseHelper.getMatchedCounters;
+import static com.tabourless.queue.Utils.DatabaseHelper.isMatchedCountersExist;
 
 
 /**
@@ -691,7 +693,7 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
 
                     // Check if there is the open counter suitable for the current user
                     // Get a map of all suitable counters. We can add suitable counters clint side if we want but we added it server side already
-                    Map<String, Boolean> suitableCounters = getMatchedCounters(selectedQueue.getCounters() , customer);
+                    Map<String, Boolean> suitableCounters = isMatchedCountersExist(selectedQueue.getCounters() , customer);
                     if(suitableCounters.size() <= 0){
                         // There is no suitable counters for current user, Refuse to add him and toast an error message
                         mBinding.bookButton.setEnabled(true);
@@ -736,45 +738,6 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
         mBinding.bookButton.setEnabled(true);
         mBinding.bookButton.setClickable(true);
 
-    }
-
-    private Map<String, Boolean> getMatchedCounters(Map<String, Counter> counters, Customer customer) {
-        // Create a HashMap to add suitable counters to it
-        Map<String, Boolean> suitableCounters = new HashMap<>();// Map for all suitable counters
-
-        // Loop throw all queue counters to match suitable ones for pushed customer
-        for (Object o : counters.entrySet()) {
-            Map.Entry pair = (Map.Entry) o;
-            Log.d(TAG, "getMatchedCounters counters map key/val = " + pair.getKey() + " = " + pair.getValue());
-            Counter counter = counters.get(String.valueOf(pair.getKey()));
-            if (counter != null && counter.isOpen()) {
-                counter.setKey(String.valueOf(pair.getKey()));
-
-                // Checking each counter if it's suitable for the current user or not
-                if ((TextUtils.equals(customer.getGender(), COUNTER_SPINNER_GENDER_MALE) && !TextUtils.equals(counter.getGender(), COUNTER_SPINNER_GENDER_FEMALE))
-                    || (TextUtils.equals(customer.getGender(), COUNTER_SPINNER_GENDER_FEMALE) && !TextUtils.equals(counter.getGender(), COUNTER_SPINNER_GENDER_MALE))){
-                    // user is male, Counter is not for females only, lets check age and disability
-                    // user is female, Counter is not for males only, lets check age and disability
-                    Log.d(TAG, "Matching. is customer gender= "+ customer.getGender() + ". counter is not for gender "+ counter.getGender());
-                    if ((customer.getAge() <60 && !TextUtils.equals(counter.getAge(), COUNTER_SPINNER_AGE_OLD))
-                        || (customer.getAge() >=60 && !TextUtils.equals(counter.getAge(), COUNTER_SPINNER_AGE_YOUNG))){
-                        // user is young, Counter is not for old only, lets check disability
-                        // user is old, Counter is not for young only, lets check disability
-                        Log.d(TAG, "Matching. is customer age = "+ customer.getAge() + ". Counter is not for age "+ counter.getAge());
-                        if ((customer.isDisabled() && !TextUtils.equals(counter.getDisability(), COUNTER_SPINNER_DISABILITY_ABLED))
-                            || (!customer.isDisabled() && !TextUtils.equals(counter.getDisability(), COUNTER_SPINNER_DISABILITY_DISABLED))){
-                            // user is disabled, Counter is not for fit people only
-                            // user is fit, Counter is not for disabled only
-                            Log.d(TAG, "Matching. is customer disabled? = "+ customer.isDisabled()+ ". counter is not for "+ counter.getDisability());
-
-                            Log.d(TAG, "Matching. Add counter = "+ counter.getName());
-                            suitableCounters.put(counter.getKey(), true); // could be counter.name, counter.key, true
-                        } // End of isDisabled
-                    }// End of Age
-                }// End of gender
-            }// End of  counter != null && counter.isOpen
-        }// End of loop throw all queue counters
-        return suitableCounters;
     }
 
     private boolean checkPermissions() {

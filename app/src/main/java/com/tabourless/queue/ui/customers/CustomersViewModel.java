@@ -14,6 +14,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.tabourless.queue.data.CustomersDataFactory;
 import com.tabourless.queue.data.QueueRepository;
+import com.tabourless.queue.interfaces.FirebaseUserCallback;
 import com.tabourless.queue.models.Customer;
 import com.tabourless.queue.models.Message;
 import com.tabourless.queue.models.Queue;
@@ -73,7 +74,7 @@ public class CustomersViewModel extends ViewModel {
                 .build();*/
         mQueue = mQueueRepository.getQueue(placeKey, queueKey);
         mCurrentCustomer = mQueueRepository.getCurrentCustomer(placeKey, queueKey, mCurrentUserId);
-
+        mCurrentUser = mQueueRepository.getCurrentUser(mCurrentUserId);
     }
 
     public LiveData<PagedList<Customer>> getItemPagedList(){
@@ -88,6 +89,11 @@ public class CustomersViewModel extends ViewModel {
     public LiveData<Customer> getCurrentCustomer() {
         return mCurrentCustomer;
     }
+
+    public LiveData<User> getCurrentUser() {
+        return mCurrentUser;
+    }
+
     public LiveData<Queue> getQueue() {
         return mQueue;
     }

@@ -59,7 +59,6 @@ import static com.tabourless.queue.App.DATABASE_REF_CHATS;
 import static com.tabourless.queue.App.DATABASE_REF_MESSAGES;
 import static com.tabourless.queue.App.DATABASE_REF_MESSAGE_STATUS;
 import static com.tabourless.queue.App.DATABASE_REF_NOTIFICATIONS;
-import static com.tabourless.queue.App.DATABASE_REF_NOTIFICATIONS_ALERTS;
 import static com.tabourless.queue.App.DATABASE_REF_NOTIFICATIONS_MESSAGES;
 import static com.tabourless.queue.App.DATABASE_REF_USER_CHATS;
 import static com.tabourless.queue.App.DIRECTION_ARGUMENTS_KEY_CHAT_USER_ID;
@@ -68,7 +67,7 @@ import static com.tabourless.queue.App.Message_STATUS_SENDING;
 import static com.tabourless.queue.App.Message_STATUS_SENT;
 import static com.tabourless.queue.App.NOTIFICATION_TYPE_MESSAGE;
 import static com.tabourless.queue.App.STORAGE_REF_IMAGES;
-import static com.tabourless.queue.Utils.DatabaseKeys.getJoinedKeys;
+import static com.tabourless.queue.Utils.DatabaseHelper.getJoinedKeys;
 import static com.tabourless.queue.Utils.StringUtils.getFirstWord;
 
 public class MessagesFragment extends Fragment {

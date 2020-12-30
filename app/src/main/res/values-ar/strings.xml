@@ -73,6 +73,7 @@
     <string name="customer_number_title" translatable="false">#:</string>
     <string name="queue_info_current_number">الرقم الحالي: %1$d</string>
     <string name="queue_info_your_number">رقمك: %1$d</string>
+    <string name="queue_info_ahead_customers_more_less">العملاء أمامك: %1$d أو أقل</string>
     <string name="queue_info_ahead_customers">العملاء أمامك: %1$d</string>
     <string name="queue_info_total_customers">إجمالي العملاء: %1$d</string>
     <string name="queue_info_expected_waiting">الانتظار المتوقع: %1$s</string>

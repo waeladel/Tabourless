@@ -31,6 +31,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,19 +40,27 @@ import com.tabourless.queue.R;
 import com.tabourless.queue.adapters.CustomersAdapter;
 import com.tabourless.queue.databinding.CustomersBottomSheetBinding;
 import com.tabourless.queue.databinding.FragmentCustomersBinding;
+import com.tabourless.queue.interfaces.FirebaseOnCompleteCallback;
+import com.tabourless.queue.interfaces.FirebaseUserCallback;
 import com.tabourless.queue.interfaces.ItemClickListener;
 import com.tabourless.queue.models.Counter;
 import com.tabourless.queue.models.Customer;
 import com.tabourless.queue.models.Queue;
+import com.tabourless.queue.models.User;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Map;
 
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
 import static com.tabourless.queue.App.CUSTOMER_STATUS_FRONT;
+import static com.tabourless.queue.App.CUSTOMER_STATUS_WAITING;
 import static com.tabourless.queue.App.DIRECTION_ARGUMENTS_KEY_PLACE_ID;
 import static com.tabourless.queue.App.DIRECTION_ARGUMENTS_KEY_QUEUE_ID;
+import static com.tabourless.queue.App.isUserOnline;
+import static com.tabourless.queue.Utils.DatabaseHelper.getMatchedCounters;
+import static com.tabourless.queue.Utils.DatabaseHelper.isMatchedCountersExist;
 import static com.tabourless.queue.Utils.DateHelper.getRelativeTime;
 import static com.tabourless.queue.Utils.StringUtils.getFirstWord;
 
@@ -85,7 +94,8 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
     private CustomersBottomSheetBinding mBottomSheetBinding;
     private BottomSheetBehavior mBottomSheetBehavior;
 
-    private Customer mCurrentCustomer;
+    private Customer mCurrentCustomer, mTempCustomer;
+    private User mCurrentUser;
     private Queue mQueue;
 
     public CustomersFragment() {
@@ -230,13 +240,41 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
 
         // To listen to changes of current customer and queue at the same time
         final MediatorLiveData liveDataMerger  = new MediatorLiveData<>();
+        liveDataMerger.addSource(mViewModel.getCurrentUser(), new Observer<User>() {
+            @Override
+            public void onChanged(User user) {
+                if (user != null){
+                    Log.d(TAG, "getCurrentUser onChanged: user name= "+ user.getName()+ " userId= "+ user.getKey());
+                    mCurrentUser = user;
+
+                    // Set customer object properties
+                    // set user age
+                    Calendar c = Calendar.getInstance();
+                    int year = c.get(Calendar.YEAR);
+                    int age = year- user.getBirthYear();
+                    mTempCustomer = new Customer(user.getAvatar(), user.getName(), user.getGender(), age, user.getDisabled(), 0, CUSTOMER_STATUS_WAITING);
+
+                    liveDataMerger.setValue(user);
+                }else{
+                    // To hide "Your token" and update customers ahead when user unbook
+                    mCurrentUser = null;
+                    liveDataMerger.setValue(null);
+                }
+            }
+        });
+
+
         liveDataMerger.addSource(mViewModel.getCurrentCustomer(), new Observer<Customer>() {
             @Override
             public void onChanged(Customer customer) {
                 if (customer != null){
-                    Log.d(TAG, "mama getCurrentCustomer onChanged: customer number= "+ customer.getNumber()+ " customerId= "+ customer.getKey());
+                    Log.d(TAG, "getCurrentCustomer onChanged: customer number= "+ customer.getNumber()+ " customerId= "+ customer.getKey());
                     mCurrentCustomer = customer;
                     liveDataMerger.setValue(customer);
+                }else{
+                    // To hide "Your token" and update customers ahead when user unbook
+                    mCurrentCustomer = null;
+                    liveDataMerger.setValue(null);
                 }
             }
         });
@@ -245,7 +283,7 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
             @Override
             public void onChanged(Queue queue) {
                 if(queue != null){
-                    Log.d(TAG, "mama getQueue onChanged: getTotalCustomers= "+ queue.getTotalCustomers());
+                    Log.d(TAG, "getQueue onChanged: getTotalCustomers= "+ queue.getTotalCustomers());
                     mQueue = queue;
                     liveDataMerger.setValue(queue);
                 }
@@ -256,29 +294,51 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
         liveDataMerger.observe(getViewLifecycleOwner(), new Observer() {
             @Override
             public void onChanged(Object object) {
-                Log.d(TAG, "mama liveDataMerger onChanged: getTotalCustomers= ");
+                Log.d(TAG, "liveDataMerger onChanged");
                 if (mQueue != null) {
-                    Log.d(TAG, "getQueue onChanged: " + mQueue.getTotalCustomers());
+                    Log.d(TAG, "liveDataMerger. getQueue onChanged: getTotalCustomers= "+ mQueue.getTotalCustomers());
+
                     // Display total customers
                     mBottomSheetBinding.totalCustomers.setText(getString(R.string.queue_info_total_customers, mQueue.getTotalCustomers()));
 
-                    if(mCurrentCustomer != null){
-                        // Display total ahead customers
-                        int biggestFrontNumber = 0;
-                        long shortestWaitingTime = 0;
-                        long shortestServiceTime = 0;
-                        long expectedWaitingTime = 0;
+                    // Display total ahead customers
+                    int biggestFrontNumber = 0;
+                    long shortestWaitingTime = 0;
+                    long shortestServiceTime = 0;
+                    long expectedWaitingTime = 0;
 
-                        // loop throw all counters to get the biggest front number
-                        for (Object o : mQueue.getCounters().entrySet()) {
+                    // Check if there is the open counters and suitable for the current user
+                    Map<String, Counter> suitableCounters = null;
+                    if(mCurrentCustomer != null){
+                        Log.d(TAG, "liveDataMerger. getCurrentCustomer onChanged: customer number= "+ mCurrentCustomer.getNumber()+ " customerId= "+ mCurrentCustomer.getKey());
+                        suitableCounters = getMatchedCounters(mQueue.getCounters() , mCurrentCustomer);
+                    }else if(mCurrentUser != null){
+                        // User didn't book the current queue, lets get the user's data instead of customers data
+                        Log.d(TAG, "liveDataMerger. getCurrentUser onChanged: user name= "+ mCurrentUser.getName()+ " userId= "+ mCurrentUser.getKey());
+                        suitableCounters = getMatchedCounters(mQueue.getCounters() , mTempCustomer);
+                    }
+
+                    if(null != suitableCounters && suitableCounters.size() > 0){
+                        // loop throw all suitable counters for this customer to get the biggest front number
+                        for (Object o : suitableCounters.entrySet()) {
                             Map.Entry pair = (Map.Entry) o;
                             Log.d(TAG, "queue.getCounters() map key/val = " + pair.getKey() + " = " + pair.getValue());
                             Counter counter = mQueue.getCounters().get(String.valueOf(pair.getKey()));
                             if (counter != null) {
                                 // get the biggest front number that doesn't exceed current customer number
-                                if (counter.getFrontNumber() >= biggestFrontNumber && counter.getFrontNumber() <= mCurrentCustomer.getNumber()) {
-                                    biggestFrontNumber = counter.getFrontNumber();
+                                if(mCurrentCustomer != null && null != mCurrentCustomer.getNumber()){
+                                    // current user is an existing customer in the queue
+                                    if (counter.getFrontNumber() >= biggestFrontNumber && counter.getFrontNumber() <= mCurrentCustomer.getNumber()) {
+                                        biggestFrontNumber = counter.getFrontNumber();
+                                    }
+                                }else{
+                                    // current user is just spectating which means there is not customer's token, just get the biggest front number
+                                    // regardless of the current customer's token
+                                    if (counter.getFrontNumber() >= biggestFrontNumber) {
+                                        biggestFrontNumber = counter.getFrontNumber();
+                                    }
                                 }
+
 
                                 // get the shortest Waiting Time
                                 if (shortestWaitingTime == 0 || counter.getWaitingTime() <= shortestWaitingTime) {
@@ -291,27 +351,57 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
                                 }
                             }
                         }// End loop
-
-                        int aheadCustomers = mCurrentCustomer.getNumber() - biggestFrontNumber;// - queue.getFrontNumber;
-                        mBottomSheetBinding.aheadCustomers.setText(getString(R.string.queue_info_ahead_customers, aheadCustomers));
-
-                        // Display expected waiting time
-                        expectedWaitingTime = shortestServiceTime * aheadCustomers;
-                        mBottomSheetBinding.expectedWaiting.setText(getString(R.string.queue_info_expected_waiting, getRelativeTime(expectedWaitingTime, mContext)));
-
-                        // Display average waiting time
-                        mBottomSheetBinding.averageWaiting.setText(getString(R.string.queue_info_average_waiting, getRelativeTime(shortestWaitingTime, mContext)));
-
-
-                        // Display average service time
-                        mBottomSheetBinding.serviceTime.setText(getString(R.string.queue_info_service_time, getRelativeTime(shortestServiceTime, mContext)));
-
-                        // Display current customer number
-                        mBottomSheetBinding.yourNumber.setText(getString(R.string.queue_info_your_number, mCurrentCustomer.getNumber()));
-
-                        // Display front number
-                        mBottomSheetBinding.servedNumber.setText(getString(R.string.queue_info_current_number, biggestFrontNumber));
                     }
+
+
+                    // Calculating the ahead users
+                    int aheadCustomers;
+                    if(mCurrentCustomer != null && null != mCurrentCustomer.getNumber()){
+                        aheadCustomers = mCurrentCustomer.getNumber() - biggestFrontNumber;// - queue.getFrontNumber;
+                        // ahead customers can't be greater or equal total customers
+                        if(aheadCustomers >= mQueue.getTotalCustomers()){
+                            aheadCustomers = mQueue.getTotalCustomers() - 1;
+                        }
+                    }else{
+                        // If user book now his number will be the queue last number + 1 or queue total
+                        //aheadCustomers = (mQueue.getLastNumber() + 1) - biggestFrontNumber;
+                        aheadCustomers = (mQueue.getLastNumber() + 1) - biggestFrontNumber;
+                        // ahead customers can't be greater than total customers
+                        if(aheadCustomers > mQueue.getTotalCustomers()){
+                            aheadCustomers = mQueue.getTotalCustomers();
+                        }
+                    }
+
+                    if(aheadCustomers <= 1){
+                        mBottomSheetBinding.aheadCustomers.setText(getString(R.string.queue_info_ahead_customers, aheadCustomers));
+                    }else{
+                        mBottomSheetBinding.aheadCustomers.setText(getString(R.string.queue_info_ahead_customers_more_less, aheadCustomers));
+                    }
+
+                    // Display expected waiting time
+                    expectedWaitingTime = shortestServiceTime * aheadCustomers;
+                    mBottomSheetBinding.expectedWaiting.setText(getString(R.string.queue_info_expected_waiting, getRelativeTime(expectedWaitingTime, mContext)));
+
+                    // Display average waiting time
+                    mBottomSheetBinding.averageWaiting.setText(getString(R.string.queue_info_average_waiting, getRelativeTime(shortestWaitingTime, mContext)));
+
+
+                    // Display average service time
+                    mBottomSheetBinding.serviceTime.setText(getString(R.string.queue_info_service_time, getRelativeTime(shortestServiceTime, mContext)));
+
+                    // Display current customer number
+                    Log.d(TAG, "mCurrentCustomer= "+ mCurrentCustomer );
+                    if(mCurrentCustomer != null && null != mCurrentCustomer.getNumber()){
+                        Log.d(TAG,  " token= "+mCurrentCustomer.getNumber());
+                        mBottomSheetBinding.yourNumber.setText(getString(R.string.queue_info_your_number, mCurrentCustomer.getNumber()));
+                        mBottomSheetBinding.yourNumber.setVisibility(View.VISIBLE);
+                    }else{
+                        mBottomSheetBinding.yourNumber.setVisibility(View.GONE);
+                        Log.d(TAG,  " token= gone");
+                    }
+
+                    // Display front number
+                    mBottomSheetBinding.servedNumber.setText(getString(R.string.queue_info_current_number, biggestFrontNumber));
 
                 }
             }
