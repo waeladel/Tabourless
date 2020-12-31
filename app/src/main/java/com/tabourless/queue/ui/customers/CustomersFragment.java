@@ -6,13 +6,10 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -24,14 +21,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.TextUtils;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -40,8 +35,6 @@ import com.tabourless.queue.R;
 import com.tabourless.queue.adapters.CustomersAdapter;
 import com.tabourless.queue.databinding.CustomersBottomSheetBinding;
 import com.tabourless.queue.databinding.FragmentCustomersBinding;
-import com.tabourless.queue.interfaces.FirebaseOnCompleteCallback;
-import com.tabourless.queue.interfaces.FirebaseUserCallback;
 import com.tabourless.queue.interfaces.ItemClickListener;
 import com.tabourless.queue.models.Counter;
 import com.tabourless.queue.models.Customer;
@@ -51,6 +44,9 @@ import com.tabourless.queue.models.User;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
@@ -58,9 +54,7 @@ import static com.tabourless.queue.App.CUSTOMER_STATUS_FRONT;
 import static com.tabourless.queue.App.CUSTOMER_STATUS_WAITING;
 import static com.tabourless.queue.App.DIRECTION_ARGUMENTS_KEY_PLACE_ID;
 import static com.tabourless.queue.App.DIRECTION_ARGUMENTS_KEY_QUEUE_ID;
-import static com.tabourless.queue.App.isUserOnline;
 import static com.tabourless.queue.Utils.DatabaseHelper.getMatchedCounters;
-import static com.tabourless.queue.Utils.DatabaseHelper.isMatchedCountersExist;
 import static com.tabourless.queue.Utils.DateHelper.getRelativeTime;
 import static com.tabourless.queue.Utils.StringUtils.getFirstWord;
 
@@ -97,6 +91,10 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
     private Customer mCurrentCustomer, mTempCustomer;
     private User mCurrentUser;
     private Queue mQueue;
+
+    private Future mItemDelayFuture;
+    private Runnable mRunnable;
+    private ExecutorService mExecutorService;
 
     public CustomersFragment() {
         // Required empty public constructor
@@ -145,6 +143,15 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
             }).get(CustomersViewModel.class);
         }
 
+
+        mRunnable = new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        };
+        // ExecutorService to help in starting and stopping the thread for items
+        mExecutorService = Executors.newSingleThreadExecutor();
     }
 
     @Override
@@ -185,15 +192,21 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
         mViewModel.getItemPagedList().observe(getViewLifecycleOwner(), new Observer<PagedList<Customer>>() {
             @Override
             public void onChanged(@Nullable final PagedList<Customer> items) {
-                Log.d(TAG, "mama customers item =" +  items.size());
+                Log.d(TAG, "mama customers items size =" +  items.size());
                 if (items != null ){
                     // your code here
                     Log.d(TAG, "queues onChanged submitList size" +  items.size());
                     // Create new Thread to loop until items.size() is greater than 0
-                    new Thread(new Runnable() {
-                        int sleepCounter = 0;
+                    // kill the previous task before start it again with the latest data
+                    if(null != mItemDelayFuture && !mItemDelayFuture.isDone()){
+                        mItemDelayFuture.cancel(true);
+                    }
+
+                    mRunnable = new Runnable() {
                         @Override
                         public void run() {
+                            int sleepCounter = 0;
+                            Log.d(TAG, "queues onChanged. new Runnable starts= "+items.size()+" sleepCounter="+sleepCounter++);
                             try {
                                 while(items.size()==0) {
                                     //Keep looping as long as items size is 0
@@ -213,6 +226,7 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
                                     //  Loop finished with 0 items. We must submitList to remove all items. also i can't count on just submitting null to adapter
                                     //  when swipe last item because last item maybe deleted by another user.
                                     Log.d(TAG, "onChanged. Loop finished with 0 items. We must submitList to remove all");
+                                    items.clear();
                                     mAdapter.submitList(items);
                                 }else{
                                     Log.d(TAG, "onChanged. submitList= "+items.size());
@@ -222,9 +236,11 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
-
                         }
-                    }).start();
+                    };
+
+                    // submit task to threadpool:
+                    mItemDelayFuture = mExecutorService.submit(mRunnable);
 
                 }
             }

@@ -281,9 +281,8 @@ public class QueuesRepository {
                             UserQueue userQueue = snapshot.getValue(UserQueue.class);
                             if (userQueue != null) {
                                 userQueue.setKey(snapshot.getKey());
+                                resultList.add(userQueue);
                             }
-
-                            resultList.add(userQueue);
                             //Log.d(TAG, "mama getItems = " + chat.getLastMessage() + " getSnapshotKey= " + snapshot.getKey());
 
                         }

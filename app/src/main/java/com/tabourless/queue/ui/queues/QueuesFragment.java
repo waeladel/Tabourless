@@ -33,6 +33,9 @@ import com.tabourless.queue.interfaces.ItemClickListener;
 import com.tabourless.queue.models.UserQueue;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
@@ -63,6 +66,10 @@ public class QueuesFragment extends Fragment implements ItemClickListener {
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
+    private Future mItemDelayFuture;
+    private Runnable mRunnable;
+    private ExecutorService mExecutorService;
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -81,6 +88,9 @@ public class QueuesFragment extends Fragment implements ItemClickListener {
         // prepare the Adapter in onCreate to use only one Adapter
         mArrayList = new ArrayList<>();
         mAdapter = new QueuesAdapter(this);
+
+        // ExecutorService to help in starting and stopping the thread for items
+        mExecutorService = Executors.newSingleThreadExecutor();
 
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -102,11 +112,15 @@ public class QueuesFragment extends Fragment implements ItemClickListener {
                             if (items != null ){
                                 // your code here
                                 Log.d(TAG, "queues onChanged submitList size" +  items.size());
-                                // Create new Thread to loop until items.size() is greater than 0
-                                new Thread(new Runnable() {
-                                    int sleepCounter = 0;
+                                // kill the previous task before start it again with the latest data
+                                if(null != mItemDelayFuture && !mItemDelayFuture.isDone()){
+                                    mItemDelayFuture.cancel(true);
+                                }
+
+                                mRunnable = new Runnable() {
                                     @Override
                                     public void run() {
+                                        int sleepCounter = 0;
                                         try {
                                             while(items.size()==0) {
                                                 //Keep looping as long as items size is 0
@@ -126,6 +140,7 @@ public class QueuesFragment extends Fragment implements ItemClickListener {
                                                 //  Loop finished with 0 items. We must submitList to remove all items. also i can't count on just submitting null to adapter
                                                 //  when swipe last item because last item maybe deleted by another user.
                                                 Log.d(TAG, "onChanged. Loop finished with 0 items. We must submitList to remove all");
+                                                items.clear();
                                                 mAdapter.submitList(items);
                                             }else{
                                                 Log.d(TAG, "ChatsFragment onChanged. submitList= "+items.size());
@@ -135,9 +150,11 @@ public class QueuesFragment extends Fragment implements ItemClickListener {
                                         } catch (InterruptedException e) {
                                             e.printStackTrace();
                                         }
-
                                     }
-                                }).start();
+                                };
+
+                                // submit task to threadpool:
+                                mItemDelayFuture = mExecutorService.submit(mRunnable);
 
                             }
                         }

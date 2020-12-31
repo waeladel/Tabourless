@@ -115,12 +115,10 @@ public class CustomersRepository {
                                 // Only add users that have received a number from the server, don't add users with the default 0 number
                                 // If the user is the current user add him even if number is 0, so user see himself waiting for receiving token when reconnect
                                 resultList.add(customer);
+                                // Add messages to totalItemsList ArrayList to be used to get the initial key position
+                                totalItemsList.add(customer);
                             }
                         }
-
-                        // Add messages to totalItemsList ArrayList to be used to get the initial key position
-                        totalItemsList.add(customer);
-
                         //Log.d(TAG, "mama getMessage = "+ message.getMessage()+" getSnapshotKey= " +  snapshot.getKey());
                     }
                 }
@@ -341,11 +339,13 @@ public class CustomersRepository {
                         Customer customer = snapshot.getValue(Customer.class);
                         if (customer != null) {
                             customer.setKey(snapshot.getKey());
-
-                            if(TextUtils.equals(customer.getKey(), currentUserId) || (null != customer.getNumber() && customer.getNumber() != 0)){
+                            if(dataSnapshot.getChildrenCount() == 1 || TextUtils.equals(customer.getKey(), currentUserId) || (null != customer.getNumber() && customer.getNumber() != 0)){
                                 // Only add users that have received a number from the server, don't add users with the default 0 number
                                 // If the user is the current user add him even if number is 0, so user see himself waiting for receiving token when reconnect
 
+                                // Add the customer how did't received a number from the server anyway because there is only one customer found
+                                // The observer is fired twice, first when customer added and then when customer got hid number,
+                                // if we don't add the unnumbered customer the first while loop will keep looping because it has zero item size which eventually will erase the added customer from adapter
                                 resultList.add(customer);
                                 // Add results to totalItemsList ArrayList to be used to get the initial key position
                                 totalItemsList.add(customer);
