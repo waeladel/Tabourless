@@ -25,8 +25,6 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import static androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode;
 
-import com.facebook.FacebookSdk;
-import com.facebook.appevents.AppEventsLogger;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -187,8 +185,8 @@ public class App extends MultiDexApplication { // had to enable MultiDex after a
         Log.i(TAG, "Application class onCreate");
         // Initialize the SDK before executing any other operations, observe how frequently users activate your app,
         // how much time they spend using it, and view other demographic information through Facebook Analytics for Apps.
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        AppEventsLogger.activateApp(this);
+        /*FacebookSdk.sdkInitialize(getApplicationContext());
+        AppEventsLogger.activateApp(this);*/
 
         // [START Firebase Database enable persistence]
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
