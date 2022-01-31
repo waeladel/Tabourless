@@ -535,16 +535,42 @@ public class QueuesRepository {
     public void removeQueue(final String userId, final UserQueue deletedQueue) {
         Map<String, Object> childUpdates = new HashMap<>(); // A HashMap to update the database
 
-        // Update customer to null to remove it from the customers node
-        childUpdates.put(DATABASE_REF_CUSTOMERS +"/" + deletedQueue.getPlaceId() + "/" + deletedQueue.getKey() + "/" + userId, null);
+        // check if user is in customers nod before deleting so that the deletion doesn't fail if he doesn't
+        // exist, because may be it's an ended queue that he is not currently in the waiting customers
+        final DatabaseReference currentCustomerRef = mDatabaseRef.child(DATABASE_REF_CUSTOMERS).child(deletedQueue.getPlaceId()).child(deletedQueue.getKey()).child(userId);
+        currentCustomerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // user exist in customers nod! remove it form customers and remove the queue.
+                    Log.d(TAG, "user exist in customers nod");
+                    // Update customer to null to remove it from the customers node
+                    childUpdates.put(DATABASE_REF_CUSTOMERS +"/" + deletedQueue.getPlaceId() + "/" + deletedQueue.getKey() + "/" + userId, null);
 
-        // Delete the queue wither we found the customer on customers or not. if we can't find the customer, probably it's an inactive queue and the booking was canceled already
-        childUpdates.put(DATABASE_REF_USER_QUEUES +"/"+  userId +"/"+ deletedQueue.getKey(), null);
+                    // Delete the queue wither we found the customer on customers or not. if we can't find the customer, probably it's an inactive queue and the booking was canceled already
+                    childUpdates.put(DATABASE_REF_USER_QUEUES +"/"+  userId +"/"+ deletedQueue.getKey(), null);
 
-        // update Data base
-        mDatabaseRef.updateChildren(childUpdates);
+                    // update Data base
+                    mDatabaseRef.updateChildren(childUpdates);
+                } else {
+                    // user Don't exist in customer nod! only remove the queue.
+                    Log.d(TAG, "user not in customers nod");
+                    // Delete the queue wither we found the customer on customers or not. if we can't find the customer, probably it's an inactive queue and the booking was canceled already
+                    childUpdates.put(DATABASE_REF_USER_QUEUES +"/"+  userId +"/"+ deletedQueue.getKey(), null);
 
-        /*// Query to get customer key to delete his/her booking
+                    // update Data base
+                    mDatabaseRef.updateChildren(childUpdates);
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
+
+        /* Query to get customer key to delete his/her booking
         // Must call a query because the customer key is a pushed id not the user id
         final DatabaseReference currentCustomerRef = mDatabaseRef.child(DATABASE_REF_CUSTOMERS).child(deletedQueue.getPlaceId()).child(deletedQueue.getKey());
         Query query = currentCustomerRef.orderByChild(DATABASE_REF_CUSTOMER_USER_ID).equalTo(userId);//.limitToFirst(1);
