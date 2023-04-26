@@ -22,6 +22,7 @@ public class Message {
     private Object created ;
 
     public Message() {
+        this.created = ServerValue.TIMESTAMP;
     }
 
     public Message(String message, String senderId, String senderName, String senderAvatar , String status) {
@@ -33,14 +34,6 @@ public class Message {
         this.created = ServerValue.TIMESTAMP;
     }
 
-    /*public Message(String message, String senderId, String senderName,String senderAvatar ,boolean revealed) {
-        this.message = message;
-        this.senderId = senderId;
-        this.senderName = senderName;
-        this.senderAvatar = senderAvatar;
-        this.revealed = revealed;
-        this.created = ServerValue.TIMESTAMP;
-    }*/
 
     // [START post_to_map]
     @Exclude
@@ -51,7 +44,7 @@ public class Message {
         result.put("senderName", senderName);
         result.put("senderAvatar", senderAvatar);
         result.put("status", status);
-        result.put("created", ServerValue.TIMESTAMP);
+        result.put("created", created);
 
         return result;
     }// [END post_to_map]

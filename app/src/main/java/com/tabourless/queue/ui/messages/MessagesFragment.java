@@ -27,6 +27,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -42,12 +43,14 @@ import com.tabourless.queue.R;
 import com.tabourless.queue.adapters.MessagesAdapter;
 import com.tabourless.queue.databinding.FragmentMessagesBinding;
 import com.tabourless.queue.interfaces.FirebaseMessageCallback;
+import com.tabourless.queue.interfaces.ItemClickListener;
 import com.tabourless.queue.models.Chat;
 import com.tabourless.queue.models.ChatMember;
 import com.tabourless.queue.models.DatabaseNotification;
 import com.tabourless.queue.models.Message;
 import com.tabourless.queue.models.User;
 import com.tabourless.queue.ui.ChatBlockedAlertFragment;
+import com.tabourless.queue.ui.report.ReportFragment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,7 +73,7 @@ import static com.tabourless.queue.App.STORAGE_REF_IMAGES;
 import static com.tabourless.queue.Utils.DatabaseHelper.getJoinedKeys;
 import static com.tabourless.queue.Utils.StringUtils.getFirstWord;
 
-public class MessagesFragment extends Fragment {
+public class MessagesFragment extends Fragment implements ItemClickListener {
 
     private final static String TAG = MessagesFragment.class.getSimpleName();
 
@@ -114,6 +117,9 @@ public class MessagesFragment extends Fragment {
     private Long mLastOnlineEndTime;
 
     private StorageReference mStorageRef;
+    private Message mLongClickedMessage; // selected message for report or copy text
+    private static final String REPORT_ALERT_FRAGMENT = "ReportFragment"; // Tag for report alert fragment
+
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -149,7 +155,7 @@ public class MessagesFragment extends Fragment {
 
         // prepare the Adapter
         mMessagesArrayList = new ArrayList<>();
-        mMessagesAdapter = new MessagesAdapter(mContext); // Pass chat id because it's needed to update message revelation
+        mMessagesAdapter = new MessagesAdapter(mContext, this); // Pass chat id because it's needed to update message revelation
 
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
         mChatsRef = mDatabaseRef.child(DATABASE_REF_CHATS);
@@ -913,5 +919,41 @@ public class MessagesFragment extends Fragment {
                 });
 
         mBinding.messagesRecycler.scrollToPosition(mMessagesAdapter.getItemCount()-1);
+    }
+
+    // show dialog For reporting messages
+    private void showReportDialog(Message message) {
+        ReportFragment reportFragment = ReportFragment.newInstance(mChatUserId, mCurrentUserId, mChatUser, mCurrentUser, message);
+        if (getChildFragmentManager() != null) {
+            reportFragment.show(getChildFragmentManager(), REPORT_ALERT_FRAGMENT);
+            Log.i(TAG, "reportAlertFragment show clicked ");
+        }
+    }
+
+    @Override
+    public void onClick(View view, int position, boolean isLongClick) {
+        if(view instanceof TextView){
+            if(isLongClick){
+                // Selecting a message is long clicked
+                mLongClickedMessage = mMessagesAdapter.getItem(position);
+                if (mLongClickedMessage != null) {
+                    Log.d(TAG, "onLongClick. selected message text = " + mLongClickedMessage.getMessage() + " created: " +mLongClickedMessage.getCreated());
+                }
+            }else{
+                // Popupmenu item is clicked after user have selected a message
+                switch (position){
+                    case 0:
+                        // Copy text to clipboard is selected
+                        Log.d(TAG, "onMenuItemClick. copy test to clipboard is clicked. view= " + view + " position= " + position);
+                        break;
+                    case 1:
+                        // Report message is selected
+                        Log.d(TAG, "onMenuItemClick. report message clicked. view= " + view + " position= " + position);
+                        showReportDialog(mLongClickedMessage);
+                        break;
+
+                }
+            }
+        }
     }
 }

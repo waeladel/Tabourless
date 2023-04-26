@@ -24,14 +24,23 @@
 
     <string name="popup_menu_block">حظر</string>
     <string name="popup_menu_block_delete">حظر وحذف الرسائل</string>
+    <string name="popup_menu_report">إبلاغ</string>
+
+    <string name="popup_menu_copy_text">نسخ نصّ الرسالة</string>
+    <string name="popup_menu_delete_message">حذف الرسالة لديّ فقط</string>
+    <string name="popup_menu_delete_message_all">حذف الرسالة لدى الجميع</string>
+    <string name="popup_menu_report_message">الإبلاغ عن الرسالة</string>
+    <string name="clipboard_label_copied_text">النص المنسوخ</string>
+
     <string name="message_button_hint">مراسلة</string>
-    <string name="block_button">حظر</string>
-    <string name="unblock_button">إلغاء الحظر</string>
+    <string name="block_report_button_hint" formatted="false">حظر//إبلاغ</string>
+    <string name="unblock_report_button_hint" formatted="false">إلغاء الحظر//إبلاغ</string>
     <string name="add_marker_title">أضف مكان</string>
     <string name="add_marker_snippet">اضغط مع الاستمرار لتغيير الموقع</string>
 
     <string name="add_service_button_title">أضف المزيد من الخدمات</string>
     <string name="add_counter_button_title">أضف المزيد من الشبابيك</string>
+    <string name="send_report_button">ارسل البلاغ</string>
 
     <!--buttons and menus -->
 
@@ -80,6 +89,9 @@
     <string name="queue_info_average_waiting">متوسط الانتظار: %1$s</string>
     <string name="queue_info_service_time">الخدمة تستغرق: %1$s</string>
 
+    <string name="report_dialog_title">هل تود الإبلاغ عن المستخدم؟</string>
+    <string name="report_dialog_message">إذا كان شخص ما يواجه خطرًا مباشرًا، فاتصل بخدمة الطوارئ المحلية فورًا. \ n \ n الرجاء تحديد سبب الإبلاغ عن هذا المستخدم أو المحتوى، لن نسمح للشخص بمعرفة هوية من أبلغ عنه.</string>
+
     <!--toast and error messages -->
     <string name="sign_in_cancelled">تم إلغاء تسجيل الدخول</string>
     <string name="no_internet_connection">لا يوجد اتصال بشبكة الإنترنت.</string>
@@ -103,7 +115,7 @@
     <string name="chat_blocked_dialog_message">غير مسموح بالتحدث مع هذا الشخص في الوقت الراهن.</string>
 
     <string name="storage_permission_dialog_title">أذونات الكاميرا والتخزين</string>
-    <string name="storage_permission_dialog_message">يحتاج التطبيق إذن الوصول إلى مساحة التخزين الخاصة بك لجلب الصور من المعرض، وإذا كنت تريد أن تلتقط صورة يجب أن ‏تمنحنا أيضا إذن الوصول إلى الكاميرا‎.‎</string>
+    <string name="storage_permission_dialog_message">يحتاج التطبيق إذن الوصول إلى مساحة التخزين الخاصة بك لجلب الصور من المعرض، وإذا كنت تريد أن تلتقط صورة يجب أن تمنحنا أيضا إذن الوصول إلى الكاميرا.</string>
     <string name="permission_denied">تم رفض إذن الحصول على موقعك الحالي.</string>
     <string name="location_access_required">مطلوب الوصول إلى موقعك لعرض الأماكن والطوابير القريبة.</string>
     <string name="access_location">تمكين الوصول إلى الموقع</string>
@@ -198,5 +210,20 @@
     <string name="counter_disability_only_disabled">متحدو الإعاقة فقط</string>
     <string name="counter_disability_only_able">القادرين جسديا فقط</string>
     <!-- gender disability array -->
+
+    <!-- report radio buttons array -->
+    <string name="radio_button_report_harassment">إزعاج أو تحرش أو تنمر</string>
+    <string name="radio_button_report_suicide">انتحار أو إيذاء الذات</string>
+    <string name="radio_button_report_inappropriate">مشاركة محتوى جنسي أو غير لائق</string>
+    <string name="radio_button_report_impersonate">انتحال شخصية شخص آخر</string>
+    <string name="radio_button_report_Hate">خطاب كراهية</string>
+    <string name="radio_button_report_child_abuse">انتهاك أطفال</string>
+    <string name="radio_button_report_misinformation">نشر شائعات أو معلومات مغلوطة</string>
+    <string name="radio_button_report_violence">عنف أو محتوى دموي</string>
+    <string name="radio_button_report_terrorism">تحريض على الإرهاب</string>
+    <string name="radio_button_report_scams">عمليات احتيال</string>
+    <string name="radio_button_report_spam">مبيعات غير مصرح بها</string>
+    <string name="radio_button_report_other">غير ذلك</string>
+    <!-- report radio buttons array -->
 
 </resources>

@@ -78,3 +78,8 @@
 -keepattributes Exceptions
 
 -dontwarn com.google.gson.Gson$6
+
+# To stop app crash when navigating to bottom or drawer menus
+#-keepclassmembers class **.R$* {
+      # public static <fields>;
+#}

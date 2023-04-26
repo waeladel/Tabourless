@@ -26,6 +26,7 @@ public class UserQueue {
     private Object joined;
 
     public UserQueue() {
+        this.joined = ServerValue.TIMESTAMP;
     }
 
     public UserQueue(String key, String name, String placeId, String placeName) {
@@ -33,6 +34,7 @@ public class UserQueue {
         this.name = name;
         this.placeId = placeId;
         this.placeName = placeName;
+        this.joined = ServerValue.TIMESTAMP;
     }
 
     public UserQueue(String key, String name, String placeId, String placeName, String status, Map<String, Counter> counters) {
@@ -42,6 +44,7 @@ public class UserQueue {
         this.placeName = placeName;
         this.status = status;
         this.counters = counters;
+        this.joined = ServerValue.TIMESTAMP;
     }
 
     // [START post_to_map]
@@ -49,7 +52,7 @@ public class UserQueue {
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
         result.put("name", name);
-        result.put("joined", ServerValue.TIMESTAMP);
+        result.put("joined", joined);
         result.put("placeId", placeId);
         result.put("placeName", placeName);
         result.put("status", status);

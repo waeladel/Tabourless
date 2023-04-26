@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    compileSdkVersion 32
-    buildToolsVersion "32.1.0-rc1"
+    compileSdkVersion 33
+    buildToolsVersion "31.0.0"
 
     // Load keystore
-    def keystorePropertiesFile = rootProject.file("keystore.properties")
+    def keystorePropertiesFile = rootProject.file("keystore.properties");
     def keystoreProperties = new Properties()
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
@@ -20,18 +20,22 @@ android {
     }
 
     // Because the dependency contains Java 8 bytecode, i must enable desugaring
+
+    // Firebase UI: Configure only for each module that uses Java 8
+    // language features (either in its source code or
+    // through dependencies).
     compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     defaultConfig {
         applicationId "com.tabourless.lineup"
         minSdkVersion 17
-        targetSdkVersion 32
+        targetSdkVersion 33
         multiDexEnabled true // Enabling multiDex support.
-        versionCode 7
-        versionName "0.0.7"
+        versionCode 12
+        versionName "0.1.2"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -63,6 +67,7 @@ android {
             //debuggable true
         }
     }
+    namespace 'com.tabourless.queue'
 
 }
 
@@ -70,20 +75,20 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation 'androidx.multidex:multidex:2.0.1' // multiDex support for below api 20
-    implementation 'androidx.appcompat:appcompat:1.4.1'
-    implementation 'com.google.android.material:material:1.6.0-alpha02'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.6.0-alpha03'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.vectordrawable:vectordrawable:1.1.0'
-    implementation 'androidx.navigation:navigation-fragment:2.4.0'
-    implementation 'androidx.navigation:navigation-ui:2.4.0'
-    implementation 'androidx.paging:paging-runtime:3.1.0' //Add the paging library
+    implementation 'androidx.navigation:navigation-fragment:2.5.3'
+    implementation 'androidx.navigation:navigation-ui:2.5.3'
+    implementation 'androidx.paging:paging-runtime:3.1.1' //Add the paging library
     //implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'  // ViewModel and LiveData
-    implementation "androidx.lifecycle:lifecycle-viewmodel:2.4.0" // ViewModel
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0" // because livedata 2.4.0 uses kotlin ViewModel
-    implementation "androidx.lifecycle:lifecycle-livedata:2.4.0" // LiveData
-    implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.4.0" // Saved state module for ViewModel
+    implementation "androidx.lifecycle:lifecycle-viewmodel:2.6.0-alpha04" // ViewModel
+    //implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.0-alpha04" // because livedata 2.4.0 uses kotlin ViewModel
+    implementation "androidx.lifecycle:lifecycle-livedata:2.6.0-alpha04" // LiveData
+    implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.0-alpha04" // Saved state module for ViewModel
     // Import the BoM for the Firebase platform. BoM will make all Firebase dependencies compatible
-    implementation platform('com.google.firebase:firebase-bom:28.4.2')
+    implementation platform('com.google.firebase:firebase-bom:28.0.0')
     implementation 'com.google.firebase:firebase-database'
     implementation 'com.google.firebase:firebase-messaging'
     implementation 'com.google.firebase:firebase-auth'
@@ -95,8 +100,8 @@ dependencies {
     implementation 'com.google.android.gms:play-services-location:19.0.1'
     implementation 'com.google.android.gms:play-services-places:17.0.0'
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     implementation 'de.hdodenhof:circleimageview:3.1.0' // for circle images
     //implementation 'com.squareup.picasso:picasso:2.71828'// Not needed, we use Glide integration with FirebaseUi now
     implementation 'com.github.bumptech.glide:glide:4.11.0' // Glide for loading images using FirebaseUi integration with Glide
@@ -111,11 +116,12 @@ dependencies {
     //implementation 'top.zibin:Luban:1.0.8' // for compressing original image
     implementation 'io.reactivex:rxandroid:1.2.1' // RxJava for compressing original image
     implementation "androidx.preference:preference:1.2.0" // For settings preference
-    implementation 'com.firebase:geofire-android:3.0.0' // For GeoFire
+    implementation 'com.firebase:geofire-android:3.1.0' // For GeoFire
     implementation 'it.xabaras.android:recyclerview-swipedecorator:1.2.2' // Recycler View SwipeDecorator
 
     // Required only if Facebook login support is required. Find the latest Facebook SDK releases here: https://goo.gl/Ce5L94
-    implementation 'com.facebook.android:facebook-android-sdk:12.3.0'
+    //implementation 'com.facebook.android:facebook-android-sdk:12.3.0'
+    implementation 'com.facebook.android:facebook-login:8.2.0'
 
     // Required only if Twitter login support is required. Find the latest Twitter SDK releases here: https://goo.gl/E5wZvQ
     implementation("com.twitter.sdk.android:twitter-core:3.3.0@aar") { transitive = true }

@@ -56,7 +56,7 @@ public class Customer {
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
-        result.put("joined", ServerValue.TIMESTAMP);
+        result.put("joined", joined);
         result.put("lastHere", lastHere);
         result.put("started", started);
         result.put("status", status);

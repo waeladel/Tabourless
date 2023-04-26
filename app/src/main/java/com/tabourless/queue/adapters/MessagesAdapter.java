@@ -1,10 +1,14 @@
 package com.tabourless.queue.adapters;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -12,6 +16,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.paging.PagedList;
 import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
@@ -81,11 +86,17 @@ public class MessagesAdapter extends PagedListAdapter<Message, RecyclerView.View
     private MessageSentItemBinding mSentBinding;
     private MessageReceivedItemBinding mReceivedBinding;
 
+    // to copy message text to clipboard
+    private ClipboardManager mClipboard;
+    private ClipData mClip;
+    private ItemClickListener itemClickListener;
+
     private Context mContext;
-    public MessagesAdapter(Context context) {
+    public MessagesAdapter(Context context, ItemClickListener itemClickListener) {
         super(DIFF_CALLBACK);
         // [START create_storage_reference]
         this.mContext = context;
+        this.itemClickListener = itemClickListener;
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
@@ -499,12 +510,55 @@ public class MessagesAdapter extends PagedListAdapter<Message, RecyclerView.View
     /// ViewHolder for ReceivedMessages list /////
     public class ReceivedMessageHolder extends RecyclerView.ViewHolder {
 
-        ItemClickListener itemClickListener;
         private MessageReceivedItemBinding mReceivedBinding;
 
         private ReceivedMessageHolder(MessageReceivedItemBinding binding) {
             super(binding.getRoot());
             this.mReceivedBinding = binding;
+            mReceivedBinding.messageText.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    Log.d(TAG, "onLongClick: ");
+
+                    if(itemClickListener != null && getBindingAdapterPosition() != RecyclerView.NO_POSITION) {
+                        itemClickListener.onClick(view, getBindingAdapterPosition(), true);
+                    }
+                    // Create a popup Menu if null. To show when block is clicked
+                    PopupMenu popupBlockMenu = new PopupMenu(mReceivedBinding.messageText.getContext(), view);
+                    popupBlockMenu.getMenu().add(Menu.NONE, 0, 0, R.string.popup_menu_copy_text);
+                    //popupBlockMenu.getMenu().add(Menu.NONE, 1, 1, R.string.popup_menu_delete_message);
+                    //popupBlockMenu.getMenu().add(Menu.NONE, 2, 2, R.string.popup_menu_delete_message_all);
+                    popupBlockMenu.getMenu().add(Menu.NONE, 1, 2, R.string.popup_menu_report_message);
+
+                    popupBlockMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            switch (item.getItemId()) {
+                                case 0:
+                                    Log.i(TAG, "onMenuItemClick. copy test to clipboard is clicked");
+                                    //copy selected text to clipboard
+                                    copyToClipboard(mReceivedBinding.messageText.getContext(), mReceivedBinding.messageText.getText());
+                                    return true;
+                                case 1:
+                                    Log.i(TAG, "onMenuItemClick. report message clicked");
+                                    // show dialog For reporting messages
+                                    if(itemClickListener != null && getBindingAdapterPosition() != RecyclerView.NO_POSITION) {
+                                        itemClickListener.onClick(view, item.getItemId(), false);
+                                    }
+                                    return true;
+                                /*case 2:
+                                    Log.i(TAG, "onMenuItemClick. item delete message for all clicked ");
+                                    return true;*/
+                                default:
+                                    return false;
+                            }
+                        }
+                    });
+
+                    popupBlockMenu.show();
+                    return false;
+                }
+            });
 
         }
     }
@@ -518,8 +572,52 @@ public class MessagesAdapter extends PagedListAdapter<Message, RecyclerView.View
         public SentMessageHolder(MessageSentItemBinding binding) {
             super(binding.getRoot());
             this.mSentBinding = binding;
+
+            mSentBinding.messageText.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    Log.d(TAG, "onLongClick: ");
+
+                    // Create a popup Menu if null. To show when block is clicked
+                    PopupMenu popupBlockMenu = new PopupMenu(mReceivedBinding.messageText.getContext(), view);
+                    popupBlockMenu.getMenu().add(Menu.NONE, 0, 0, R.string.popup_menu_copy_text);
+                    //popupBlockMenu.getMenu().add(Menu.NONE, 1, 1, R.string.popup_menu_delete_message);
+                    //popupBlockMenu.getMenu().add(Menu.NONE, 2, 2, R.string.popup_menu_delete_message_all);
+
+                    popupBlockMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            switch (item.getItemId()) {
+                                case 0:
+                                    Log.i(TAG, "onMenuItemClick. item block clicked ");
+                                    //copy selected text to clipboard
+                                    copyToClipboard(mReceivedBinding.messageText.getContext(), mSentBinding.messageText.getText());
+                                    return true;
+                                /*case 1:
+                                    Log.i(TAG, "onMenuItemClick. item delete message for you clicked ");
+                                    return true;
+                                case 2:
+                                    Log.i(TAG, "onMenuItemClick. item delete message for all clicked ");
+                                    return true;*/
+                                default:
+                                    return false;
+                            }
+                        }
+                    });
+
+                    popupBlockMenu.show();
+                    return false;
+                }
+            });
+
         }
 
+    }
+
+    private void copyToClipboard(Context context, CharSequence text) {
+        mClipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+        mClip = ClipData.newPlainText("Copied Text", text);
+        mClipboard.setPrimaryClip(mClip);
     }
 
 }

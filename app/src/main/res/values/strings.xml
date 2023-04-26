@@ -25,15 +25,23 @@
 
     <string name="popup_menu_block">Block</string>
     <string name="popup_menu_block_delete">Block and delete chat</string>
+    <string name="popup_menu_report">Report</string>
+
+    <string name="popup_menu_copy_text">Copy message text</string>
+    <string name="popup_menu_delete_message">Delete message for you</string>
+    <string name="popup_menu_delete_message_all">Delete message for everyone</string>
+    <string name="popup_menu_report_message">Report message</string>
+    <string name="clipboard_label_copied_text">Copied Text</string>
+
     <string name="message_button_hint">Message</string>
-    <string name="block_button">Block</string>
-    <string name="unblock_button">Unblock</string>
+    <string name="block_report_button_hint" formatted="false">Block\\Report</string>
+    <string name="unblock_report_button_hint" formatted="false">Unblock\\Report</string>
     <string name="add_marker_title">Add Place</string>
     <string name="add_marker_snippet">Hold to change position</string>
 
     <string name="add_service_button_title">add more services</string>
     <string name="add_counter_button_title">add more counters</string>
-
+    <string name="send_report_button">Send report</string>
     <!--buttons and menus -->
 
     <!--hints and titles-->
@@ -81,6 +89,9 @@
     <string name="queue_info_expected_waiting">Expected waiting: %1$s</string>
     <string name="queue_info_average_waiting">Average waiting: %1$s</string>
     <string name="queue_info_service_time">Service time: %1$s</string>
+
+    <string name="report_dialog_title">Report User?</string>
+    <string name="report_dialog_message">If someone is in immediate danger, call local emergency service.\n\nPlease select the reason for reporting this user or content, we won’t let the person know who reported them.</string>
 
     <!--toast and error messages -->
     <string name="sign_in_cancelled">Sign in has been cancelled</string>
@@ -199,5 +210,20 @@
     <string name="counter_disability_only_disabled">Disabled only</string>
     <string name="counter_disability_only_able">Able-bodied only</string>
     <!-- gender disability array -->
+
+    <!-- report radio buttons array -->
+    <string name="radio_button_report_harassment">Harassment or bullying</string>
+    <string name="radio_button_report_suicide">Suicide or self-harm</string>
+    <string name="radio_button_report_inappropriate">Shown sexual or inappropriate content</string>
+    <string name="radio_button_report_impersonate">Impersonating someone else</string>
+    <string name="radio_button_report_Hate">Hate speech</string>
+    <string name="radio_button_report_child_abuse">Child abuse</string>
+    <string name="radio_button_report_misinformation">Spreads false information</string>
+    <string name="radio_button_report_violence">Violence or repulsive</string>
+    <string name="radio_button_report_terrorism">Promotes terrorism</string>
+    <string name="radio_button_report_scams">Scams</string>
+    <string name="radio_button_report_spam">Spam</string>
+    <string name="radio_button_report_other">Other</string>
+    <!-- report radio buttons array -->
 
 </resources>

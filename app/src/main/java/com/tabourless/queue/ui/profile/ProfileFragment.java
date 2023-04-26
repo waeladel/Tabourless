@@ -2,12 +2,12 @@ package com.tabourless.queue.ui.profile;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -21,8 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -38,6 +37,8 @@ import com.tabourless.queue.models.Relation;
 import com.tabourless.queue.models.User;
 import com.tabourless.queue.ui.BlockAlertFragment;
 import com.tabourless.queue.ui.BlockDeleteAlertFragment;
+import com.tabourless.queue.ui.report.ReportFragment;
+
 import java.util.Calendar;
 
 import static com.tabourless.queue.App.AVATAR_ORIGINAL_NAME;
@@ -65,6 +66,7 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
     private  static final String CONFIRM_DELETE_RELATION_ALERT_FRAGMENT = "DeleteRelationAlertFragment";
     private  static final String CONFIRM_BLOCK_ALERT_FRAGMENT = "BlockFragment"; // Tag for confirm block alert fragment
     private  static final String CONFIRM_BLOCK_DELETE_ALERT_FRAGMENT = "BlockDeleteFragment"; // Tag for confirm block and delete alert fragment
+    private  static final String REPORT_ALERT_FRAGMENT = "ReportFragment"; // Tag for report alert fragment
 
     private String notificationType;
     private String mRelationStatus;
@@ -82,6 +84,8 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
 
     private Context mContext;
 
+    private FragmentManager mFragmentManager;
+
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -93,6 +97,8 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mFragmentManager = getChildFragmentManager();
 
         //Get current logged in user
         mFirebaseCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -186,7 +192,7 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
         // toggle Buttons
         if (null != mUserId && !mUserId.equals(mCurrentUserId)) { // it's not logged in user. It's another user
             mBinding.blockEditButton.setImageResource(R.drawable.ic_block_24dp);
-            mBinding.blockEditText.setText(R.string.block_button);
+            mBinding.blockEditText.setText(R.string.block_report_button_hint);
 
             // update the reveal request
             mRelationStatus = RELATION_STATUS_NOT_FRIEND;
@@ -224,7 +230,7 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
                                 mRelationStatus = RELATION_STATUS_BLOCKED;
 
                                 // change block hint to Unblock, and change color to red
-                                mBinding.blockEditText.setText(R.string.unblock_button);
+                                mBinding.blockEditText.setText(R.string.unblock_report_button_hint);
                                 mBinding.blockEditText.setTextColor(getResources().getColor(R.color.colorError));
 
                                 mBinding.messageButton.setEnabled(false);
@@ -252,7 +258,7 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
                         mRelationStatus = RELATION_STATUS_NOT_FRIEND;
 
                         // Enable all buttons. In case they were disabled by previous block
-                        mBinding.blockEditText.setText(R.string.block_button); // in case it was set to unblock from previous block
+                        mBinding.blockEditText.setText(R.string.block_report_button_hint); // in case it was set to unblock from previous block
                         mBinding.blockEditButton.setEnabled(true);
                         mBinding.blockEditButton.setClickable(true);
                         mBinding.blockEditButton.setBackgroundTintList(mFabDefaultColor);
@@ -305,6 +311,7 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
                             PopupMenu popupBlockMenu = new PopupMenu(mContext, view);
                             popupBlockMenu.getMenu().add(Menu.NONE, 0, 0, R.string.popup_menu_block);
                             popupBlockMenu.getMenu().add(Menu.NONE, 1, 1, R.string.popup_menu_block_delete);
+                            popupBlockMenu.getMenu().add(Menu.NONE, 2, 2, R.string.popup_menu_report);
 
                             popupBlockMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                                 @Override
@@ -319,6 +326,10 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
                                             Log.i(TAG, "onMenuItemClick. item block and delete conversation clicked ");
                                             //blockDelete();
                                             showBlockDeleteDialog();
+                                            return true;
+                                        case 2:
+                                            Log.i(TAG, "onMenuItemClick. item report clicked ");
+                                            showReportDialog();
                                             return true;
                                         default:
                                             return false;
@@ -559,7 +570,7 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
     //Show a dialog to confirm blocking user
     private void showBlockDialog() {
         BlockAlertFragment blockFragment = BlockAlertFragment.newInstance(mContext, this);
-        if(getParentFragmentManager() != null) {
+        if(mFragmentManager != null) {
             blockFragment.show(getParentFragmentManager(), CONFIRM_BLOCK_ALERT_FRAGMENT);
             Log.i(TAG, "blockFragment show clicked ");
         }
@@ -569,9 +580,17 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
     //Show a dialog to confirm blocking user and delete his conversation with us (current user)
     private void showBlockDeleteDialog() {
         BlockDeleteAlertFragment blockDeleteFragment = BlockDeleteAlertFragment.newInstance(mContext, this);
-        if(getParentFragmentManager() != null) {
+        if(mFragmentManager != null) {
             blockDeleteFragment.show(getParentFragmentManager(), CONFIRM_BLOCK_DELETE_ALERT_FRAGMENT);
             Log.i(TAG, "blockDeleteFragment show clicked ");
+        }
+    }
+
+    private void showReportDialog() {
+        ReportFragment reportFragment = ReportFragment.newInstance(mUserId, mCurrentUserId, mUser, mCurrentUser);
+        if (mFragmentManager != null) {
+            reportFragment.show(mFragmentManager, REPORT_ALERT_FRAGMENT);
+            Log.i(TAG, "reportAlertFragment show clicked ");
         }
     }
 }

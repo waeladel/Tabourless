@@ -43,7 +43,7 @@ public class Chat {
         result.put("members", members);
         result.put("active", active);
         result.put("sender", sender);
-        result.put("lastSent", ServerValue.TIMESTAMP);
+        result.put("lastSent", lastSent);
 
         return result;
     }

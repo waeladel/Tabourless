@@ -18,7 +18,7 @@ public class Relation {
     //private Date joined;// annotation to put server timestamp
 
     public Relation() {
-        created = ServerValue.TIMESTAMP;
+        this.created = ServerValue.TIMESTAMP;
     }
 
     public Relation(String status, Map<String, Boolean> contacts) {
