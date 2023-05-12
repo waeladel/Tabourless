@@ -47,7 +47,9 @@ import static com.tabourless.queue.App.COVER_ORIGINAL_NAME;
 import static com.tabourless.queue.App.COVER_THUMBNAIL_NAME;
 import static com.tabourless.queue.App.DIRECTION_ARGUMENTS_KEY_USER_ID;
 import static com.tabourless.queue.App.RELATION_STATUS_BLOCKED;
+import static com.tabourless.queue.App.RELATION_STATUS_BLOCKED_VS_BLOCKING_BACK;
 import static com.tabourless.queue.App.RELATION_STATUS_BLOCKING;
+import static com.tabourless.queue.App.RELATION_STATUS_BLOCKING_VS_BLOCKED_BACK;
 import static com.tabourless.queue.App.RELATION_STATUS_NOT_FRIEND;
 import static com.tabourless.queue.App.STORAGE_REF_IMAGES;
 import static com.tabourless.queue.App.USER_SPINNER_GENDER_FEMALE;
@@ -206,28 +208,48 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
                         // Relation exist
                         switch (relation.getStatus()){
                             case RELATION_STATUS_BLOCKING:
-                                // If this selected user has blocked me
-                                //current user can't do anything about it
+                                // If this selected user has blocked me, current user is eligible to block back or report
                                 mRelationStatus = RELATION_STATUS_BLOCKING;
 
-                                mBinding.blockEditButton.setEnabled(false);
-                                mBinding.blockEditButton.setClickable(false);
-                                mBinding.blockEditButton.setBackgroundTintList(ColorStateList.valueOf
-                                        (getResources().getColor(R.color.disabled_button)));
+                                // Enable mBlockEditButton buttons. In case they were disabled by previous block
+                                mBinding.blockEditText.setText(R.string.block_report_button_hint); // in case it was set to unblock from previous block
+                                mBinding.blockEditText.setTextColor(mFabDefaultTextColor);
+                                mBinding.blockEditButton.setEnabled(true);
+                                mBinding.blockEditButton.setClickable(true);
+                                mBinding.blockEditButton.setBackgroundTintList(mFabDefaultColor);
 
                                 mBinding.messageButton.setEnabled(false);
                                 mBinding.messageButton.setClickable(false);
                                 mBinding.messageButton.setBackgroundTintList(ColorStateList.valueOf
                                         (getResources().getColor(R.color.disabled_button)));
 
-                                //disable all FAB's hints
+                                // reset buttons hints to original text color then disable them
+                                mBinding.messageButtonText.setText(R.string.message_button_hint);
+                                mBinding.messageButtonText.setTextColor(mFabDefaultTextColor);
+
+                                //disable all buttons' hints except block hint
                                 mBinding.messageButtonText.setEnabled(false);
-                                mBinding.blockEditText.setEnabled(false);
+                                mBinding.blockEditText.setEnabled(true);
                                 break;
+                            case RELATION_STATUS_BLOCKING_VS_BLOCKED_BACK:
+                                // If this selected user had blocked me (current user) and i blocked him back
+                                // the only option is to unblock or report him, so we will not break to move to blocked status
+                            case RELATION_STATUS_BLOCKED_VS_BLOCKING_BACK:
+                                // If this selected user was blocked by me (current user) and he blocked me back
+                                // the only option is to unblock or report him, so we will not break to move to blocked status
                             case RELATION_STATUS_BLOCKED:
                                 // If this selected user is blocked by me (current user)
-                                // the only option is to unblock him
-                                mRelationStatus = RELATION_STATUS_BLOCKED;
+                                // the only option is to unblock him or report him
+
+                                if(relation.getStatus().equals(RELATION_STATUS_BLOCKING_VS_BLOCKED_BACK)){
+                                    // change mRelationStatus to BLOCKING_VS_BLOCKED_BACK if we reach her throw RELATION_STATUS_BLOCKING_VS_BLOCKED_BACK Case
+                                    mRelationStatus = RELATION_STATUS_BLOCKING_VS_BLOCKED_BACK;
+                                }else if (relation.getStatus().equals(RELATION_STATUS_BLOCKED_VS_BLOCKING_BACK)) {
+                                    // change mRelationStatus to BLOCKED_VS_BLOCKING_BACK if we reach her throw RELATION_STATUS_BLOCKED_VS_BLOCKING_BACK Case
+                                    mRelationStatus = RELATION_STATUS_BLOCKED_VS_BLOCKING_BACK;
+                                }else{
+                                    mRelationStatus = RELATION_STATUS_BLOCKED;
+                                }
 
                                 // change block hint to Unblock, and change color to red
                                 mBinding.blockEditText.setText(R.string.unblock_report_button_hint);
@@ -235,11 +257,16 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
 
                                 mBinding.messageButton.setEnabled(false);
                                 mBinding.messageButton.setClickable(false);
-                                mBinding.messageButton.setBackgroundTintList(ColorStateList.valueOf
-                                        (getResources().getColor(R.color.disabled_button)));
+                                mBinding.messageButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.disabled_button)));
 
-                                ////disable all FAB's except block button
+
+                                // reset buttons hints to original text color then disable them
+                                mBinding.messageButtonText.setText(R.string.message_button_hint);
+                                mBinding.messageButtonText.setTextColor(mFabDefaultTextColor);
+
+                                //disable all buttons' hints except block hint
                                 mBinding.messageButtonText.setEnabled(false);
+                                mBinding.blockEditText.setEnabled(true);
 
                                 break;
                         }
@@ -294,49 +321,26 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
                     switch (mRelationStatus) {
                         case RELATION_STATUS_BLOCKING:
                             Log.d(TAG, "mRelationStatus = RELATION_STATUS_BLOCKING");
-                            // If this selected user has blocked me
-                            //current user can't do anything about it
+                            // If this selected user has blocked me, current user is eligible to block back or report
+                            showBlockReportMenu(view); // To select whether to block or report the selected user
                             break;
+                        case RELATION_STATUS_BLOCKING_VS_BLOCKED_BACK:
+                            Log.d(TAG, "mRelationStatus = RELATION_STATUS_BLOCKING_VS_BLOCKED_BACK. continue to BLOCKED case");
+                            // If this selected user had blocked me (current user) and i blocked him back
+                            // the only option is to unblock or report him, so we will not break to move to blocked status
+                        case RELATION_STATUS_BLOCKED_VS_BLOCKING_BACK:
+                            Log.d(TAG, "mRelationStatus = RELATION_STATUS_BLOCKED_VS_BLOCKING_BACK. continue to BLOCKED case");
+                            // If this selected user had blocked me (current user) and i blocked him back
+                            // the only option is to unblock or report him, so we will not break to move to blocked status
                         case RELATION_STATUS_BLOCKED:
                             Log.d(TAG, "mRelationStatus = RELATION_STATUS_BLOCKED");
-                            // If this selected user is blocked by me (current user)
-                            // the only option is to unblock him
-                            mViewModel.unblockUser(mCurrentUserId, mUserId);
+                            // If this selected user is blocked by me (current user), the only option is to unblock him
+                            //mProfileViewModel.unblockUser(mCurrentUserId, mUserId, mRelationStatus);
+                            showUnblockReportMenu(view);
                             break;
                         default:
-                            // There is no blocking relation, proceed with blocking
                             // There is no blocking relation
-                            //showBlockDialog(); // To confirm blocking or cancel
-                            // Create a popup Menu if null. To show when block is clicked
-                            PopupMenu popupBlockMenu = new PopupMenu(mContext, view);
-                            popupBlockMenu.getMenu().add(Menu.NONE, 0, 0, R.string.popup_menu_block);
-                            popupBlockMenu.getMenu().add(Menu.NONE, 1, 1, R.string.popup_menu_block_delete);
-                            popupBlockMenu.getMenu().add(Menu.NONE, 2, 2, R.string.popup_menu_report);
-
-                            popupBlockMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                                @Override
-                                public boolean onMenuItemClick(MenuItem item) {
-                                    switch (item.getItemId()) {
-                                        case 0:
-                                            Log.i(TAG, "onMenuItemClick. item block clicked ");
-                                            //blockUser();
-                                            showBlockDialog();
-                                            return true;
-                                        case 1:
-                                            Log.i(TAG, "onMenuItemClick. item block and delete conversation clicked ");
-                                            //blockDelete();
-                                            showBlockDeleteDialog();
-                                            return true;
-                                        case 2:
-                                            Log.i(TAG, "onMenuItemClick. item report clicked ");
-                                            showReportDialog();
-                                            return true;
-                                        default:
-                                            return false;
-                                    }
-                                }
-                            });
-                            popupBlockMenu.show();
+                            showBlockReportMenu(view); // To select whether to block or report the selected user
                             break;
                     }
                 } else {
@@ -408,12 +412,12 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
               case 6:
                 // block is clicked
                 Log.i(TAG, "block is clicked, we must start blocking function");
-                  mViewModel.blockUser(mCurrentUserId, mUserId);
+                  mViewModel.blockUser(mCurrentUserId, mUserId, mRelationStatus, false);
                 break;
             case 7:
                 // block and delete is clicked
                 Log.i(TAG, "block and delete  is clicked, we must start blocking function");
-                mViewModel.blockDelete(mCurrentUserId, mUserId);
+                mViewModel.blockUser(mCurrentUserId, mUserId, mRelationStatus, true);
                 break;
         }
     }
@@ -566,6 +570,72 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
         }
 
     }*/
+
+    //Show menu to enable user to select whether to block or report selected user
+    private void showBlockReportMenu(View view) {
+        // Create a popup Menu if null. To show when block/report is clicked
+        PopupMenu popupBlockMenu = new PopupMenu(mContext, view);
+        popupBlockMenu.getMenu().add(Menu.NONE, 0, 0, R.string.popup_menu_block);
+        popupBlockMenu.getMenu().add(Menu.NONE, 1, 1, R.string.popup_menu_block_delete);
+        popupBlockMenu.getMenu().add(Menu.NONE, 2, 2, R.string.popup_menu_report);
+
+
+        popupBlockMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case 0:
+                        Log.i(TAG, "onMenuItemClick. item block clicked ");
+                        //blockUser();
+                        showBlockDialog();
+                        return true;
+                    case 1:
+                        Log.i(TAG, "onMenuItemClick. item block and delete conversation clicked ");
+                        //blockDelete();
+                        showBlockDeleteDialog();
+                        return true;
+                    case 2:
+                        Log.i(TAG, "onMenuItemClick. item report clicked ");
+                        showReportDialog();
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+
+        popupBlockMenu.show();
+    }
+
+    //Show menu to enable user to select whether to unblock or report selected user
+    private void showUnblockReportMenu(View view) {
+        // Create a popup Menu if null. To show when block/report is clicked
+        PopupMenu popupBlockMenu = new PopupMenu(mContext, view);
+        popupBlockMenu.getMenu().add(Menu.NONE, 0, 0, R.string.popup_menu_unblock);
+        popupBlockMenu.getMenu().add(Menu.NONE, 1, 1, R.string.popup_menu_report);
+
+        popupBlockMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case 0:
+                        Log.i(TAG, "onMenuItemClick. item block clicked ");
+                        // unblock this selected user
+                        mViewModel.unblockUser(mCurrentUserId, mUserId, mRelationStatus);
+                        return true;
+                    case 1:
+                        Log.i(TAG, "onMenuItemClick. item report clicked ");
+                        showReportDialog();
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+
+        popupBlockMenu.show();
+    }
+
 
     //Show a dialog to confirm blocking user
     private void showBlockDialog() {

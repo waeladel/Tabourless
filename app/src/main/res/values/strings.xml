@@ -24,8 +24,9 @@
     <string name="upload_button">Upload</string>
 
     <string name="popup_menu_block">Block</string>
-    <string name="popup_menu_block_delete">Block and delete chat</string>
+    <string name="popup_menu_block_delete">Block and hide conversation</string>
     <string name="popup_menu_report">Report</string>
+    <string name="popup_menu_unblock">Unblock</string>
 
     <string name="popup_menu_copy_text">Copy message text</string>
     <string name="popup_menu_delete_message">Delete message for you</string>
@@ -105,7 +106,7 @@
     <string name="send_message_error">Sorry, couldn\'t send your message.</string>
 
     <string name="confirm_block_dialog_message">You won\'t be able to exchange messages with this person anymore.</string>
-    <string name="confirm_block_delete_dialog_message">You won\'t be able to exchange messages with this person anymore and your conversation will be deleted.</string>
+    <string name="confirm_block_delete_dialog_message">You won\'t be able to exchange messages with this person anymore and your conversation will be hidden.</string>
     <string name="user_confirm_dialog_enable">Enable</string>
     <string name="user_confirm_dialog_positive">Yes</string>
     <string name="user_confirm_blocking_dialog">Block</string>

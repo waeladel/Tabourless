@@ -528,7 +528,7 @@ public class MessagesAdapter extends PagedListAdapter<Message, RecyclerView.View
                     popupBlockMenu.getMenu().add(Menu.NONE, 0, 0, R.string.popup_menu_copy_text);
                     //popupBlockMenu.getMenu().add(Menu.NONE, 1, 1, R.string.popup_menu_delete_message);
                     //popupBlockMenu.getMenu().add(Menu.NONE, 2, 2, R.string.popup_menu_delete_message_all);
-                    popupBlockMenu.getMenu().add(Menu.NONE, 1, 2, R.string.popup_menu_report_message);
+                    popupBlockMenu.getMenu().add(Menu.NONE, 1, 1, R.string.popup_menu_report_message);
 
                     popupBlockMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                         @Override

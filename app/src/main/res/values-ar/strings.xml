@@ -23,8 +23,9 @@
     <string name="upload_button">تحميل</string>
 
     <string name="popup_menu_block">حظر</string>
-    <string name="popup_menu_block_delete">حظر وحذف الرسائل</string>
+    <string name="popup_menu_block_delete">حظر وإخفاء المحادثة</string>
     <string name="popup_menu_report">إبلاغ</string>
+    <string name="popup_menu_unblock">رفع الحظر</string>
 
     <string name="popup_menu_copy_text">نسخ نصّ الرسالة</string>
     <string name="popup_menu_delete_message">حذف الرسالة لديّ فقط</string>
@@ -104,7 +105,7 @@
     <string name="send_message_error">نأسف، تعذر ارسال رسالتك.</string>
 
     <string name="confirm_block_dialog_message">لن يمكنك تبادل الرسائل مع هذا الشخص بعد الآن.</string>
-    <string name="confirm_block_delete_dialog_message">لن يمكنك تبادل الرسائل مع هذا الشخص بعد الآن وسيتم حذف محادثتكما.</string>
+    <string name="confirm_block_delete_dialog_message">لن يمكنك تبادل الرسائل مع هذا الشخص بعد الآن وسيتم إخفاء محادثتكما.</string>
     <string name="user_confirm_dialog_enable">مكن</string>
     <string name="user_confirm_dialog_positive">نعم</string>
     <string name="user_confirm_blocking_dialog">حظر</string>

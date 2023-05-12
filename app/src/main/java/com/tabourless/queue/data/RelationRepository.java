@@ -19,11 +19,16 @@ import java.util.Map;
 
 import static com.tabourless.queue.App.DATABASE_REF_CHATS;
 import static com.tabourless.queue.App.DATABASE_REF_CHAT_ACTIVE;
+import static com.tabourless.queue.App.DATABASE_REF_NOTIFICATIONS;
+import static com.tabourless.queue.App.DATABASE_REF_NOTIFICATIONS_ALERTS;
+import static com.tabourless.queue.App.DATABASE_REF_NOTIFICATIONS_MESSAGES;
 import static com.tabourless.queue.App.DATABASE_REF_RELATIONS;
 import static com.tabourless.queue.App.DATABASE_REF_RELATION_STATUS;
 import static com.tabourless.queue.App.DATABASE_REF_USER_CHATS;
 import static com.tabourless.queue.App.RELATION_STATUS_BLOCKED;
 import static com.tabourless.queue.App.RELATION_STATUS_BLOCKING;
+import static com.tabourless.queue.App.RELATION_STATUS_BLOCKING_VS_BLOCKED_BACK;
+import static com.tabourless.queue.App.RELATION_STATUS_BLOCKED_VS_BLOCKING_BACK;
 import static com.tabourless.queue.Utils.DatabaseHelper.getJoinedKeys;
 
 public class RelationRepository {
@@ -128,24 +133,40 @@ public class RelationRepository {
     }
 
     // Block user without deleting conversation
-    public void blockUser(String currentUserId, String userId) {
+    public void blockUser(String currentUserId, String userId, String relation, boolean isDeleteChat) {
         Map<String, Object> childUpdates = new HashMap<>();
 
-        // Update relations to blocking (current user) and blocked (target user)
-        childUpdates.put(DATABASE_REF_RELATIONS +"/"+ currentUserId + "/" + userId +"/"+ DATABASE_REF_RELATION_STATUS, RELATION_STATUS_BLOCKED);
-        childUpdates.put(DATABASE_REF_RELATIONS +"/"+ userId +"/"+ currentUserId +"/"+ DATABASE_REF_RELATION_STATUS, RELATION_STATUS_BLOCKING);
+        if(relation.equals(RELATION_STATUS_BLOCKING)){
+            // this selected user had already blocked me (current user), it's time to block back
+            // Update relations to blocking/blocked_back for (current user) and blocked/blocking_back for (selected user)
+            childUpdates.put(DATABASE_REF_RELATIONS + "/" + currentUserId + "/" + userId + "/" + DATABASE_REF_RELATION_STATUS, RELATION_STATUS_BLOCKING_VS_BLOCKED_BACK);
+            childUpdates.put(DATABASE_REF_RELATIONS + "/" + userId + "/" + currentUserId + "/" + DATABASE_REF_RELATION_STATUS, RELATION_STATUS_BLOCKED_VS_BLOCKING_BACK);
+        }else{
+            // Update relations to blocking for (current user) and blocked for (selected user)
+            childUpdates.put(DATABASE_REF_RELATIONS + "/" + currentUserId + "/" + userId + "/" + DATABASE_REF_RELATION_STATUS, RELATION_STATUS_BLOCKED);
+            childUpdates.put(DATABASE_REF_RELATIONS + "/" + userId + "/" + currentUserId + "/" + DATABASE_REF_RELATION_STATUS, RELATION_STATUS_BLOCKING);
+        }
 
         // Chat ID is not passed from MainFragment, we need to create
         String chatId = getJoinedKeys(currentUserId , userId);
         // update chat active to -1, which means it's blocked chat room
         childUpdates.put(DATABASE_REF_CHATS  +"/"+ chatId +"/"+ DATABASE_REF_CHAT_ACTIVE,-1);
 
-        // Delete chats with this person from chats recycler view
-        /*childUpdates.put("/userChats/" + currentUserId + "/" + chatId, null);
-        childUpdates.put("/userChats/" + userId + "/" + chatId, null);*/
+        // to remove the conversation room if user selected to hide the conversation too
+        if(isDeleteChat){
+            // Delete chat room with this person from chats recycler view
+            childUpdates.put(DATABASE_REF_USER_CHATS + "/" + currentUserId + "/" + chatId, null);
+            childUpdates.put(DATABASE_REF_USER_CHATS + "/" + userId + "/" + chatId, null);
+        }
 
         // Delete notifications
+        // remove notifications i (current user) received from the selected user
+        childUpdates.put(DATABASE_REF_NOTIFICATIONS + "/" + DATABASE_REF_NOTIFICATIONS_ALERTS + "/" + currentUserId + "/" +userId, null);
+        childUpdates.put(DATABASE_REF_NOTIFICATIONS + "/" + DATABASE_REF_NOTIFICATIONS_MESSAGES + "/" + currentUserId + "/" +userId, null);
 
+        // remove my notifications (current user) that had been sent to the selected user, because we are blocking him
+        childUpdates.put(DATABASE_REF_NOTIFICATIONS + "/" + DATABASE_REF_NOTIFICATIONS_ALERTS + "/" + userId + "/" +currentUserId, null);
+        childUpdates.put(DATABASE_REF_NOTIFICATIONS + "/" + DATABASE_REF_NOTIFICATIONS_MESSAGES + "/" + userId + "/" +currentUserId, null);
 
         mDatabaseRef.updateChildren(childUpdates).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
@@ -157,43 +178,27 @@ public class RelationRepository {
         });
     }
 
-    // Block user and delete the conversation (userChat table)
-    public void blockDelete(String currentUserId, String userId) {
-        Map<String, Object> childUpdates = new HashMap<>();
-
-        // Update relations to blocking (current user) and blocked (target user)
-        childUpdates.put(DATABASE_REF_RELATIONS +"/"+  currentUserId + "/" + userId +"/"+ DATABASE_REF_RELATION_STATUS, RELATION_STATUS_BLOCKED);
-        childUpdates.put(DATABASE_REF_RELATIONS +"/"+ userId + "/" + currentUserId+"/"+ DATABASE_REF_RELATION_STATUS, RELATION_STATUS_BLOCKING);
-
-        // Chat ID is not passed from MainFragment, we need to create
-        String chatId = getJoinedKeys(currentUserId , userId);
-        // update chat active to -1, which means it's blocked chat room
-        childUpdates.put(DATABASE_REF_CHATS  +"/"+  chatId +"/"+ DATABASE_REF_CHAT_ACTIVE,-1);
-
-        // Delete chats with this person from chats recycler view
-        childUpdates.put(DATABASE_REF_USER_CHATS +"/"+ currentUserId + "/" + chatId, null);
-        childUpdates.put(DATABASE_REF_USER_CHATS +"/"+ userId + "/" + chatId, null);
-
-        // Delete notifications
-
-
-        mDatabaseRef.updateChildren(childUpdates).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                // Write was successful!
-                Log.i(TAG, "block onSuccess");
-                // ...
-            }
-        });
-    }
 
     // Delete blocking/blocked relation to start fresh
-    public void unblockUser(String currentUserId, String userId) {
+    public void unblockUser(String currentUserId, String userId, String relationStatus) {
         Map<String, Object> childUpdates = new HashMap<>();
 
-        // Update relations to null. To start fresh
-        childUpdates.put(DATABASE_REF_RELATIONS +"/"+ currentUserId +"/"+ userId, null);
-        childUpdates.put(DATABASE_REF_RELATIONS +"/"+ userId + "/" + currentUserId, null);
+        if(relationStatus.equals(RELATION_STATUS_BLOCKING_VS_BLOCKED_BACK)) {
+            // this selected user had already blocked me (current user), and i am (current user) blocked him back and now i am unblocking
+            // Update relations to the previous blocking status, blocking/blocked_back for (current user) and blocked/blocking_back for (selected user)
+            childUpdates.put(DATABASE_REF_RELATIONS + "/" + currentUserId + "/" + userId +"/" + DATABASE_REF_RELATION_STATUS, RELATION_STATUS_BLOCKING);
+            childUpdates.put(DATABASE_REF_RELATIONS + "/" + userId + "/" + currentUserId + "/" + DATABASE_REF_RELATION_STATUS, RELATION_STATUS_BLOCKED);
+
+        }else if(relationStatus.equals(RELATION_STATUS_BLOCKED_VS_BLOCKING_BACK)){
+            // This selected user was blocked by me (current user) and he blocked me back and now i am unblocking
+            // Now the original block is being removed and we will be only left with the block back, so we need to reverse the original block relation
+            childUpdates.put(DATABASE_REF_RELATIONS + "/" + currentUserId + "/" + userId + "/" + DATABASE_REF_RELATION_STATUS, RELATION_STATUS_BLOCKING);
+            childUpdates.put(DATABASE_REF_RELATIONS + "/" + userId + "/" + currentUserId + "/" + DATABASE_REF_RELATION_STATUS, RELATION_STATUS_BLOCKED);
+        }else{
+            // Update relations to null. To start fresh
+            childUpdates.put(DATABASE_REF_RELATIONS + "/" + currentUserId + "/" + userId, null);
+            childUpdates.put(DATABASE_REF_RELATIONS + "/" + userId + "/" + currentUserId, null);
+        }
 
         // Chat ID is not passed from MainFragment, we need to create
         String chatId = getJoinedKeys(currentUserId , userId);

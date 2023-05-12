@@ -131,6 +131,8 @@ public class App extends MultiDexApplication { // had to enable MultiDex after a
     public static final String RELATION_STATUS_BLOCKING = "blocking"; // the selected user is blocking me (current user)
     public static final String RELATION_STATUS_BLOCKED= "blocked"; // the selected user is blocked by me (current user)
 
+    public static final String RELATION_STATUS_BLOCKING_VS_BLOCKED_BACK = "blocking/blocked_back"; // the selected user is blocking me (current user) and i the (current user) blocked him back
+    public static final String RELATION_STATUS_BLOCKED_VS_BLOCKING_BACK = "blocked/blocking_back"; // the selected user is blocked by me and the selected user blocked me back
 
     private SharedPreferences sharedPreferences;
     private AudioAttributes audioAttributes;
