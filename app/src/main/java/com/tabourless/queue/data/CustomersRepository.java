@@ -64,7 +64,7 @@ public class CustomersRepository {
     // When that happens clearing listeners is triggered on viewmodel Cleared, which removes that new listeners for the just added query
     // When new listener is removed we got 0 results and have no listeners for updates.
     private List<FirebaseListeners> mListenersList;
-    private List<Customer> totalItemsList;// = new ArrayList<>();
+    private List<Customer> totalItemsList, zeroResultList;// = new ArrayList<>();
     //private static List<Message> seenItemsList;// = new ArrayList<>() for seen messages by current user;
 
     private MutableLiveData<User> mUser;
@@ -134,6 +134,7 @@ public class CustomersRepository {
             } else {
                 // no data
                 Log.w(TAG, "getAfter no users exist");
+                getLoadAfterCallback().onResult(zeroResultList); // send empty list to clear recycler
             }
             printListeners();
             isAfterFirstLoaded =  false;
@@ -202,6 +203,7 @@ public class CustomersRepository {
             } else {
                 // no data
                 Log.w(TAG, "getBefore no users exist");
+                getLoadBeforeCallback().onResult(zeroResultList); // send empty list to clear recycler
             }
             printListeners();
             isBeforeFirstLoaded =  false;
@@ -258,6 +260,8 @@ public class CustomersRepository {
                 //totalItemsList.clear();
             }
         }
+
+        zeroResultList = new ArrayList<>(); // lest just to return empty results
 
         /*if(seenItemsList == null){
             seenItemsList = new ArrayList<>();
@@ -364,6 +368,7 @@ public class CustomersRepository {
                 } else {
                     // no data
                     Log.w(TAG, "getInitial no users exist");
+                    callback.onResult(zeroResultList); // send empty list to clear recycler
                 }
                 printListeners();
                 isInitialFirstLoaded =  false;
@@ -444,7 +449,7 @@ public class CustomersRepository {
 
         Log.d(TAG, "getAfter. AfterKey= " + key);
         afterQuery = mCustomersRef.orderByChild(DATABASE_REF_CUSTOMER_NUMBER)
-                            .startAt(key)
+                            .startAfter(key)
                             .limitToFirst(size);
 
         afterQuery.addValueEventListener(afterListener);
@@ -463,7 +468,7 @@ public class CustomersRepository {
         Query beforeQuery;
 
         beforeQuery = mCustomersRef.orderByChild(DATABASE_REF_CUSTOMER_NUMBER)
-                                .endAt(key)
+                                .endBefore(key)
                                 .limitToLast(size);
 
         beforeQuery.addValueEventListener(beforeListener);

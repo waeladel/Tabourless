@@ -82,17 +82,20 @@
 <!--    <string name="add_place_counter_helper">Only add multiple counters if this service can serve more than one customer simultaneously. If you see multiple queues in front of a single counter, add only one counter then use filters to separate the queues</string>-->
     <string name="add_place_counter_helper">If the counter has no sign, use names like (counter A,B) instead of (1,2) to be clear they are named from left to right. If you see a counter serving multiple queues, add a separate counter for each queue.</string>
     <string name="customer_number_title" translatable="false">#:</string>
-    <string name="queue_info_current_number">Serving token: %1$d</string>
+    <string name="queue_info_current_number">Current token: %1$d</string>
     <string name="queue_info_your_number">Your token: %1$d</string>
     <string name="queue_info_ahead_customers_more_less">Customers Ahead: %1$d or less</string>
     <string name="queue_info_ahead_customers">Customers Ahead: %1$d</string>
     <string name="queue_info_total_customers">Total customers: %1$d</string>
     <string name="queue_info_expected_waiting">Expected waiting: %1$s</string>
     <string name="queue_info_average_waiting">Average waiting: %1$s</string>
-    <string name="queue_info_service_time">Service time: %1$s</string>
+    <string name="queue_info_service_time">Service duration: %1$s</string>
 
     <string name="report_dialog_title">Report User?</string>
     <string name="report_dialog_message">If someone is in immediate danger, call local emergency service.\n\nPlease select the reason for reporting this user or content, we won’t let the person know who reported them.</string>
+    <string name="allow_notification_title">Allow notifications</string>
+    <string name="allow_notification_message">The app needs permission to send notifications in order to notify you when it is your turn in a queue, or when some one sends you a message.</string>
+    <string name="notification_settings_message">The app needs permission to send notifications in order to notify you when it is your turn in a queue, or when some one sends you a message. \n\n Do you want to go to settings to enable notifications?</string>
 
     <!--toast and error messages -->
     <string name="sign_in_cancelled">Sign in has been cancelled</string>
@@ -121,7 +124,7 @@
     <string name="permission_denied">Permission to get your current location denied</string>
     <string name="location_access_required">Location access is required to fetch nearby places and queues.</string>
     <string name="access_location">Enable location access</string>
-    <string name="permission_not_granted">ٍSorry, we cannot access this feature until you grant us permission.</string>
+    <string name="permission_not_granted">Sorry, we cannot access this feature until you grant us permission.</string>
     <string name="permission_not_granted_title">Permission not granted</string>
 
     <string name="add_place_name_error">Place\'s name can\'t be empty.</string>

@@ -2,6 +2,8 @@ package com.tabourless.queue.ui.main;
 import android.util.Log;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+
+import com.tabourless.queue.data.MainActivityRepository;
 import com.tabourless.queue.data.UserRepository;
 import com.tabourless.queue.models.User;
 
@@ -9,7 +11,7 @@ import com.tabourless.queue.models.User;
 public class MainViewModel extends ViewModel {
 
     private final static String TAG = MainViewModel.class.getSimpleName();
-    private UserRepository userRepository;
+    private MainActivityRepository mainActivityRepository;
     private MutableLiveData<User> currentUser;
     private MutableLiveData<String> currentUserId;
     private MutableLiveData<Long> inboxCount, notificationCount;
@@ -17,7 +19,7 @@ public class MainViewModel extends ViewModel {
     public MainViewModel() {
 
         // pass userId to the constructor of MessagesDataFactory
-        userRepository = new UserRepository();
+        mainActivityRepository = new MainActivityRepository();
 
         //currentUserId = new MutableLiveData<>();
         //chatCount = new MutableLiveData<>();
@@ -48,14 +50,14 @@ public class MainViewModel extends ViewModel {
             if(inboxCount == null){
                 inboxCount = new MutableLiveData<>();
             }
-            inboxCount = userRepository.getInboxCount(userId);
+            inboxCount = mainActivityRepository.getInboxCount(userId);
             Log.d(TAG, "updateCurrentUserId chatCount= "+ inboxCount.getValue());
 
             // update notification count of the new user
             if(notificationCount == null){
                 notificationCount = new MutableLiveData<>();
             }
-            notificationCount = userRepository.getNotificationsCount(userId);
+            notificationCount = mainActivityRepository.getNotificationsCount(userId);
 
         }
         currentUserId.setValue(userId);
@@ -64,7 +66,7 @@ public class MainViewModel extends ViewModel {
 
     public MutableLiveData<User> getCurrentUser() {
         Log.d(TAG, "getUser"+ currentUserId);
-        currentUser = userRepository.getCurrentUser(currentUserId.getValue());
+        currentUser = mainActivityRepository.getCurrentUser(currentUserId.getValue());
         return currentUser;
     }
 
@@ -74,7 +76,7 @@ public class MainViewModel extends ViewModel {
         if(inboxCount == null){
             Log.d(TAG, "chatCount is null, get relation from database");
             inboxCount = new MutableLiveData<>();
-            inboxCount = userRepository.getInboxCount(userId);
+            inboxCount = mainActivityRepository.getInboxCount(userId);
         }
         Log.d(TAG, "getChatsCount chatCount Count= "+ inboxCount.getValue());
         return inboxCount;
@@ -86,21 +88,16 @@ public class MainViewModel extends ViewModel {
         if(notificationCount == null){
             Log.d(TAG, "notificationCount is null, get relation from database");
             notificationCount = new MutableLiveData<>();
-            notificationCount = userRepository.getNotificationsCount(userId);
+            notificationCount = mainActivityRepository.getNotificationsCount(userId);
         }
         Log.d(TAG, "getNotificationsCount notification Count= "+ notificationCount.getValue());
         return notificationCount;
-    }
-
-    public void clearViewModel() {
-        Log.d(TAG, "removeListeners");
-        onCleared();
     }
 
     @Override
     protected void onCleared() {
         Log.d(TAG, "mama MainActivityViewModel onCleared:");
         super.onCleared();
-        userRepository.removeListeners();
+        mainActivityRepository.removeListeners();
     }
 }

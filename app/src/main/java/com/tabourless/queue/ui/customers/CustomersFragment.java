@@ -192,56 +192,9 @@ public class CustomersFragment extends Fragment implements ItemClickListener {
         mViewModel.getItemPagedList().observe(getViewLifecycleOwner(), new Observer<PagedList<Customer>>() {
             @Override
             public void onChanged(@Nullable final PagedList<Customer> items) {
-                Log.d(TAG, "mama customers items size =" +  items.size());
                 if (items != null ){
-                    // your code here
                     Log.d(TAG, "queues onChanged submitList size" +  items.size());
-                    // Create new Thread to loop until items.size() is greater than 0
-                    // kill the previous task before start it again with the latest data
-                    if(null != mItemDelayFuture && !mItemDelayFuture.isDone()){
-                        mItemDelayFuture.cancel(true);
-                    }
-
-                    mRunnable = new Runnable() {
-                        @Override
-                        public void run() {
-                            int sleepCounter = 0;
-                            Log.d(TAG, "queues onChanged. new Runnable starts= "+items.size()+" sleepCounter="+sleepCounter++);
-                            try {
-                                while(items.size()==0) {
-                                    //Keep looping as long as items size is 0
-                                    Thread.sleep(20);
-                                    Log.d(TAG, "queues onChanged. sleep 1000. size= "+items.size()+" sleepCounter="+sleepCounter++);
-                                    if(sleepCounter == 500){
-                                        break;
-                                    }
-                                    //handler.post(this);
-                                }
-                                //Now items size is greater than 0, let's submit the List
-                                Log.d(TAG, "onChanged. after  sleep finished. size= "+items.size());
-                                if(items.size() == 0 && sleepCounter == 500){
-                                    // If we submit List after loop is finish with 0 results
-                                    // we may erase another results submitted via newer thread
-
-                                    //  Loop finished with 0 items. We must submitList to remove all items. also i can't count on just submitting null to adapter
-                                    //  when swipe last item because last item maybe deleted by another user.
-                                    Log.d(TAG, "onChanged. Loop finished with 0 items. We must submitList to remove all");
-                                    items.clear();
-                                    mAdapter.submitList(items);
-                                }else{
-                                    Log.d(TAG, "onChanged. submitList= "+items.size());
-                                    mAdapter.submitList(items);
-                                }
-
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    };
-
-                    // submit task to threadpool:
-                    mItemDelayFuture = mExecutorService.submit(mRunnable);
-
+                    mAdapter.submitList(items);
                 }
             }
         }); // End of get itemPagedList//

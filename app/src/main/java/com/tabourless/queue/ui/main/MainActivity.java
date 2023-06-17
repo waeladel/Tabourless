@@ -16,7 +16,9 @@ import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
+import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
 import com.firebase.ui.auth.IdpResponse;
+import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.badge.BadgeDrawable;
@@ -38,6 +40,8 @@ import com.tabourless.queue.databinding.ToolbarBinding;
 import com.tabourless.queue.models.User;
 import com.tabourless.queue.ui.queues.QueuesFragmentDirections;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -179,6 +183,18 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    // Create an ActivityResultLauncher which registers a callback for the FirebaseUI Activity result contract
+    // See: https://developer.android.com/training/basics/intents/result
+    private final ActivityResultLauncher<Intent> signInLauncher = registerForActivityResult(
+            new FirebaseAuthUIActivityResultContract(),
+            new ActivityResultCallback<FirebaseAuthUIAuthenticationResult>() {
+                @Override
+                public void onActivityResult(FirebaseAuthUIAuthenticationResult result) {
+                    onSignInResult(result);
+                }
+            }
+    );
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -234,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "destination Label= "+ destination.getLabel()+ " currentUserId="+ currentUserId);
                 Log.d(TAG, "destination id= "+ destination.getId());
 
-                if(R.id.queues == destination.getId()){
+                /*if(R.id.queues == destination.getId()){
                     //showMenuItem();
                     mBinding.bottomNavView.setVisibility(View.VISIBLE);
                     //mBinding.bottomNavView.setSelectedItemId(R.id.places);
@@ -249,22 +265,23 @@ public class MainActivity extends AppCompatActivity {
                 }else{
                     //showMenuItem();
                     mBinding.bottomNavView.setVisibility(View.GONE);
-                }
+                }*/
 
-                // Hide toolbar in complete profile and message fragment
-                if(R.id.complete_profile == destination.getId()){
+                // Hide toolbar and bottom navigation in complete profile and message fragment
+                if(R.id.complete_profile == destination.getId() || R.id.messages == destination.getId()){
                     mToolbarBinding.toolbar.setVisibility(View.GONE);
-                }else if (R.id.messages == destination.getId()) {
-                    mToolbarBinding.toolbar.setVisibility(View.GONE);
-                } else{
-                    mToolbarBinding.toolbar.setVisibility(View.VISIBLE);
-                }
-
-                // To only pan window in message fragment without effecting edit and complete profile
-                if(R.id.messages == destination.getId()){
+                    mBinding.bottomNavView.setVisibility(View.GONE);
+                    // To only pan window in message fragment without effecting edit and complete profile
                     //getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+                }else if(R.id.customers == destination.getId()){
+                    mToolbarBinding.toolbar.setVisibility(View.VISIBLE);
+                    mBinding.bottomNavView.setVisibility(View.GONE);
                 }else{
+                    mToolbarBinding.toolbar.setVisibility(View.VISIBLE);
+                    mBinding.bottomNavView.setVisibility(View.VISIBLE);
+                    // To only pan window in message fragment without effecting edit and complete profile
                     getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+
                 }
 
                 // Only show save button in add or edit place
@@ -506,53 +523,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //Activity result after user selects a provider he wants to use
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == RC_SIGN_IN) {
-            IdpResponse response = IdpResponse.fromResultIntent(data);
-
-            Log.d(TAG, "requestCode ok:" + requestCode);
-
-            if (resultCode == RESULT_OK) {
-                // Successfully signed in
-                Log.d(TAG, "Sign in successfully:" + response);
-                isFirstloaded = true; // to add the Listener because it won't be added Automatically on onStart
-                mAuth.addAuthStateListener(mAuthListener); //
-                //finish();
-            } else {
-                // Sign in failed, check response for error code
-                // Sign in failed
-                if (response == null) {
-                    // User pressed back button
-                    //Toast.makeText(MainActivity.this, getString(R.string.sign_in_cancelled), Toast.LENGTH_LONG).show();
-                    Log.d(TAG, "Sign in has been cancelled. response is null");
-                    if(!isFirstloaded){
-                        finish();
-                    }
-                    return;
-                }
-
-                if (ErrorCodes.NO_NETWORK == response.getError().getErrorCode()) {
-                    Log.d(TAG, "No internet connection:" + response);
-
-                    Toast.makeText(MainActivity.this, getString(R.string.no_internet_connection),
-                            Toast.LENGTH_LONG).show();
-                    return;
-                }
-
-                Log.d(TAG, "Unknown error occurred:" + response);
-
-                Toast.makeText(MainActivity.this, getString(R.string.unknown_error),
-                        Toast.LENGTH_LONG).show();
-
-                Log.e(TAG, "Sign-in error: ", response.getError());
-            }
-        }
-    }
-
     private void initiateLogin() {
 
         List<AuthUI.IdpConfig> providers;
@@ -561,7 +531,7 @@ public class MainActivity extends AppCompatActivity {
             // Choose authentication providers
             providers = Arrays.asList(
                     new AuthUI.IdpConfig.EmailBuilder().build(),
-                    new AuthUI.IdpConfig.FacebookBuilder().build(),
+                    //new AuthUI.IdpConfig.FacebookBuilder().build(),
                     new AuthUI.IdpConfig.TwitterBuilder().build(),
                     new AuthUI.IdpConfig.GoogleBuilder().build());
 
@@ -570,24 +540,62 @@ public class MainActivity extends AppCompatActivity {
             // Choose authentication providers
             providers = Arrays.asList(
                     new AuthUI.IdpConfig.EmailBuilder().build(),
-                    new AuthUI.IdpConfig.FacebookBuilder().build(),
+                    //new AuthUI.IdpConfig.FacebookBuilder().build(),
                     new AuthUI.IdpConfig.GoogleBuilder().build());
         }
 
         // Create and launch sign-in intent
-        startActivityForResult(
-                AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAvailableProviders(providers)
-                        .setLogo(R.mipmap.ic_launcher)      // Set logo drawable
-                        .setAlwaysShowSignInMethodScreen(true)
-                        .setTheme(R.style.Background_FirebaseUI)      // Set theme
-                        .setTosAndPrivacyPolicyUrls("https://sites.google.com/view/tabourless/terms-of-service","https://sites.google.com/view/tabourless/privacy-policy")
-                        .build(),
-                RC_SIGN_IN);
+        Intent signInIntent = AuthUI.getInstance()
+                .createSignInIntentBuilder()
+                .setAvailableProviders(providers)
+                .setLogo(R.mipmap.ic_launcher)      // Set logo drawable
+                .setAlwaysShowSignInMethodScreen(true)
+                .setTheme(R.style.Background_FirebaseUI)      // Set theme
+                .setTosAndPrivacyPolicyUrls("https://sites.google.com/view/tabourless/terms-of-service","https://sites.google.com/view/tabourless/privacy-policy")
+                .build();
+        signInLauncher.launch(signInIntent);
+
 
         isFirstloaded = false;
 
+    }
+
+    private void onSignInResult(FirebaseAuthUIAuthenticationResult result) {
+
+        IdpResponse response = result.getIdpResponse();
+        Log.d(TAG, "onSignInResult: requestCode ok:" + result.getResultCode());
+
+        if (result.getResultCode() == RESULT_OK) {
+            // Successfully signed in
+            //FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            Log.d(TAG, "onSignInResult: Sign in successfully:" + response);
+            isFirstloaded = true; // to add the Listener because it won't be added Automatically on onStart
+            mAuth.addAuthStateListener(mAuthListener); //
+            //finish();
+        } else {
+            // Sign in failed. If response is null the user canceled the
+            // sign-in flow using the back button. Otherwise check
+            // response.getError().getErrorCode() and handle the error.
+            if (response == null) {
+                // User pressed back button
+                Log.d(TAG, "onSignInResult: Sign in has been cancelled. response is null");
+                if(!isFirstloaded){
+                    finish();
+                }
+                return;
+            }
+
+            initiateLogin(); // App failed to login,  display login options again
+
+            if (ErrorCodes.NO_NETWORK == response.getError().getErrorCode()) {
+                Log.d(TAG, "onSignInResult: No internet connection:" + response);
+                Toast.makeText(MainActivity.this, getString(R.string.no_internet_connection), Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            Log.d(TAG, "onSignInResult: Unknown error occurred:" + response + " error= "+response.getError());
+            Toast.makeText(MainActivity.this, getString(R.string.unknown_error), Toast.LENGTH_LONG).show();
+        }
     }
 
     // start observation for Notifications count

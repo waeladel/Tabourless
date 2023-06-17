@@ -10,6 +10,7 @@ import androidx.fragment.app.DialogFragment;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.tabourless.queue.R;
+import com.tabourless.queue.interfaces.ItemClickListener;
 
 public class ExplainPermissionAlertFragment extends DialogFragment {
     private final static String TAG = ExplainPermissionAlertFragment.class.getSimpleName();
@@ -19,6 +20,7 @@ public class ExplainPermissionAlertFragment extends DialogFragment {
 
     private static final int MY_PERMISSION_REQUEST_CODE = 7000;
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 7001;
+    private static ItemClickListener itemClickListen;
 
     private ExplainPermissionAlertFragment(Activity activity) {
         // Empty constructor is required for DialogFragment
@@ -27,8 +29,9 @@ public class ExplainPermissionAlertFragment extends DialogFragment {
         this.activity = activity;
     }
 
-    public static ExplainPermissionAlertFragment newInstance(Activity activity) {
+    public static ExplainPermissionAlertFragment newInstance(Activity activity, ItemClickListener itemClickListener) {
 
+        itemClickListen = itemClickListener;
         ExplainPermissionAlertFragment fragment = new ExplainPermissionAlertFragment(activity);
         Bundle args = new Bundle();
         //args.putParcelableArrayList(PRIVET_CONTACTS_KEY, privateContacts);
@@ -54,10 +57,11 @@ public class ExplainPermissionAlertFragment extends DialogFragment {
             public void onClick(DialogInterface dialog, int which) {
                 // on success
                 // Request the permission
-                ActivityCompat.requestPermissions(activity,
-                        new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION,
-                                android.Manifest.permission.ACCESS_FINE_LOCATION},
-                        MY_PERMISSION_REQUEST_CODE);
+                //ActivityCompat.requestPermissions(activity, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION_REQUEST_CODE);
+                if(itemClickListen != null){
+                    // trigger click event when yes is selected
+                    itemClickListen.onClick(null, 6, false);
+                }
             }
         }).setNegativeButton(R.string.user_confirm_dialog_negative, new DialogInterface.OnClickListener() {
             @Override

@@ -114,6 +114,12 @@ public class MessagesViewModel extends ViewModel {
         messagesDataFactory.setScrollDirection(scrollDirection, lastVisibleItem);
     }
 
+    // To only update message's seen when user is opening the message's tap
+    public void setSeeing(boolean isSeeing) {
+        Log.d(TAG, "NotificationsViewModel set seeing= "+isSeeing);
+        // Remove all listeners when fragment is paused so it doesn't update seen filed to true for notifications that user is not watching in fact
+        messagesDataFactory.setSeeing(isSeeing);
+    }
 
     public void getLastMessageOnce(String chatId, FirebaseMessageCallback  callback) {
         messagesRepository.getLastMessageOnce(chatId, callback);

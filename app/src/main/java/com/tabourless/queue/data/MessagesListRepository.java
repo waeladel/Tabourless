@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.paging.DataSource;
 import androidx.paging.ItemKeyedDataSource;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -87,6 +88,9 @@ public class MessagesListRepository {
     private static int mLastVisibleItem;
 
     private boolean isChatRead;
+
+    private boolean isSeeing;
+    private static Map<String, Object> updateSeenMap;
 
     private ValueEventListener afterMessagesListener = new ValueEventListener() {
         @Override
@@ -219,7 +223,7 @@ public class MessagesListRepository {
 
     //private Query getMessagesQuery;
 
-    public MessagesListRepository(String chatKey, @NonNull DataSource.InvalidatedCallback onInvalidatedCallback){
+    public MessagesListRepository(String chatKey, boolean seeing, @NonNull DataSource.InvalidatedCallback onInvalidatedCallback){
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
         // use received chatKey to create a database ref
         mMessagesRef = mDatabaseRef.child(DATABASE_REF_MESSAGES).child(chatKey);
@@ -236,6 +240,14 @@ public class MessagesListRepository {
         isInitialFirstLoaded =  true;
         isAfterFirstLoaded = true;
         isBeforeFirstLoaded = true;
+
+        // When we first load isSeeing is true to update seeing fields in fetched notifications to true but then
+        // isSeeing should be updated from notification fragment based on it's onResume and OnStop
+        // if fragment stopped it should be false so we don't update seen field, when its resumed it should be true to update seen field
+        isSeeing = seeing;
+
+        // to hold all notifications that their seen field need to be updated
+        updateSeenMap = new HashMap<>();
 
         Log.d(TAG, "MessagesListRepository init. isInitialFirstLoaded= " + isInitialFirstLoaded+ " after= "+isAfterFirstLoaded + " before= "+isBeforeFirstLoaded);
 
@@ -283,6 +295,25 @@ public class MessagesListRepository {
         Log.d(TAG, "mScrollDirection = " + scrollDirection+ " lastVisibleItem= "+ lastVisibleItem);
         mScrollDirection = scrollDirection;
         mLastVisibleItem = lastVisibleItem;
+    }
+
+    // To only update massages' seen when user is opening the massage's tap
+    public void setSeeing (boolean seeing) {
+        isSeeing = seeing;
+        Log.d(TAG, "setSeeing function called. isSeeing: "+ isSeeing);
+        // Update seen messages
+        if(updateSeenMap.size() > 0){
+            Log.d(TAG, "setSeeing function called. updating updateSeenMap because it's size is > 0");
+            //Update seen messages
+            mDatabaseRef.updateChildren(updateSeenMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void unused) {
+                    Log.d(TAG, "setSeeing function called. updateSeenMap onSuccess. clearing updateSeenMap after pushing seeing updateSeenMap do database. size before clear= "+ updateSeenMap.size() + " isSeeing= "+ isSeeing);
+                    updateSeenMap.clear();
+                }
+            });
+
+        }
     }
 
     /*public static MessagesListRepository getInstance() {
@@ -340,19 +371,11 @@ public class MessagesListRepository {
                 if (dataSnapshot.exists()) {
                     final List<Message> messagesList = new ArrayList<>();
 
-                    // Create a map for all seen messages need to be updated
-                    Map<String, Object> updateMap = new HashMap<>();
                     // loop throw users value
                     for (DataSnapshot snapshot: dataSnapshot.getChildren()){
                         Message message = snapshot.getValue(Message.class);
                         if (message != null) {
                             message.setKey(snapshot.getKey());
-
-                            /*// Add only seen messages by current user to seenItemsList
-                            // If current user is not the sender, the other user is seeing this message
-                            if(null != message.getSenderId() && !message.getSenderId().equals(currentUserId)){
-                                seenItemsList.add(message);
-                            }*/
 
                             // Add only seen messages by current user to seenItemsList
                             // If current user is not the sender, the other user is seeing this message
@@ -364,19 +387,29 @@ public class MessagesListRepository {
                         messagesList.add(message);
                         // Add messages to totalItemsList ArrayList to be used to get the initial key position
                         totalItemsList.add(message);
-
-                        //Log.d(TAG, "mama getMessage = "+ message.getMessage()+" getSnapshotKey= " +  snapshot.getKey());
                     }
 
-                    // Update seen messages
-                    if(isChatRead){
-                        // Update chats member read
-                        updateMap.put(DATABASE_REF_USER_CHATS +"/"+  currentUserId +"/"+ chatKey +"/"+  DATABASE_REF_CHATS_MEMBERS +"/"+ currentUserId +"/"+ DATABASE_REF_CHATS_MEMBER_READ+"/" , true);
-                        updateMap.put(DATABASE_REF_CHATS +"/"+  chatKey +"/"+ DATABASE_REF_CHATS_MEMBERS +"/"+  currentUserId +"/"+ DATABASE_REF_CHATS_MEMBER_READ+"/" , true);
+                    // Update seen chat only as we don't have seen messages her like in Basbes app
+                    Log.d(TAG, "initialListener: SeenMap size= "+ updateSeenMap.size() + " isSeeing= "+ isSeeing);
 
-                       /* // Update seen chats count
-                        updateMap.put("/counts/" + currentUserId + "/chats/" + chatKey, null);*/
-                        mDatabaseRef.updateChildren(updateMap);
+                    if(isChatRead){
+                        Log.d(TAG, "initialListener: put read chat to updateSeenMap. updateSeenMap size= "+ updateSeenMap.size() + " isSeeing= "+ isSeeing);
+                        // put read chats into updateSeenMap so we update database when on fragment resume or stop or right now on invalidate
+                        updateSeenMap.put(DATABASE_REF_USER_CHATS +"/"+  currentUserId +"/"+ chatKey +"/"+  DATABASE_REF_CHATS_MEMBERS +"/"+ currentUserId +"/"+ DATABASE_REF_CHATS_MEMBER_READ+"/" , true);
+                        updateSeenMap.put(DATABASE_REF_CHATS +"/"+  chatKey +"/"+ DATABASE_REF_CHATS_MEMBERS +"/"+  currentUserId +"/"+ DATABASE_REF_CHATS_MEMBER_READ+"/" , true);
+
+                        if(isSeeing){
+                            // We already push updateSeenMap to the database when fragment stops and resume but we need to Update seen messages hear too
+                            // just in case an invalidate happens while the user is seeing by currently opening messages tap
+                            mDatabaseRef.updateChildren(updateSeenMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    Log.d(TAG, "initialListener: clearing updateSeenMap after pushing updateSeenMap do database. size before clear= "+ updateSeenMap.size() + " isSeeing= "+ isSeeing);
+                                    updateSeenMap.clear();
+                                }
+                            });
+                        }
+
                     }
 
                     printTotalItems();
@@ -510,7 +543,7 @@ public class MessagesListRepository {
 
         Log.d(TAG, "getMessagesAfter. AfterKey= " + key);
         afterMessagesQuery = mMessagesRef.orderByKey()
-                            .startAt(key)
+                            .startAfter(key)
                             .limitToFirst(size);
 
         afterMessagesQuery.addValueEventListener(afterMessagesListener);
@@ -529,7 +562,7 @@ public class MessagesListRepository {
         Query beforeMessagesQuery;
 
         beforeMessagesQuery = mMessagesRef.orderByKey()
-                                .endAt(key)
+                                .endBefore(key)
                                 .limitToLast(size);
 
         beforeMessagesQuery.addValueEventListener(beforeMessagesListener);

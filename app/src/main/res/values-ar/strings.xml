@@ -80,7 +80,6 @@
     <string name="add_place_counter_title">اسم الشباك*</string>
     <string name="add_place_counter_hint">الرئيسي، شباك أ، شباك كبار السن</string>
     <string name="add_place_counter_helper">في حالة عدم وجود لافتة للشباك، اختر أسماء مثل (شباك أ، ب) بدلا من (1، 2) لتوضيح أن الشبابيك مسماه من اليمن لليسار. لو ترى شباك يقدم خدمة لأكثر من طابور، أضف شباكا منفصلا لكل طابور.</string>
-    <string name="customer_number_title" translatable="false">#:</string>
     <string name="queue_info_current_number">الرقم الحالي: %1$d</string>
     <string name="queue_info_your_number">رقمك: %1$d</string>
     <string name="queue_info_ahead_customers_more_less">العملاء أمامك: %1$d أو أقل</string>
@@ -88,10 +87,13 @@
     <string name="queue_info_total_customers">إجمالي العملاء: %1$d</string>
     <string name="queue_info_expected_waiting">الانتظار المتوقع: %1$s</string>
     <string name="queue_info_average_waiting">متوسط الانتظار: %1$s</string>
-    <string name="queue_info_service_time">الخدمة تستغرق: %1$s</string>
+    <string name="queue_info_service_time">الخدمة تستغرق حوالي: %1$s</string>
 
     <string name="report_dialog_title">هل تود الإبلاغ عن المستخدم؟</string>
     <string name="report_dialog_message">إذا كان شخص ما يواجه خطرًا مباشرًا، فاتصل بخدمة الطوارئ المحلية فورًا. \ n \ n الرجاء تحديد سبب الإبلاغ عن هذا المستخدم أو المحتوى، لن نسمح للشخص بمعرفة هوية من أبلغ عنه.</string>
+    <string name="allow_notification_title">السماح بالتنبيهات</string>
+    <string name="allow_notification_message">يحتاج التطبيق إذن التنبيهات لكي نرسل لك تنبيها عندما يحين دورك في الطابور، أو عندما تصلك رسالة.</string>
+    <string name="notification_settings_message">يحتاج التطبيق إذن التنبيهات لكي نرسل لك تنبيها عندما يحين دورك في الطابور، أو عندما تصلك رسالة. \ n \ n هل تريد الذهاب إلى الإعدادات لكي تسمح بالتنبيهات؟</string>
 
     <!--toast and error messages -->
     <string name="sign_in_cancelled">تم إلغاء تسجيل الدخول</string>

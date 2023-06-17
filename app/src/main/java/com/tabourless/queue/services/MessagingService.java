@@ -35,6 +35,8 @@ import com.google.firebase.storage.StorageReference;
 import com.tabourless.queue.App;
 import com.tabourless.queue.GlideApp;
 import com.tabourless.queue.R;
+import com.tabourless.queue.Utils.CheckPermissions;
+
 import static com.tabourless.queue.App.DIRECTION_ARGUMENTS_KEY_CHAT_ID;
 import static com.tabourless.queue.App.DIRECTION_ARGUMENTS_KEY_CHAT_USER_ID;
 import static com.tabourless.queue.App.DIRECTION_ARGUMENTS_KEY_IS_GROUP;
@@ -103,6 +105,12 @@ public class MessagingService extends FirebaseMessagingService {
         super.onMessageReceived(remoteMessage);
         Log.d(TAG, "onMessageReceived. remoteMessage= " + remoteMessage);
 
+        // Starting from Api 33 we must grant post notification permission at run time to be able to send notifications
+        // lets check if permission is granted or if the user had disabled notifications for this app
+        if(!CheckPermissions.isNotificationGrantedEnabled(MessagingService.this)){
+            Log.d(TAG, "onMessageReceived. notification permission is not granted or notification is disabled");
+            return;
+        }
         //String notificationTitle = remoteMessage.getNotification().
         //RemoteMessage.DatabaseNotification notification =  remoteMessage.getNotification();
         Log.d(TAG, "onMessageReceived. remoteMessage From= " + remoteMessage.getFrom());
@@ -220,7 +228,7 @@ public class MessagingService extends FirebaseMessagingService {
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(MessagingService.this, channelId)
                 //.setLargeIcon(bitmap)
                 //.setSmallIcon(R.mipmap.ic_launcher)
-                .setSmallIcon(R.mipmap.ic_notification)
+                .setSmallIcon(R.drawable.ic_notification)
                 .setColor(getResources().getColor(R.color.colorPrimary))
                 .setContentTitle(messageTitle)
                 .setContentText(messageBody)

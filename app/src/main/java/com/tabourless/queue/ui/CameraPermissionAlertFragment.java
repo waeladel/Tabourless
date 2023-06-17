@@ -17,8 +17,6 @@ import com.tabourless.queue.interfaces.ItemClickListener;
 public class CameraPermissionAlertFragment extends DialogFragment {
     private final static String TAG = CameraPermissionAlertFragment.class.getSimpleName();
 
-    private static final int REQUEST_STORAGE_PERMISSIONS_CODE = 124;
-
     private Context mActivityContext;
     private Activity activity;
     private static Context sContext;

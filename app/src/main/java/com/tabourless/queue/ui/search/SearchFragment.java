@@ -5,13 +5,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
-import android.content.res.ColorStateList;
 import android.location.Location;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
@@ -50,17 +51,17 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.chip.Chip;
-import com.google.android.material.chip.ChipDrawable;
 import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.tabourless.queue.R;
+import com.tabourless.queue.Utils.CheckPermissions;
 import com.tabourless.queue.databinding.ChipItemBinding;
 import com.tabourless.queue.databinding.FragmentSearchBinding;
 import com.tabourless.queue.interfaces.FirebaseOnCompleteCallback;
 import com.tabourless.queue.interfaces.FirebaseUserCallback;
 import com.tabourless.queue.interfaces.FirebaseUserQueueCallback;
+import com.tabourless.queue.interfaces.ItemClickListener;
 import com.tabourless.queue.models.Counter;
 import com.tabourless.queue.models.Customer;
 import com.tabourless.queue.models.Place;
@@ -71,22 +72,12 @@ import com.tabourless.queue.models.UserQueue;
 import com.tabourless.queue.ui.DeniedPermissionAlertFragment;
 import com.tabourless.queue.ui.ExplainPermissionAlertFragment;
 
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
-import static com.tabourless.queue.App.COUNTER_SPINNER_AGE_OLD;
-import static com.tabourless.queue.App.COUNTER_SPINNER_AGE_YOUNG;
-import static com.tabourless.queue.App.COUNTER_SPINNER_DISABILITY_ABLED;
-import static com.tabourless.queue.App.COUNTER_SPINNER_DISABILITY_DISABLED;
-import static com.tabourless.queue.App.COUNTER_SPINNER_GENDER_FEMALE;
-import static com.tabourless.queue.App.COUNTER_SPINNER_GENDER_MALE;
 import static com.tabourless.queue.App.CUSTOMER_STATUS_WAITING;
 import static com.tabourless.queue.App.isUserOnline;
-import static com.tabourless.queue.Utils.DatabaseHelper.getMatchedCounters;
 import static com.tabourless.queue.Utils.DatabaseHelper.isMatchedCountersExist;
 
 
@@ -96,7 +87,8 @@ import static com.tabourless.queue.Utils.DatabaseHelper.isMatchedCountersExist;
 public class SearchFragment extends Fragment implements OnMapReadyCallback
         , GoogleMap.OnMapLongClickListener
         , GoogleMap.OnMapClickListener
-        , GoogleMap.OnInfoWindowClickListener, GoogleMap.OnCameraIdleListener, GoogleMap.OnMarkerClickListener {
+        , GoogleMap.OnInfoWindowClickListener, GoogleMap.OnCameraIdleListener
+        , GoogleMap.OnMarkerClickListener, ItemClickListener {
     
     private final static String TAG = SearchFragment.class.getSimpleName();
     private FirebaseUser mFirebaseCurrentUser;
@@ -129,6 +121,11 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
     private static final int MAX_WAIT_TIME  = 20 * 60 * 1000;
     private static final long EXPIRATION_DURATION = 30 * 60 * 1000L;
     private static final int DISPLACEMENT = 10;
+
+    private final String[] PERMISSIONS = {
+            android.Manifest.permission.ACCESS_COARSE_LOCATION,
+            android.Manifest.permission.ACCESS_FINE_LOCATION,
+    };
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -185,6 +182,15 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
 
         Log.d(TAG, "onCreateView: ");
 
+        // disable addQueueButton if location permission is not granted
+        if(checkLocationPermissions()){
+            mBinding.addQueueButton.setEnabled(true);
+            mBinding.addQueueButton.setClickable(true);
+        }else{
+            mBinding.addQueueButton.setEnabled(false);
+            mBinding.addQueueButton.setClickable(false);
+
+        }
         // change icon of add place FAB
         if(null != mViewModel.getAddPlaceMarker()){
             mBinding.addQueueButton.setImageResource(R.drawable.ic_select_this_location_24px);
@@ -353,7 +359,7 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
         Log.d(TAG, "onMapReady: = "+ googleMap);
         if(googleMap != null){
             mViewModel.setMap(googleMap);
-            if(checkPermissions() && isGooglePlayServicesAvailable()) {
+            if(checkLocationPermissions() && isGooglePlayServicesAvailable()) {
                 mViewModel.getMap().setMyLocationEnabled(true);
                 mViewModel.getMap().getUiSettings().setMyLocationButtonEnabled(true);
                 mViewModel.getMap().setIndoorEnabled(true);
@@ -678,6 +684,9 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
 
     // To add customer to queue
     private void bookQueue(final UserQueue selectedQueue) {
+        // Starting from Api 33 we must grant post notification permission at run time to be able to send notifications
+        CheckPermissions.checkNotificationPermission(getContext());
+
         // Get current user once, to get currentUser's name and avatar for notifications
         mViewModel.getUserOnce(mCurrentUserId, new FirebaseUserCallback() {
             @Override
@@ -740,39 +749,39 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
 
     }
 
-    private boolean checkPermissions() {
-        if (ActivityCompat.checkSelfPermission(mContext, android.Manifest.permission.ACCESS_COARSE_LOCATION)== PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(mContext, android.Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED) {
+    private boolean checkLocationPermissions() {
+        if (ContextCompat.checkSelfPermission(mContext, android.Manifest.permission.ACCESS_COARSE_LOCATION)== PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(mContext, android.Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED) {
             return true;
         } else {
-            requestPermissions();
+            requestLocationPermissions();
             return false;
         }
     }
 
-    private void requestPermissions() {
+    private void requestLocationPermissions() {
 
         // Permission has not been granted and must be requested.
-        if (ActivityCompat.shouldShowRequestPermissionRationale(mActivity,
-                android.Manifest.permission.ACCESS_COARSE_LOCATION ) || ActivityCompat.shouldShowRequestPermissionRationale(mActivity,
-                android.Manifest.permission.ACCESS_FINE_LOCATION)) {
+        if (shouldShowRequestPermissionRationale(android.Manifest.permission.ACCESS_COARSE_LOCATION )
+                || shouldShowRequestPermissionRationale(android.Manifest.permission.ACCESS_FINE_LOCATION)) {
             // Provide an additional rationale to the user if the permission was not granted
             // and the user would benefit from additional context for the use of the permission.
             showExplainDialog();
-
         } else {
             // No explanation needed; request the permission
             // Request the permission. The result will be received in onRequestPermissionResult().
-            ActivityCompat.requestPermissions(mActivity,
+            multiplePermissionLauncher.launch(PERMISSIONS);
+
+            /*ActivityCompat.requestPermissions(mActivity,
                     new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION,
                             android.Manifest.permission.ACCESS_FINE_LOCATION},
-                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);*/
         }
 
     }
 
     private void showExplainDialog() {
-        ExplainPermissionAlertFragment explainFragment = ExplainPermissionAlertFragment.newInstance(mActivity);
+        ExplainPermissionAlertFragment explainFragment = ExplainPermissionAlertFragment.newInstance(mActivity, this);
         if(getParentFragmentManager() != null) {
             explainFragment.show(getParentFragmentManager(), EXPLAIN_PERMISSION_ALERT_FRAGMENT);
         }
@@ -821,7 +830,7 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
     private void getLastLocation() {
 
         Log.d(TAG, "getLastLocation is on");
-        if(checkPermissions() && isGooglePlayServicesAvailable()){
+        if(checkLocationPermissions() && isGooglePlayServicesAvailable()){
             mFusedLocationClient = getFusedLocationProviderClient(mActivity);
 
             mFusedLocationClient.getLastLocation()
@@ -858,7 +867,7 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
     }
 
     private void getLocationUpdates() {
-        if(checkPermissions() && isGooglePlayServicesAvailable()) {
+        if(checkLocationPermissions() && isGooglePlayServicesAvailable()) {
             // Create the location request to start receiving updates
             mLocationRequest = new LocationRequest();
             mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -907,18 +916,20 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
 
     }
 
-    @Override
+   /*@Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        Log.d(TAG, "onRequestPermissionsResult: grantResults.length= "+grantResults.length +" grantResults= "+ grantResults[0]);
         switch (requestCode) {
             case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
-                Log.d(TAG, "onRequestPermissionsResult: grantResults.length= "+grantResults.length
-                        +"grantResults= "+ grantResults[0]);
+
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay! Do the
                     // init task you need to do.
                     if(isGooglePlayServicesAvailable()) {
+                        mBinding.addQueueButton.setEnabled(true);
+                        mBinding.addQueueButton.setClickable(true);
                         getLastLocation();
                         //startLocationUpdates();
                     }
@@ -934,9 +945,35 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
             }
 
         }
-    }
+    }*/
 
-    // listen if user enabled location or kept it disabled
+    // Register the permissions callback, which handles the user's response to the
+    // system permissions dialog. Save the return value, an instance of
+    // ActivityResultLauncher, as an instance variable.
+    private final ActivityResultLauncher<String[]> multiplePermissionLauncher
+            = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), isGranted -> {
+        Log.d(TAG, "Launcher result: " + isGranted.toString());
+        if(!isGranted.isEmpty()){
+            if (isGranted.containsValue(false)) {
+                Log.d(TAG, "At least one of the permissions was not granted");
+                // permission denied, boo! Disable the functionality that depends on this permission.
+                mBinding.addQueueButton.setEnabled(false);
+                mBinding.addQueueButton.setClickable(false);
+                showDeniedDialog();
+            }else if(isGranted.containsValue(true)){
+                Log.d(TAG, "Launcher result is granted ");
+                // permission was granted, yay! Do the task you need to do.
+                if(isGooglePlayServicesAvailable()) {
+                    mBinding.addQueueButton.setEnabled(true);
+                    mBinding.addQueueButton.setClickable(true);
+                    getLastLocation();
+                    //startLocationUpdates();
+                }
+            }
+        }
+
+    });
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -945,6 +982,17 @@ public class SearchFragment extends Fragment implements OnMapReadyCallback
                 // User enabled location, lets get his location again
                 getLastLocation();
             }
+        }
+    }
+
+    @Override
+    public void onClick(View view, int position, boolean isLongClick) {
+        switch (position) {
+            case 6:
+                // block is clicked
+                Log.i(TAG, "request location permission is clicked");
+                multiplePermissionLauncher.launch(PERMISSIONS);
+                break;
         }
     }
 }

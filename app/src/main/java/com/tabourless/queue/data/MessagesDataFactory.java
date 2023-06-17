@@ -25,6 +25,11 @@ public class MessagesDataFactory extends DataSource.Factory<String, Message>{
         messagesDataSource.setScrollDirection(scrollDirection, lastVisibleItem);
     }
 
+    // To only update message's seen when user is opening the message's tap
+    public void setSeeing (boolean seeing) {
+        messagesDataSource.setSeeing(seeing);
+    }
+
     public void removeListeners() {
         messagesDataSource.removeListeners();
     }

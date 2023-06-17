@@ -150,7 +150,7 @@ public class InboxAdapter extends PagedListAdapter<Chat, InboxAdapter.ViewHolder
                                 // Normal text
                                 Log.d(TAG, "currentMember=" + currentMember.getName() + " isRead= "+ currentMember.isRead() + " message= "+ chat.getLastMessage() );
                                 holder.mBinding.lastMessage.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
-                                holder.mBinding.lastMessage.setTextColor(fragment.getResources().getColor(R.drawable.my_color_on_surface_emphasis_medium_trype));
+                                holder.mBinding.lastMessage.setTextColor(fragment.getResources().getColor(R.drawable.my_color_on_surface_emphasis_medium_type));
                                 //holder.mLastMessage.setTextAppearance(App.getContext(), R.style.TextAppearance_MyTheme_Body2);
                                 //holder.mLastMessage.setTextColor(App.getContext().getResources().getColor(R.color.color_on_background));
                                 //holder.mLastMessage.setAlpha(0.54f);
@@ -345,8 +345,8 @@ public class InboxAdapter extends PagedListAdapter<Chat, InboxAdapter.ViewHolder
 
         @Override
         public void onClick(View view) {
-            if(itemClickListener != null && getAdapterPosition() != RecyclerView.NO_POSITION){
-                itemClickListener.onClick(view, getAdapterPosition(), false);
+            if(itemClickListener != null && getBindingAdapterPosition() != RecyclerView.NO_POSITION){
+                itemClickListener.onClick(view, getBindingAdapterPosition(), false);
             }
         }
 

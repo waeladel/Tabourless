@@ -12,12 +12,12 @@
         android:layout_height="0dp"
         android:contentDescription="@string/cover_image_description"
         android:scaleType="centerCrop"
-        android:tint="@color/transparent_edit_image"
         app:layout_constraintBottom_toBottomOf="@id/divider"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_picture_gallery" />
+        app:srcCompat="@drawable/ic_picture_gallery"
+        app:tint="@color/transparent_edit_image" />
 <!--app:layout_constraintDimensionRatio="2:1"-->
 
     <de.hdodenhof.circleimageview.CircleImageView

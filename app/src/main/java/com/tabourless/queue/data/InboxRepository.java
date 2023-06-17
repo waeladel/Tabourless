@@ -430,7 +430,7 @@ public class InboxRepository {
 
         afterQuery = mChatsRef
                 .orderByChild(DATABASE_REF_CHAT_LAST_SENT)
-                .startAt(key)
+                .startAfter(key)
                 .limitToFirst(size);
 
         afterQuery.addValueEventListener(afterListener);
@@ -451,7 +451,7 @@ public class InboxRepository {
 
         beforeQuery = mChatsRef
                 .orderByChild(DATABASE_REF_CHAT_LAST_SENT)
-                .endAt(key)
+                .endBefore(key)
                 .limitToLast(size);
 
         beforeQuery.addValueEventListener(beforeListener);

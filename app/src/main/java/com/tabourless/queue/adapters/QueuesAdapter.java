@@ -1,7 +1,5 @@
 package com.tabourless.queue.adapters;
 
-import android.graphics.Typeface;
-import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,9 +8,6 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.NavDirections;
-import androidx.navigation.Navigation;
 import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
@@ -103,15 +98,15 @@ public class QueuesAdapter extends PagedListAdapter<UserQueue, QueuesAdapter.Vie
                         case CUSTOMER_STATUS_NEXT:
                             holder.mBinding.numberValue.setBackgroundResource(R.drawable.text_rounded_background_next);
                             //holder.mBinding.numberValue.setTextColor(ContextCompat.getColor(mContext, R.color.color_on_surface_emphasis_medium));
-                            holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_medium_trype);
+                            holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_medium_type);
                             break;
                         case CUSTOMER_STATUS_FRONT:
                             holder.mBinding.numberValue.setBackgroundResource(R.drawable.text_rounded_background_front);
-                            holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_medium_trype);
+                            holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_medium_type);
                             break;
                         case CUSTOMER_STATUS_AWAY:
                             holder.mBinding.numberValue.setBackgroundResource(R.drawable.text_rounded_background_away);
-                            holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_disabled_trype);
+                            holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_disabled_type);
                             break;
                         default:
                             // default is waiting
@@ -124,7 +119,7 @@ public class QueuesAdapter extends PagedListAdapter<UserQueue, QueuesAdapter.Vie
                     // booking ended
                     holder.mBinding.joinedTimeValue.setText(R.string.joined_time_ended);
                     holder.mBinding.numberValue.setBackgroundResource(R.drawable.text_rounded_background_away);
-                    holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_disabled_trype);
+                    holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_disabled_type);
                 }
             }else{
                 holder.mBinding.joinedTimeValue.setText(null);
@@ -203,8 +198,8 @@ public class QueuesAdapter extends PagedListAdapter<UserQueue, QueuesAdapter.Vie
 
         @Override
         public void onClick(View view) {
-            if(itemClickListener != null && getAdapterPosition() != RecyclerView.NO_POSITION){
-                itemClickListener.onClick(view, getAdapterPosition(), false);
+            if(itemClickListener != null && getBindingAdapterPosition() != RecyclerView.NO_POSITION){
+                itemClickListener.onClick(view, getBindingAdapterPosition(), false);
             }
         }
     }

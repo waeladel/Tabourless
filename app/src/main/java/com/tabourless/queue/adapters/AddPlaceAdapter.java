@@ -197,9 +197,9 @@ public class AddPlaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             mQueueBinding.addMoreCounters.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //itemClickListener.onClick(v, getAdapterPosition(), false);
-                    //Queue mQueueItem = placeItemsList.get(getAdapterPosition()).getQueue();
-                    CountersDialogFragment dialogFragment = CountersDialogFragment.newInstance(new Counter(), getAdapterPosition(), AddPlaceAdapter.this);
+                    //itemClickListener.onClick(v, getBindingAdapterPosition(), false);
+                    //Queue mQueueItem = placeItemsList.get(getBindingAdapterPosition()).getQueue();
+                    CountersDialogFragment dialogFragment = CountersDialogFragment.newInstance(new Counter(), getBindingAdapterPosition(), AddPlaceAdapter.this);
                     if (mFragment.getParentFragmentManager() != null) {
                         dialogFragment.show(mFragment.getParentFragmentManager(), COUNTER_DIALOG_FRAGMENT_TAG);
                     }
@@ -211,7 +211,7 @@ public class AddPlaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             mQueueBinding.deleteServiceButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    itemClickListener.onClick(v, getAdapterPosition(), false);
+                    itemClickListener.onClick(v, getBindingAdapterPosition(), false);
                 }
             });
 
@@ -227,15 +227,15 @@ public class AddPlaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
                 @Override
                 public void afterTextChanged(Editable editable) {
-                    Log.d(TAG, "Editable Name= "+ editable.toString()+ " position= "+getAdapterPosition()+ " key= "+placeItemsList.get(getAdapterPosition()).getName());
+                    Log.d(TAG, "Editable Name= "+ editable.toString()+ " position= "+getBindingAdapterPosition()+ " key= "+placeItemsList.get(getBindingAdapterPosition()).getName());
 
-                    Queue mQueueItem = placeItemsList.get(getAdapterPosition()).getQueue();
+                    Queue mQueueItem = placeItemsList.get(getBindingAdapterPosition()).getQueue();
 
                     if(TextUtils.isEmpty((String.valueOf(editable).trim()))){
                         // It's empty string, delete existing value
                         mQueueItem.setName(null);
-                        placeItemsList.get(getAdapterPosition()).setQueue(mQueueItem);
-                        placeItemsList.get(getAdapterPosition()).setValue(null); // to save service name input text
+                        placeItemsList.get(getBindingAdapterPosition()).setQueue(mQueueItem);
+                        placeItemsList.get(getBindingAdapterPosition()).setValue(null); // to save service name input text
 
                         // set ViewModel queues values to use it in saving and when rotating the device
                         mPlaceQueuesMap.put(mQueueItem.getKey(), mQueueItem);
@@ -245,8 +245,8 @@ public class AddPlaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     }else{
                         // It's not empty string, save value
                         mQueueItem.setName(editable.toString());
-                        placeItemsList.get(getAdapterPosition()).setQueue(mQueueItem);
-                        placeItemsList.get(getAdapterPosition()).setValue(String.valueOf(editable).trim());// to save service name input text
+                        placeItemsList.get(getBindingAdapterPosition()).setQueue(mQueueItem);
+                        placeItemsList.get(getBindingAdapterPosition()).setValue(String.valueOf(editable).trim());// to save service name input text
 
                         // set ViewModel queues values to use it in saving and when rotating the device
                         mPlaceQueuesMap.put(mQueueItem.getKey(), mQueueItem);
@@ -280,12 +280,12 @@ public class AddPlaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
                 @Override
                 public void afterTextChanged(Editable editable) {
-                    Log.d(TAG, "Editable Name= "+ editable.toString()+ " position= "+getAdapterPosition()+ " key= "+placeItemsList.get(getAdapterPosition()).getName());
+                    Log.d(TAG, "Editable Name= "+ editable.toString()+ " position= "+getBindingAdapterPosition()+ " key= "+placeItemsList.get(getBindingAdapterPosition()).getName());
 
                     if(TextUtils.isEmpty((String.valueOf(editable).trim()))){
-                        placeItemsList.get(getAdapterPosition()).setValue(null);
+                        placeItemsList.get(getBindingAdapterPosition()).setValue(null);
                         // set viewModel values
-                        switch (placeItemsList.get(getAdapterPosition()).getName()){
+                        switch (placeItemsList.get(getBindingAdapterPosition()).getName()){
                             case "Name*":
                                 mViewModel.getPlace().setName(null);
                                 mTextInputBinding.valueText.setError(mFragment.getString(R.string.add_place_name_error));
@@ -295,10 +295,10 @@ public class AddPlaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                                 break;
                         }
                     }else{
-                        placeItemsList.get(getAdapterPosition()).setValue(String.valueOf(editable).trim());
+                        placeItemsList.get(getBindingAdapterPosition()).setValue(String.valueOf(editable).trim());
 
                         // set viewModel values
-                        switch (placeItemsList.get(getAdapterPosition()).getName()){
+                        switch (placeItemsList.get(getBindingAdapterPosition()).getName()){
                             case "Name*":
                                 mViewModel.getPlace().setName(String.valueOf(editable).trim());
                                 break;
@@ -328,7 +328,7 @@ public class AddPlaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             mButtonBinding.addMoreServices.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    itemClickListener.onClick(v, getAdapterPosition(), false);
+                    itemClickListener.onClick(v, getBindingAdapterPosition(), false);
                 }
             });
         }

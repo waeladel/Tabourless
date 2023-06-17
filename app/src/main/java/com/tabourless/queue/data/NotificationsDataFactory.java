@@ -35,6 +35,11 @@ public class NotificationsDataFactory extends DataSource.Factory<Long, DatabaseN
         mDataSource.setScrollDirection(scrollDirection, lastVisibleItem);
     }
 
+    // To only update notification's seen when user is opening the notification's tap
+    public void setSeeing (boolean seeing) {
+        mDataSource.setSeeing(seeing);
+    }
+
     public void removeListeners() {
         mDataSource.removeListeners();
     }

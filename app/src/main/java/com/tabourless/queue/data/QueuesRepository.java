@@ -48,7 +48,7 @@ public class QueuesRepository {
     private List<FirebaseListeners> mListenersList;
 
     // Not static have a new list of each repository instance
-    private List<UserQueue> totalItemsList;// = new ArrayList<>();
+    private List<UserQueue> totalItemsList, zeroResultList;// = new ArrayList<>();
 
     private DataSource.InvalidatedCallback invalidatedCallback;
     private ItemKeyedDataSource.LoadInitialCallback loadInitialCallback;
@@ -125,6 +125,7 @@ public class QueuesRepository {
             } else {
                 // no data
                 Log.w(TAG, "getAfter no result exist");
+                getLoadAfterCallback().onResult(zeroResultList); // send empty list to clear recycler
             }
             printListeners();
             isAfterFirstLoaded =  false;
@@ -185,6 +186,7 @@ public class QueuesRepository {
             } else {
                 // no data
                 Log.w(TAG, "getBefore no result exist");
+                getLoadBeforeCallback().onResult(zeroResultList); // send empty list to clear recycler
             }
             printListeners();
             isBeforeFirstLoaded =  false;
@@ -237,6 +239,8 @@ public class QueuesRepository {
                 //totalItemsList.clear();
             }
         }
+
+        zeroResultList = new ArrayList<>(); // lest just to return empty results
 
     }
 
@@ -300,20 +304,7 @@ public class QueuesRepository {
                     } else {
                         // No data exist
                         Log.w(TAG, "isInitialKey. getItems no results exist");
-                        // It might failed because the initial key is changed and there is no data above it.
-                        // Try to get any data regardless of the initial key
-                        Log.d(TAG, "isInitialKey. Try to get any data regardless of the initial key "+ isInitialKey);
-                        if(isInitialKey){
-                            // If no data and we are doing a query with Initial Key, try another query without it
-                            isInitialKey = false; // Make isInitialKey boolean false so that we don't loop forever
-                            Query query = mCurrentUserQueuesRef
-                                    .orderByChild(DATABASE_REF_QUEUE_JOINED)//limitToLast to start from the last (page size) items
-                                    .limitToLast(size);
-
-                            Log.d(TAG, "isInitialKey. initialListener is added to Query without InitialKey "+ isInitialKey);
-                            query.addValueEventListener(initialListener);
-                            mListenersList.add(new FirebaseListeners(query, initialListener));
-                        }
+                        callback.onResult(zeroResultList); // send empty list to clear recycler
                     }
 
                     printListeners();
@@ -435,7 +426,7 @@ public class QueuesRepository {
 
         afterQuery = mCurrentUserQueuesRef
                 .orderByChild(DATABASE_REF_QUEUE_JOINED)
-                .startAt(key)
+                .startAfter(key)
                 .limitToFirst(size);
 
         afterQuery.addValueEventListener(afterListener);
@@ -456,7 +447,7 @@ public class QueuesRepository {
 
         beforeQuery = mCurrentUserQueuesRef
                 .orderByChild(DATABASE_REF_QUEUE_JOINED)
-                .endAt(key)
+                .endBefore(key)
                 .limitToLast(size);
 
         beforeQuery.addValueEventListener(beforeListener);

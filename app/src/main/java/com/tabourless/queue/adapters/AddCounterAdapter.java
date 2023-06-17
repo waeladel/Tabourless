@@ -319,9 +319,9 @@ public class AddCounterAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             mBinding.counterName.setOnCloseIconClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //Counter counterItem = mQueueCountersMap.get(mCountersMapKeys[getAdapterPosition()]);
-                    mQueueCountersMap.remove(mCountersMapKeys[getAdapterPosition()]);
-                    notifyItemRemoved(getAdapterPosition());
+                    //Counter counterItem = mQueueCountersMap.get(mCountersMapKeys[getBindingAdapterPosition()]);
+                    mQueueCountersMap.remove(mCountersMapKeys[getBindingAdapterPosition()]);
+                    notifyItemRemoved(getBindingAdapterPosition());
                 }
             });
 
@@ -329,14 +329,14 @@ public class AddCounterAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             mBinding.counterName.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Counter counterItem = mQueueCountersMap.get(mCountersMapKeys[getAdapterPosition()]);
+                    Counter counterItem = mQueueCountersMap.get(mCountersMapKeys[getBindingAdapterPosition()]);
                     //Log.d(TAG, "onClick: counterItem key= "+counterItem.getKey());
 
                     // Must set key to get counter data instead of start from blank
                     if(counterItem != null){
-                        counterItem.setKey(String.valueOf(mCountersMapKeys[getAdapterPosition()]));
+                        counterItem.setKey(String.valueOf(mCountersMapKeys[getBindingAdapterPosition()]));
                         // Open edit counter dialog
-                        CountersDialogFragment dialogFragment = CountersDialogFragment.newInstance(counterItem, getAdapterPosition(), AddCounterAdapter.this);
+                        CountersDialogFragment dialogFragment = CountersDialogFragment.newInstance(counterItem, getBindingAdapterPosition(), AddCounterAdapter.this);
                         if (mFragment.getParentFragmentManager() != null) {
                             dialogFragment.show(mFragment.getParentFragmentManager(), COUNTER_DIALOG_FRAGMENT_TAG);
                         }
@@ -356,9 +356,9 @@ public class AddCounterAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
                 @Override
                 public void afterTextChanged(Editable editable) {
-                    final Counter counterItem = mQueueCountersMap.get(mCountersMapKeys[getAdapterPosition()]);
+                    final Counter counterItem = mQueueCountersMap.get(mCountersMapKeys[getBindingAdapterPosition()]);
 
-                    Log.d(TAG, "Editable Name= "+ editable.toString()+ " position= "+getAdapterPosition() + " title= "+ counterItem.getName());
+                    Log.d(TAG, "Editable Name= "+ editable.toString()+ " position= "+getBindingAdapterPosition() + " title= "+ counterItem.getName());
                     if(TextUtils.isEmpty((String.valueOf(editable).trim()))){
                         // It's empty string, delete existing value
                         counterItem.setName(null); // Update current counter gender value

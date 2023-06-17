@@ -12,11 +12,13 @@ public class MessagesDataSource extends ItemKeyedDataSource<String, Message> {
     private final static String TAG = MessagesDataSource.class.getSimpleName();
     private String mMessageKey;
     private MessagesListRepository messagesRepository;
+    private boolean isSeeing;
 
     // get chatKey on the constructor
     public MessagesDataSource(String messageKey){
         //messagesRepository = new MessagesListRepository(chatKey);
         this.mMessageKey = messageKey;
+        isSeeing = true;
         Log.d(TAG, " MessagesDataSource initiated ");
        /* usersRepository.getUsersChangeSubject().observeOn(Schedulers.io()).subscribeOn(Schedulers.computation()).subscribe();{
             invalidate();
@@ -33,12 +35,18 @@ public class MessagesDataSource extends ItemKeyedDataSource<String, Message> {
         // initiate messagesRepository here to pass  onInvalidatedCallback
         //messagesRepository = MessagesListRepository.getInstance();
         //messagesRepository = MessagesListRepository.init(mMessageKey, onInvalidatedCallback);
-        messagesRepository = new MessagesListRepository(mMessageKey, onInvalidatedCallback);
+        messagesRepository = new MessagesListRepository(mMessageKey, isSeeing, onInvalidatedCallback);
         //messagesRepository.MessagesChanged(onInvalidatedCallback);
         //invalidate();
     }
     public void setScrollDirection(int scrollDirection, int lastVisibleItem) {
         messagesRepository.setScrollDirection(scrollDirection, lastVisibleItem);
+    }
+
+    // To only update notification's seen when user is opening the notification's tap
+    public void setSeeing (boolean seeing) {
+        this.isSeeing = seeing;
+        messagesRepository.setSeeing(isSeeing);
     }
 
     public void removeListeners() {

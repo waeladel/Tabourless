@@ -30,6 +30,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.tabourless.queue.GlideApp;
 import com.tabourless.queue.R;
+import com.tabourless.queue.Utils.CheckPermissions;
 import com.tabourless.queue.databinding.FragmentProfileBinding;
 import com.tabourless.queue.interfaces.FirebaseUserCallback;
 import com.tabourless.queue.interfaces.ItemClickListener;
@@ -356,6 +357,9 @@ public class ProfileFragment extends Fragment implements ItemClickListener {
             @Override
             public void onClick(View view) {
                 if (null != mUserId && !mUserId.equals(mCurrentUserId)) { // it's not logged in user. It's another user
+                    // Starting from Api 33 we must grant post notification permission at run time to be able to send notifications
+                    CheckPermissions.checkNotificationPermission(getContext());
+
                     Log.d(TAG, "send message to user");
                     NavDirections MessageDirection = ProfileFragmentDirections.actionProfileToMessages(null, mUserId, false);
                     //NavController navController = Navigation.findNavController(this, R.id.host_fragment);

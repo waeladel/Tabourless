@@ -5,7 +5,6 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
-import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,7 +21,6 @@ import com.tabourless.queue.R;
 import com.tabourless.queue.databinding.NotificationItemBinding;
 import com.tabourless.queue.interfaces.ItemClickListener;
 import com.tabourless.queue.models.DatabaseNotification;
-import com.tabourless.queue.models.UserQueue;
 
 import java.util.List;
 
@@ -146,15 +144,15 @@ public class NotificationsAdapter extends PagedListAdapter<DatabaseNotification,
                     case CUSTOMER_STATUS_NEXT:
                         holder.mBinding.numberValue.setBackgroundResource(R.drawable.text_rounded_background_next);
                         //holder.mBinding.numberValue.setTextColor(ContextCompat.getColor(mContext, R.color.color_on_surface_emphasis_medium));
-                        holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_medium_trype);
+                        holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_medium_type);
                         break;
                     case CUSTOMER_STATUS_FRONT:
                         holder.mBinding.numberValue.setBackgroundResource(R.drawable.text_rounded_background_front);
-                        holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_medium_trype);
+                        holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_medium_type);
                         break;
                     case CUSTOMER_STATUS_AWAY:
                         holder.mBinding.numberValue.setBackgroundResource(R.drawable.text_rounded_background_away);
-                        holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_disabled_trype);
+                        holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_disabled_type);
                         break;
                     default:
                         // default is waiting
@@ -293,14 +291,14 @@ public class NotificationsAdapter extends PagedListAdapter<DatabaseNotification,
 
         @Override
         public void onClick(View view) {
-            if(itemClickListener != null && getAdapterPosition() != RecyclerView.NO_POSITION){
-                itemClickListener.onClick(view, getAdapterPosition(), false);
+            if(itemClickListener != null && getBindingAdapterPosition() != RecyclerView.NO_POSITION){
+                itemClickListener.onClick(view, getBindingAdapterPosition(), false);
             }
 
-            /*if(getAdapterPosition() != RecyclerView.NO_POSITION){
-                Log.i(TAG, "user row clicked= "+view.getId()+ " Position= "+ getAdapterPosition());
+            /*if(getBindingAdapterPosition() != RecyclerView.NO_POSITION){
+                Log.i(TAG, "user row clicked= "+view.getId()+ " Position= "+ getBindingAdapterPosition());
                 // get clicked notification
-                DatabaseNotification notification = getItem(getAdapterPosition());
+                DatabaseNotification notification = getItem(getBindingAdapterPosition());
                 if(notification != null){
                     notification.setClicked(true); // set clicked notification to true
                     mNotificationsRef.child(notification.getKey()).child("clicked").setValue(true);// update clicked field on database

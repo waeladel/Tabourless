@@ -14,6 +14,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -119,6 +121,18 @@ public class CompleteProfileFragment extends Fragment implements ItemClickListen
     private  static final String PERMISSION_RATIONALE_FRAGMENT = "storagePermissionFragment";
 
     private final static String TAG = CompleteProfileFragment.class.getSimpleName();
+
+    private final String[] ReadCameraPermissions = {
+            android.Manifest.permission.READ_EXTERNAL_STORAGE,
+            android.Manifest.permission.CAMERA,
+    };
+
+    private final String[] ReadWriteCameraPermissions = {
+            android.Manifest.permission.READ_EXTERNAL_STORAGE,
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            android.Manifest.permission.CAMERA,
+    };
+
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -827,8 +841,8 @@ public class CompleteProfileFragment extends Fragment implements ItemClickListen
                 // No explanation needed; request the permission
                 Log.i(TAG, "requestPermission: No explanation needed; request the permission");
                 // using requestPermissions(new String[] instead of ActivityCompat.requestPermissions(this, new String[] to get onRequestPermissionsResult in the fragment
-                requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE ,
-                        Manifest.permission.CAMERA}, REQUEST_STORAGE_PERMISSIONS_CODE);
+                //requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE , Manifest.permission.CAMERA}, REQUEST_STORAGE_PERMISSIONS_CODE);
+                multiplePermissionLauncher.launch(ReadCameraPermissions);
             }
         }else{
             if (ActivityCompat.shouldShowRequestPermissionRationale(mActivity, Manifest.permission.READ_EXTERNAL_STORAGE) ||
@@ -843,9 +857,8 @@ public class CompleteProfileFragment extends Fragment implements ItemClickListen
                 // No explanation needed; request the permission
                 Log.i(TAG, "requestPermission: No explanation needed; request the permission");
                 // using requestPermissions(new String[] instead of ActivityCompat.requestPermissions(this, new String[] to get onRequestPermissionsResult in the fragment
-                requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE ,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        Manifest.permission.CAMERA}, REQUEST_STORAGE_PERMISSIONS_CODE);
+                //requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE , Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, REQUEST_STORAGE_PERMISSIONS_CODE);
+                multiplePermissionLauncher.launch(ReadWriteCameraPermissions);
             }
         }
     }
@@ -863,13 +876,10 @@ public class CompleteProfileFragment extends Fragment implements ItemClickListen
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 // API level 29 Android 10 and higher
                 // OK button of the permission dialog is clicked, lets ask for permissions
-                requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE ,
-                        Manifest.permission.CAMERA}, REQUEST_STORAGE_PERMISSIONS_CODE);
+                multiplePermissionLauncher.launch(ReadCameraPermissions);
             }else{
                 // OK button of the permission dialog is clicked, lets ask for permissions
-                requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE ,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        Manifest.permission.CAMERA}, REQUEST_STORAGE_PERMISSIONS_CODE);
+                multiplePermissionLauncher.launch(ReadWriteCameraPermissions);
             }
 
             return; // No need to check other clicks, it's the OK button of the permission dialog
@@ -877,8 +887,28 @@ public class CompleteProfileFragment extends Fragment implements ItemClickListen
         }
     }
 
+    // Register the permissions callback, which handles the user's response to the
+    // system permissions dialog. Save the return value, an instance of
+    // ActivityResultLauncher, as an instance variable.
+    private final ActivityResultLauncher<String[]> multiplePermissionLauncher
+            = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), isGranted -> {
+        Log.d(TAG, "Launcher result: " + isGranted.toString());
+        if(!isGranted.isEmpty()){
+            if (isGranted.containsValue(true)) {
+                Log.d(TAG, "Launcher result is granted ");
+                // permission was granted, yay! Do the task you need to do.
+                if(mViewModel.isSelectAvatarClicked()){
+                    selectMedia(0);
+                }else{
+                    selectMedia(1);
+                }
+            }
+        }
+
+    });
+
     // Get Request Permissions Result
-    @Override
+    /*@Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         Log.d(TAG, "onRequestPermissionsResult we got a permissions result");
         if (requestCode == REQUEST_STORAGE_PERMISSIONS_CODE) {
@@ -899,5 +929,5 @@ public class CompleteProfileFragment extends Fragment implements ItemClickListen
                 Log.i(TAG, "onRequestPermissionsResult permission denied");
             }
         }
-    }
+    }*/
 }

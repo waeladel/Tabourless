@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
@@ -120,15 +119,15 @@ public class CustomersAdapter extends PagedListAdapter<Customer, CustomersAdapte
                     case CUSTOMER_STATUS_NEXT:
                         holder.mBinding.numberValue.setBackgroundResource(R.drawable.text_rounded_background_next);
                         //holder.mBinding.numberValue.setTextColor(ContextCompat.getColor(mContext, R.color.color_on_surface_emphasis_medium));
-                        holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_medium_trype);
+                        holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_medium_type);
                         break;
                     case CUSTOMER_STATUS_FRONT:
                         holder.mBinding.numberValue.setBackgroundResource(R.drawable.text_rounded_background_front);
-                        holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_medium_trype);
+                        holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_medium_type);
                         break;
                     case CUSTOMER_STATUS_AWAY:
                         holder.mBinding.numberValue.setBackgroundResource(R.drawable.text_rounded_background_away);
-                        holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_disabled_trype);
+                        holder.mBinding.numberValue.setTextColor(R.drawable.my_color_on_surface_emphasis_disabled_type);
                         break;
                     default:
                         // default is waiting
@@ -315,8 +314,8 @@ public class CustomersAdapter extends PagedListAdapter<Customer, CustomersAdapte
 
         @Override
         public void onClick(View view) {
-            if(itemClickListener != null && getAdapterPosition() != RecyclerView.NO_POSITION){
-                itemClickListener.onClick(view, getAdapterPosition(), false);
+            if(itemClickListener != null && getBindingAdapterPosition() != RecyclerView.NO_POSITION){
+                itemClickListener.onClick(view, getBindingAdapterPosition(), false);
             }
         }
     }
