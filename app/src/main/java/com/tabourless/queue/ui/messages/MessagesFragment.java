@@ -296,6 +296,9 @@ public class MessagesFragment extends Fragment implements ItemClickListener {
                                 @Override
                                 public void run() {
                                     mBinding.messagesRecycler.smoothScrollToPosition(mMessagesAdapter.getItemCount()-1);
+                                    // to update the seeing field after a delay to prevent a crash happens because of
+                                    // setting a boolean value on a null object when doing it in onResume
+                                    mViewModel.setSeeing(true);
                                 }
                             }, 500);
                         }
@@ -513,7 +516,8 @@ public class MessagesFragment extends Fragment implements ItemClickListener {
     public void onResume() {
         super.onResume();
         Log.d(TAG, "onResume");
-        mViewModel.setSeeing(true); // to disable updating seeing field when fragment is stopped
+        // removed setSeeing from onResume because it crash the app for setting a value ona null object
+        //mViewModel.setSeeing(true); // to disable updating seeing field when fragment is stopped
     }
 
     @Override
